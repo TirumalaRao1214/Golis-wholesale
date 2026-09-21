@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
-  <title>Vendor Dashboard — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
+  <title>Vendor Dashboard � GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -23,35 +23,35 @@
         </div>
 
         <!-- 4 KPI Cards -->
-        <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);">
+        <div class="stats-grid stats-grid--4">
           <div class="stat-card stat-card--info">
-            <div class="stat-card__icon">🛒</div>
+            <div class="stat-card__icon">??</div>
             <div class="stat-card__body">
-              <div class="stat-card__value" id="kpi-today-orders">—</div>
+              <div class="stat-card__value" id="kpi-today-orders">�</div>
               <div class="stat-card__label">Today's Orders</div>
               <div class="stat-card__trend">Placed today</div>
             </div>
           </div>
           <div class="stat-card stat-card--warning">
-            <div class="stat-card__icon">⏳</div>
+            <div class="stat-card__icon">?</div>
             <div class="stat-card__body">
-              <div class="stat-card__value" id="kpi-pending-orders">—</div>
+              <div class="stat-card__value" id="kpi-pending-orders">�</div>
               <div class="stat-card__label">Pending Orders</div>
               <div class="stat-card__trend trend-warning">Awaiting dispatch</div>
             </div>
           </div>
           <div class="stat-card stat-card--success">
-            <div class="stat-card__icon">₹</div>
+            <div class="stat-card__icon">?</div>
             <div class="stat-card__body">
-              <div class="stat-card__value" id="kpi-total-purchases">—</div>
+              <div class="stat-card__value" id="kpi-total-purchases">�</div>
               <div class="stat-card__label">Total Purchases This Month</div>
               <div class="stat-card__trend trend-up">This month</div>
             </div>
           </div>
           <div class="stat-card stat-card--danger">
-            <div class="stat-card__icon">💳</div>
+            <div class="stat-card__icon">??</div>
             <div class="stat-card__body">
-              <div class="stat-card__value" id="kpi-outstanding">—</div>
+              <div class="stat-card__value" id="kpi-outstanding">�</div>
               <div class="stat-card__label">Outstanding Balance</div>
               <div class="stat-card__trend trend-down">Payable to GOLIS</div>
             </div>
@@ -59,48 +59,48 @@
         </div>
 
         <!-- Quick Action Cards + Today's Price Highlights -->
-        <div style="display:grid;grid-template-columns:repeat(3,1fr) 1fr;gap:1.25rem;margin-top:1.5rem;">
+        <div class="stats-grid stats-grid--4" style="margin-top:1.5rem;">
           <!-- Quick Action CTA -->
           <a href="prices.html" style="text-decoration:none;">
             <div style="background:var(--color-primary);color:white;border-radius:var(--radius-lg);padding:2rem;text-align:center;transition:opacity 0.2s;cursor:pointer;" onmouseover="this.style.opacity='.9'" onmouseout="this.style.opacity='1'">
-              <div style="font-size:2.5rem;">🛒</div>
-              <div style="font-size:1.25rem;font-weight:700;margin-top:0.75rem;">Order Now →</div>
+              <div style="font-size:2.5rem;">??</div>
+              <div style="font-size:1.25rem;font-weight:700;margin-top:0.75rem;">Order Now ?</div>
               <div style="font-size:0.85rem;opacity:0.85;margin-top:0.4rem;">Browse today's wholesale prices</div>
             </div>
           </a>
           <!-- Pending Orders -->
           <a href="orders.html" style="text-decoration:none;">
             <div style="background:#fffbeb;border:2px solid #fde68a;border-radius:var(--radius-lg);padding:2rem;text-align:center;transition:box-shadow 0.2s;cursor:pointer;" onmouseover="this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.boxShadow='none'">
-              <div style="font-size:2.5rem;">📋</div>
-              <div style="font-size:1.1rem;font-weight:700;color:#92400e;margin-top:0.75rem;">View Pending Orders →</div>
+              <div style="font-size:2.5rem;">??</div>
+              <div style="font-size:1.1rem;font-weight:700;color:#92400e;margin-top:0.75rem;">View Pending Orders ?</div>
               <div style="font-size:0.85rem;color:#78350f;margin-top:0.4rem;" id="pending-orders-label">Loading...</div>
             </div>
           </a>
           <!-- Outstanding -->
           <a href="payments.html" style="text-decoration:none;">
             <div style="background:#fee2e2;border:2px solid #fecaca;border-radius:var(--radius-lg);padding:2rem;text-align:center;transition:box-shadow 0.2s;cursor:pointer;" onmouseover="this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.boxShadow='none'">
-              <div style="font-size:2.5rem;">💰</div>
-              <div style="font-size:1.1rem;font-weight:700;color:#991b1b;margin-top:0.75rem;">Check Outstanding →</div>
+              <div style="font-size:2.5rem;">??</div>
+              <div style="font-size:1.1rem;font-weight:700;color:#991b1b;margin-top:0.75rem;">Check Outstanding ?</div>
               <div style="font-size:0.85rem;color:#991b1b;margin-top:0.4rem;" id="outstanding-label">Loading...</div>
             </div>
           </a>
           <!-- Cart shortcut -->
           <a href="cart.html" style="text-decoration:none;">
             <div style="background:var(--color-primary-pale);border:2px solid var(--color-primary-light);border-radius:var(--radius-lg);padding:2rem;text-align:center;transition:box-shadow 0.2s;cursor:pointer;" onmouseover="this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.boxShadow='none'">
-              <div style="font-size:2.5rem;">🛒</div>
-              <div style="font-size:1.1rem;font-weight:700;color:var(--color-primary);margin-top:0.75rem;">My Cart →</div>
+              <div style="font-size:2.5rem;">??</div>
+              <div style="font-size:1.1rem;font-weight:700;color:var(--color-primary);margin-top:0.75rem;">My Cart ?</div>
               <div style="font-size:0.85rem;color:var(--color-primary);margin-top:0.4rem;" id="cart-label">0 items</div>
             </div>
           </a>
         </div>
 
         <!-- Price Highlights + Recent Orders -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-top:1.25rem;">
+        <div class="grid-2col" style="margin-top:1.25rem;">
           <!-- Today's Price Highlights -->
           <div class="card">
             <div class="card__header">
-              <h3 class="card__title">📊 Today's Price Highlights</h3>
-              <a href="prices.html" class="btn btn-ghost btn-sm">Full Board →</a>
+              <h3 class="card__title">?? Today's Price Highlights</h3>
+              <a href="prices.html" class="btn btn-ghost btn-sm">Full Board ?</a>
             </div>
             <div class="card__body" style="padding:0.5rem 0;">
               <div id="price-highlights"></div>
@@ -110,8 +110,8 @@
           <!-- Recent Orders -->
           <div class="card">
             <div class="card__header">
-              <h3 class="card__title">📦 Recent Orders</h3>
-              <a href="orders.html" class="btn btn-ghost btn-sm">All Orders →</a>
+              <h3 class="card__title">?? Recent Orders</h3>
+              <a href="orders.html" class="btn btn-ghost btn-sm">All Orders ?</a>
             </div>
             <div class="card__body" style="padding:0;">
               <table class="table">
@@ -165,7 +165,7 @@
       document.getElementById('cart-label').textContent = `${cart.length} item${cart.length !== 1 ? 's' : ''}`;
 
       // Price Highlights (top 5)
-    var changeIcon = { up:'↑', down:'↓', neutral:'→' };
+    var changeIcon = { up:'?', down:'?', neutral:'?' };
     var highlights = document.getElementById('price-highlights');
       highlights.innerHTML = vegs.slice(0, 5).map(v => {
     var ch = v.currentSellPrice > v.prevSellPrice ? 'up' : v.currentSellPrice < v.prevSellPrice ? 'down' : 'neutral';

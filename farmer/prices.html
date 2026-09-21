@@ -1,15 +1,15 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
-  <title>Today's Prices — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
+  <title>Today's Prices � GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
   <style>
-    .price-board { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; }
-    @media(max-width:900px){ .price-board { grid-template-columns:repeat(2,1fr); } }
+    .price-board { display:grid; grid-template-columns:repeat(auto-fill, minmax(min(220px,100%), 1fr)); gap:1rem; }
+    @media(max-width:540px){ .price-board { grid-template-columns:1fr; } }
     @media(max-width:600px){ .price-board { grid-template-columns:1fr; } }
     .price-card { background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--radius-lg); padding:1.25rem; transition:box-shadow 0.2s; }
     .price-card:hover { box-shadow:var(--shadow-md); }
@@ -42,10 +42,10 @@
 
         <!-- Disclaimer Banner -->
         <div style="background:#fef3c7;border:1px solid #fde68a;border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1.5rem;display:flex;align-items:flex-start;gap:0.75rem;">
-          <div style="font-size:1.5rem;flex-shrink:0;">📊</div>
+          <div style="font-size:1.5rem;flex-shrink:0;">??</div>
           <div>
             <strong style="color:#92400e;">Reference Prices Only</strong>
-            <p style="color:#78350f;font-size:0.875rem;margin:0.25rem 0 0;">These are indicative wholesale market prices. Actual purchase price depends on quality grade and market conditions at time of inspection. This is a <strong>DEMO application</strong> — prices shown are sample data.</p>
+            <p style="color:#78350f;font-size:0.875rem;margin:0.25rem 0 0;">These are indicative wholesale market prices. Actual purchase price depends on quality grade and market conditions at time of inspection. This is a <strong>DEMO application</strong> � prices shown are sample data.</p>
           </div>
         </div>
 
@@ -58,12 +58,12 @@
         <div class="card" style="margin-top:1.5rem;">
           <div class="card__body">
             <div style="display:flex;gap:2rem;flex-wrap:wrap;align-items:center;font-size:0.875rem;">
-              <span><strong>Grade A</strong> — Premium quality, highest price</span>
-              <span><strong>Grade B</strong> — Standard quality</span>
-              <span><strong>Grade C</strong> — Economy quality, lowest price</span>
-              <span class="change-up">↑ Price increased from yesterday</span>
-              <span class="change-down">↓ Price decreased from yesterday</span>
-              <span class="change-neutral">→ No change</span>
+              <span><strong>Grade A</strong> � Premium quality, highest price</span>
+              <span><strong>Grade B</strong> � Standard quality</span>
+              <span><strong>Grade C</strong> � Economy quality, lowest price</span>
+              <span class="change-up">? Price increased from yesterday</span>
+              <span class="change-down">? Price decreased from yesterday</span>
+              <span class="change-neutral">? No change</span>
             </div>
           </div>
         </div>
@@ -88,9 +88,9 @@
       // Grade price multipliers (relative to sell price)
     var gradeMultiplier = { A: 1.0, B: 0.85, C: 0.70 };
     var changeIcon = (ch) => {
-        if (ch === 'up')      return `<span class="change-up">↑ Up today</span>`;
-        if (ch === 'down')    return `<span class="change-down">↓ Down today</span>`;
-        return `<span class="change-neutral">→ Stable</span>`;
+        if (ch === 'up')      return `<span class="change-up">? Up today</span>`;
+        if (ch === 'down')    return `<span class="change-down">? Down today</span>`;
+        return `<span class="change-neutral">? Stable</span>`;
       };
     var board = document.getElementById('price-board');
       board.innerHTML = vegetables.map(v => {
@@ -99,8 +99,8 @@
     var sellRate = Math.round(v.currentSellPrice * gradeMultiplier[g]);
           return `<div class="grade-row">
             <span class="grade-label">Grade ${g}</span>
-            <span class="grade-buy">Buy: ₹${buyRate}/kg</span>
-            <span class="grade-sell">₹${sellRate}/kg</span>
+            <span class="grade-buy">Buy: ?${buyRate}/kg</span>
+            <span class="grade-sell">?${sellRate}/kg</span>
           </div>`;
         }).join('');
     var pctChange = v.prevSellPrice !== 0

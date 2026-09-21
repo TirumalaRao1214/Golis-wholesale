@@ -1,10 +1,10 @@
-ï»¿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
-  <title>Loading Management â€” GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
+  <title>Loading Management — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -25,7 +25,7 @@
         <!-- Orders Ready Queue -->
         <div class="card" style="margin-bottom:1.5rem;">
           <div class="card__header">
-            <h3 class="card__title">ðŸ“¦ Orders Ready for Loading</h3>
+            <h3 class="card__title">?? Orders Ready for Loading</h3>
             <span class="badge badge--success" id="ready-count"></span>
           </div>
           <div class="card__body">
@@ -85,7 +85,7 @@
 
           <div class="form-group">
             <label class="form-label">Assign Workers <span class="required">*</span></label>
-            <div id="worker-checkboxes" style="display:grid;grid-template-columns:repeat(2,1fr);gap:0.5rem;padding:0.75rem;border:1px solid var(--color-border);border-radius:6px;background:var(--color-bg);"></div>
+            <div id="worker-checkboxes" class="grid-2col" style="padding:0.75rem;border:1px solid var(--color-border);border-radius:6px;background:var(--color-bg);"></div>
           </div>
 
           <div class="form-grid form-grid--2">
@@ -120,7 +120,7 @@
           <div id="labour-cost-preview" style="padding:1rem;background:var(--color-bg);border:1px solid var(--color-border);border-radius:8px;">
             <div style="display:flex;justify-content:space-between;align-items:center;">
               <span>Estimated Labour Cost</span>
-              <strong id="ld-cost-display" style="font-size:1.125rem;color:var(--color-primary);">â‚¹0</strong>
+              <strong id="ld-cost-display" style="font-size:1.125rem;color:var(--color-primary);">?0</strong>
             </div>
             <div style="font-size:0.75rem;color:var(--color-text-secondary);margin-top:0.25rem;" id="ld-cost-formula">Select workers and time range to calculate.</div>
           </div>
@@ -150,7 +150,7 @@
     var vendor = order ? MockDB.getVendorById(order.vendorId) : null;
     var items  = MockDB.getOrderItems(orderId);
       preview.innerHTML =
-        `<strong>${orderId}</strong> â€” ${vendor ? vendor.businessName : ''} (${vendor ? vendor.city : ''})<br>
+        `<strong>${orderId}</strong> — ${vendor ? vendor.businessName : ''} (${vendor ? vendor.city : ''})<br>
         Items: ${items.map(i => { var v = MockDB.getVegetableById(i.vegId); return `${v ? v.nameEn : ''} ${i.qty} kg`; }).join(', ')}<br>
         Total: <strong>${Utils.formatCurrency(order ? order.total : 0)}</strong>`;
       preview.style.display = 'block';
@@ -163,7 +163,7 @@
     var selectedLabour  = selectedWorkers.map(cb => _labour.find(l => l.id === cb.value)).filter(Boolean);
 
       if (!start || !end || selectedLabour.length === 0) {
-        document.getElementById('ld-cost-display').textContent = 'â‚¹0';
+        document.getElementById('ld-cost-display').textContent = '?0';
         document.getElementById('ld-cost-formula').textContent = 'Select workers and time range to calculate.';
         return;
       }
@@ -176,7 +176,7 @@
 
       document.getElementById('ld-cost-display').textContent = Utils.formatCurrency(Math.round(totalCost));
       document.getElementById('ld-cost-formula').textContent =
-        `${selectedLabour.length} worker(s) Ã— ${hours.toFixed(1)} hrs Ã— avg â‚¹${Math.round(selectedLabour.reduce((s, l) => s + hourlyRate(l), 0) / selectedLabour.length)}/hr = ${Utils.formatCurrency(Math.round(totalCost))}`;
+        `${selectedLabour.length} worker(s) × ${hours.toFixed(1)} hrs × avg ?${Math.round(selectedLabour.reduce((s, l) => s + hourlyRate(l), 0) / selectedLabour.length)}/hr = ${Utils.formatCurrency(Math.round(totalCost))}`;
     }
 
     function renderReadyQueue() {
@@ -192,7 +192,7 @@
     var vendor = MockDB.getVendorById(o.vendorId);
           return `<div style="padding:0.875rem 1rem;border:2px solid var(--color-success);border-radius:8px;min-width:250px;">
             <div style="font-weight:700;">${o.id}</div>
-            <div style="font-size:0.8rem;color:var(--color-text-secondary);margin-bottom:0.5rem;">${vendor ? vendor.businessName : ''} â€” ${Utils.formatCurrency(o.total)}</div>
+            <div style="font-size:0.8rem;color:var(--color-text-secondary);margin-bottom:0.5rem;">${vendor ? vendor.businessName : ''} — ${Utils.formatCurrency(o.total)}</div>
             ${Utils.statusBadge(o.status)}
             <button class="btn btn-sm btn-primary" style="margin-left:0.5rem;" onclick="document.getElementById('ld-order').value='${o.id}';onOrderSelect();Utils.openModal('modal-loading');">+ Add Loading</button>
           </div>`;
@@ -211,7 +211,7 @@
               return w ? w.name : id;
             });
             // Duration
-    var duration = 'â€”';
+    var duration = '—';
             if (l.startTime && l.endTime) {
     var ms = new Date(l.endTime) - new Date(l.startTime);
     var hrs = ms / 3600000;
@@ -220,12 +220,12 @@
             return `<tr>
               <td><code>${l.id}</code></td>
               <td><code>${l.orderId}</code></td>
-              <td>${vendor ? vendor.businessName : 'â€”'}</td>
-              <td>${workers.join(', ') || 'â€”'}</td>
-              <td>${l.startTime ? new Date(l.startTime).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : 'â€”'}</td>
+              <td>${vendor ? vendor.businessName : '—'}</td>
+              <td>${workers.join(', ') || '—'}</td>
+              <td>${l.startTime ? new Date(l.startTime).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '—'}</td>
               <td>${l.endTime ? new Date(l.endTime).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '<span class="badge badge--warning">In Progress</span>'}</td>
               <td>${duration}</td>
-              <td>${l.labourCost ? Utils.formatCurrency(l.labourCost) : 'â€”'}</td>
+              <td>${l.labourCost ? Utils.formatCurrency(l.labourCost) : '—'}</td>
               <td>${Utils.statusBadge(l.status || 'pending')}</td>
             </tr>`;
           }).join('');
@@ -279,7 +279,7 @@
         .filter(o => ['stockAllocated','confirmed'].includes(o.status))
         .forEach(o => {
     var vendor = MockDB.getVendorById(o.vendorId);
-          document.getElementById('ld-order').add(new Option(`${o.id} â€” ${vendor ? vendor.businessName : ''} (${Utils.statusBadge ? o.status : o.status})`, o.id));
+          document.getElementById('ld-order').add(new Option(`${o.id} — ${vendor ? vendor.businessName : ''} (${Utils.statusBadge ? o.status : o.status})`, o.id));
         });
 
       // Build worker checkboxes
@@ -289,7 +289,7 @@
         div.innerHTML = `<label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-size:0.875rem;">
           <input type="checkbox" value="${l.id}" onchange="calcLabourCost()">
           <span>${l.name}</span>
-          <span style="font-size:0.75rem;color:var(--color-text-secondary);">${l.workType} (â‚¹${l.dailyWage}/day)</span>
+          <span style="font-size:0.75rem;color:var(--color-text-secondary);">${l.workType} (?${l.dailyWage}/day)</span>
         </label>`;
         cbContainer.appendChild(div);
       });

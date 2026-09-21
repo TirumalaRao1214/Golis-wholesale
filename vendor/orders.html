@@ -1,16 +1,16 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
-  <title>Orders — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
+  <title>Orders � GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
   <style>
     .order-timeline { display:flex; align-items:center; gap:0; margin:1.5rem 0; flex-wrap:wrap; }
     .timeline-step { display:flex; align-items:center; flex-direction:column; flex:1; min-width:80px; text-align:center; position:relative; }
-    .timeline-step:not(:last-child)::after { content:'→'; position:absolute; right:-12px; top:12px; color:var(--color-border); font-size:1.1rem; }
+    .timeline-step:not(:last-child)::after { content:'?'; position:absolute; right:-12px; top:12px; color:var(--color-border); font-size:1.1rem; }
     .timeline-dot { width:28px; height:28px; border-radius:50%; border:2px solid var(--color-border); background:var(--color-bg); display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:700; margin-bottom:0.3rem; }
     .timeline-dot.active { background:var(--color-primary); border-color:var(--color-primary); color:white; }
     .timeline-dot.done   { background:var(--color-success); border-color:var(--color-success); color:white; }
@@ -31,15 +31,15 @@
         <div id="mode-checkout" style="display:none;">
           <div class="page-header">
             <h1 class="page-title">Place Order</h1>
-            <a href="cart.html" class="btn btn-ghost">← Back to Cart</a>
+            <a href="cart.html" class="btn btn-ghost">? Back to Cart</a>
           </div>
-          <div style="display:grid;grid-template-columns:1fr 340px;gap:1.5rem;align-items:start;">
+          <div class="grid-form-aside">
             <!-- Order Form -->
             <div class="card checkout-form" style="max-width:100%;">
               <div class="card__header"><h3 class="card__title">Delivery & Contact Details</h3></div>
               <div class="card__body">
                 <form id="checkout-form" onsubmit="placeOrder(event)">
-                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                  <div class="grid-2col">
                     <div class="form-group">
                       <label class="form-label">Business Name</label>
                       <input type="text" class="form-input" id="co-biz-name" required>
@@ -61,7 +61,7 @@
                     <label class="form-label">Delivery Address <span class="text-danger">*</span></label>
                     <textarea class="form-textarea" id="co-address" rows="2" required></textarea>
                   </div>
-                  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;">
+                  <div class="grid-3col">
                     <div class="form-group">
                       <label class="form-label">City</label>
                       <input type="text" class="form-input" id="co-city">
@@ -75,7 +75,7 @@
                       <input type="text" class="form-input" id="co-pincode">
                     </div>
                   </div>
-                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                  <div class="grid-2col">
                     <div class="form-group">
                       <label class="form-label">Preferred Delivery Date</label>
                       <input type="date" class="form-input" id="co-delivery-date">
@@ -87,7 +87,7 @@
                   </div>
                   <div style="display:flex;gap:0.75rem;justify-content:flex-end;margin-top:0.5rem;">
                     <a href="cart.html" class="btn btn-ghost">Cancel</a>
-                    <button type="submit" class="btn btn-primary" style="padding:0.75rem 2rem;">Place Order →</button>
+                    <button type="submit" class="btn btn-primary" style="padding:0.75rem 2rem;">Place Order ?</button>
                   </div>
                 </form>
               </div>
@@ -102,7 +102,7 @@
                 </table>
                 <div style="padding:1rem;border-top:2px solid var(--color-primary);display:flex;justify-content:space-between;align-items:center;">
                   <strong style="font-size:1rem;">Grand Total</strong>
-                  <strong style="font-size:1.4rem;color:var(--color-primary);" id="checkout-total">₹0</strong>
+                  <strong style="font-size:1.4rem;color:var(--color-primary);" id="checkout-total">?0</strong>
                 </div>
               </div>
             </div>
@@ -114,7 +114,7 @@
           <div class="page-header">
             <h1 class="page-title">My Orders</h1>
             <div class="page-header-actions">
-              <a href="prices.html" class="btn btn-primary">🛒 New Order</a>
+              <a href="prices.html" class="btn btn-primary">?? New Order</a>
             </div>
           </div>
           <!-- Filters -->
@@ -183,7 +183,7 @@
     <div class="modal" style="max-width:420px;">
       <div class="modal__body">
         <div class="success-modal-content">
-          <div style="font-size:4rem;">🎉</div>
+          <div style="font-size:4rem;">??</div>
           <h2 style="margin-top:1rem;color:var(--color-primary);">Order Placed Successfully!</h2>
           <p style="font-size:1.1rem;color:var(--color-text-secondary);margin-top:0.5rem;">
             Order <strong id="success-order-id"></strong>
@@ -287,8 +287,8 @@
         return `<tr>
           <td style="font-weight:700;">${o.id}</td>
           <td>${Utils.formatDate(o.orderDate)}</td>
-          <td style="font-size:0.85rem;">${itemSummary || '—'}</td>
-          <td class="text-right">${totalQty ? Utils.formatWeight(totalQty) : '—'}</td>
+          <td style="font-size:0.85rem;">${itemSummary || '�'}</td>
+          <td class="text-right">${totalQty ? Utils.formatWeight(totalQty) : '�'}</td>
           <td class="text-right" style="font-weight:700;">${Utils.formatCurrency(o.total)}</td>
           <td><span class="badge ${statusMap[o.status] || ''}">${statusLabels[o.status] || o.status}</span></td>
           <td><button class="btn btn-ghost btn-sm" onclick="viewOrderDetail('${o.id}')">View</button></td>
@@ -316,7 +316,7 @@
     var cls = i < stepIdx ? 'done' : i === stepIdx ? 'active' : '';
     var lbl = statusLabels[step] || step;
         return `<div class="timeline-step">
-          <div class="timeline-dot ${cls}">${i < stepIdx ? '✓' : i+1}</div>
+          <div class="timeline-dot ${cls}">${i < stepIdx ? '?' : i+1}</div>
           <div class="timeline-label ${cls === 'active' ? 'active' : ''}">${lbl}</div>
         </div>`;
       }).join('');
@@ -329,7 +329,7 @@
           <td><span class="badge badge--info">Grade ${item.grade}</span></td>
           <td class="text-right">${Utils.formatIndianNumber(item.qty)} kg</td>
           <td class="text-right">${Utils.formatIndianNumber(confirmedQty)} kg ${shortage > 0 ? `<br><span style="color:var(--color-warning);font-size:0.75rem;">Shortage: ${Utils.formatWeight(shortage)}</span>` : ''}</td>
-          <td class="text-right">₹${item.rate}</td>
+          <td class="text-right">?${item.rate}</td>
           <td class="text-right" style="font-weight:700;">${Utils.formatCurrency(item.amount)}</td>
         </tr>`;
       }).join('');
@@ -353,7 +353,7 @@
         <div style="text-align:right;padding:0.75rem;font-size:1.1rem;font-weight:800;color:var(--color-primary);">
           Grand Total: ${Utils.formatCurrency(order.total)}
         </div>
-        ${order.notes ? `<p class="text-muted" style="font-size:0.85rem;margin-top:0.5rem;">📝 Notes: ${order.notes}</p>` : ''}`;
+        ${order.notes ? `<p class="text-muted" style="font-size:0.85rem;margin-top:0.5rem;">?? Notes: ${order.notes}</p>` : ''}`;
 
       Utils.openModal('modal-order-detail');
     }

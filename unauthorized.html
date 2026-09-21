@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -25,10 +25,20 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 1rem 2rem;
+      padding: 1rem;
       max-width: 1200px;
       width: 100%;
       margin: 0 auto;
+      box-sizing: border-box;
+    }
+    @media (min-width: 540px) {
+      .unauthorized-header-bar { padding: 1rem 2rem; }
+    }
+    .unauthorized-card {
+      padding: 2rem 1.25rem;
+    }
+    @media (min-width: 480px) {
+      .unauthorized-card { padding: 3rem 2.5rem; }
     }
 
     .unauthorized-logo {

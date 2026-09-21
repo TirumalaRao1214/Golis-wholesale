@@ -1637,3 +1637,362 @@ select.form-control {
 .form-control.is-invalid:focus {
   box-shadow: 0 0 0 3px rgba(230,57,70,0.15);
 }
+
+/* ==========================================================
+   GOLIS Wholesale — public.css RESPONSIVE ADDENDUM
+   Mobile-first improvements for the public landing page.
+   Targets phones from 320px to 414px as base, then enhances.
+   ========================================================== */
+
+/* ──────────────────────────────────────────────────────────
+   NAV — mobile-first inner padding
+   ────────────────────────────────────────────────────────── */
+.public-nav__inner {
+  padding: 0 var(--space-4);
+  gap: var(--space-4);
+}
+
+@media (min-width: 769px) {
+  .public-nav__inner {
+    padding: 0 var(--space-6);
+    gap: var(--space-8);
+  }
+  .public-nav__links { display: flex; }
+  .public-nav__actions .btn { display: inline-flex; }
+  .public-nav__hamburger { display: none; }
+}
+
+/* ──────────────────────────────────────────────────────────
+   PUBLIC DEMO BANNER — responsive wrap
+   ────────────────────────────────────────────────────────── */
+.public-demo-banner {
+  padding: 5px var(--space-4);
+  font-size: 11px;
+  line-height: 1.5;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 480px) {
+  .public-demo-banner {
+    font-size: 10px;
+    padding: 5px var(--space-2);
+  }
+  .demo-banner__sep { display: none; }
+  .demo-banner__te  { display: none; }
+}
+
+/* ──────────────────────────────────────────────────────────
+   HERO SECTION — mobile-first
+   ────────────────────────────────────────────────────────── */
+.hero-section {
+  min-height: auto;
+  padding: var(--space-12) 0;
+}
+
+@media (min-width: 769px) {
+  .hero-section {
+    min-height: calc(100vh - 64px);
+    padding: 0;
+  }
+}
+
+.hero-inner {
+  grid-template-columns: 1fr;
+  gap: var(--space-8);
+  padding: var(--space-8) var(--space-4);
+}
+
+@media (min-width: 769px) {
+  .hero-inner {
+    padding: var(--space-16) var(--space-6);
+  }
+}
+
+@media (min-width: 1025px) {
+  .hero-inner {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-12);
+  }
+  .hero-visual { display: flex; }
+}
+
+.hero-visual { display: none; }
+
+.hero-title {
+  font-size: clamp(1.75rem, 6vw, 3.25rem);
+}
+
+.hero-subtitle {
+  font-size: var(--text-base);
+  max-width: 100%;
+}
+
+@media (min-width: 769px) {
+  .hero-subtitle { font-size: var(--text-lg); max-width: 480px; }
+}
+
+.hero-stats {
+  gap: var(--space-6);
+  flex-wrap: wrap;
+}
+
+@media (max-width: 480px) {
+  .hero-stats {
+    gap: var(--space-4);
+  }
+  .hero-stat__value {
+    font-size: var(--text-xl);
+  }
+}
+
+.hero-ctas { flex-wrap: wrap; }
+
+@media (max-width: 540px) {
+  .hero-ctas { flex-direction: column; }
+  .hero-btn-primary,
+  .hero-btn-outline,
+  .hero-btn-accent {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   SECTIONS — mobile padding
+   ────────────────────────────────────────────────────────── */
+.section {
+  padding: var(--space-12) 0;
+}
+
+@media (min-width: 769px) {
+  .section {
+    padding: var(--space-20) 0;
+  }
+}
+
+.section-inner {
+  padding: 0 var(--space-4);
+}
+
+@media (min-width: 769px) {
+  .section-inner {
+    padding: 0 var(--space-6);
+  }
+}
+
+.section-header {
+  margin-bottom: var(--space-8);
+}
+
+@media (min-width: 769px) {
+  .section-header {
+    margin-bottom: var(--space-12);
+  }
+}
+
+.section-subtitle {
+  font-size: var(--text-base);
+}
+
+@media (min-width: 769px) {
+  .section-subtitle { font-size: var(--text-lg); }
+}
+
+/* ──────────────────────────────────────────────────────────
+   PRICE BOARD — mobile-first auto grid
+   ────────────────────────────────────────────────────────── */
+.price-board {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (min-width: 769px) {
+  .price-board {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   PROCESS FLOW — mobile stacked
+   ────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .process-flow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-5);
+  }
+  .process-step {
+    max-width: 100%;
+    width: 100%;
+    flex-direction: row;
+    text-align: left;
+    gap: var(--space-4);
+    padding: 0;
+    justify-content: flex-start;
+  }
+  .process-step::after { display: none; }
+  .process-step__number { flex-shrink: 0; }
+}
+
+/* ──────────────────────────────────────────────────────────
+   FEATURE GRID — 1 col on small phones
+   ────────────────────────────────────────────────────────── */
+.feature-grid {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 540px) {
+  .feature-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 900px) {
+  .feature-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   VEGETABLE GRID — 2 col on mobile
+   ────────────────────────────────────────────────────────── */
+.vegetable-grid {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (min-width: 540px) {
+  .vegetable-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 769px) {
+  .vegetable-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   ROLE SECTIONS — mobile stack
+   ────────────────────────────────────────────────────────── */
+.role-section {
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+}
+
+@media (min-width: 769px) {
+  .role-section {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-8);
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   FOOTER — mobile stack
+   ────────────────────────────────────────────────────────── */
+.footer__top {
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+}
+
+@media (min-width: 540px) {
+  .footer__top {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-8);
+  }
+}
+
+@media (min-width: 1025px) {
+  .footer__top {
+    grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  }
+}
+
+.footer__bottom {
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+@media (max-width: 540px) {
+  .footer__bottom {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .footer__inner {
+    padding: 0 var(--space-4);
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   TRUST BAR — mobile wrap
+   ────────────────────────────────────────────────────────── */
+.trust-bar__inner {
+  flex-wrap: wrap;
+  gap: var(--space-6);
+  justify-content: center;
+}
+
+@media (max-width: 480px) {
+  .trust-item {
+    min-width: calc(50% - var(--space-3));
+    text-align: center;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   ABOUT / CONTACT GRIDS — mobile-first
+   ────────────────────────────────────────────────────────── */
+.about-grid {
+  grid-template-columns: 1fr;
+  gap: var(--space-8);
+}
+
+@media (min-width: 1025px) {
+  .about-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-10);
+  }
+}
+
+.contact-grid {
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+}
+
+@media (min-width: 769px) {
+  .contact-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-8);
+  }
+}
+
+.about-stats {
+  grid-template-columns: 1fr 1fr;
+}
+
+@media (min-width: 540px) {
+  .about-stats {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   CONTACT LOGIN BUTTONS — mobile stack
+   ────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .contact-login-btns {
+    flex-direction: column;
+    width: 100%;
+  }
+  .contact-login-btns .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   MOCK DASHBOARD / CART — mobile safe
+   ────────────────────────────────────────────────────────── */
+.mock-dashboard {
+  max-width: 100%;
+  overflow: hidden;
+}

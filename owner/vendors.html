@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
-  <title>Vendor Management — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
+  <title>Vendor Management � GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -25,7 +25,7 @@
         <div class="card" style="margin-bottom:1rem;">
           <div class="card__body">
             <div class="filter-row">
-              <input type="text" class="form-input" id="vendor-search" placeholder="Search name, city, GST…" oninput="renderVendorTable()">
+              <input type="text" class="form-input" id="vendor-search" placeholder="Search name, city, GST�" oninput="renderVendorTable()">
               <select class="form-select" id="vendor-state-filter" onchange="renderVendorTable()">
                 <option value="">All States</option>
                 <option value="TS">Telangana (TS)</option>
@@ -111,7 +111,7 @@
             </div>
             <div class="form-group">
               <label class="form-label" data-i18n="field.creditLimit"></label>
-              <input type="number" class="form-input" id="v-credit" placeholder="Credit Limit (₹)">
+              <input type="number" class="form-input" id="v-credit" placeholder="Credit Limit (?)">
             </div>
             <div class="form-group form-group--full">
               <label class="form-label" data-i18n="field.deliveryAddress"></label>
@@ -240,7 +240,7 @@
     var payments = MockDB.getPayments().filter(p => p.partyId === id && p.partyType === 'vendor');
       document.getElementById('view-vendor-name').textContent = v.businessName;
       document.getElementById('view-vendor-body').innerHTML = `
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
+        <div class="grid-2col" style="margin-bottom:1.5rem;">
           <div><strong>Contact:</strong> ${v.contactPerson}</div>
           <div><strong>Mobile:</strong> ${v.mobile}</div>
           <div><strong>City:</strong> ${v.city}, ${v.state}</div>

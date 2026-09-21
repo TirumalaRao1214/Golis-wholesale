@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
-  <title>Dispatch Management — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
+  <title>Dispatch Management � GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -23,32 +23,32 @@
         </div>
 
         <!-- Active Dispatches Summary -->
-        <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:1.25rem;">
+        <div class="stats-grid stats-grid--4" style="margin-bottom:1.25rem;">
           <div class="stat-card stat-card--warning">
-            <div class="stat-card__icon">📦</div>
+            <div class="stat-card__icon">??</div>
             <div class="stat-card__body">
-              <div class="stat-card__value" id="d-loading">—</div>
+              <div class="stat-card__value" id="d-loading">�</div>
               <div class="stat-card__label">Loading</div>
             </div>
           </div>
           <div class="stat-card stat-card--info">
-            <div class="stat-card__icon">🚚</div>
+            <div class="stat-card__icon">??</div>
             <div class="stat-card__body">
-              <div class="stat-card__value" id="d-dispatched">—</div>
+              <div class="stat-card__value" id="d-dispatched">�</div>
               <div class="stat-card__label">Dispatched</div>
             </div>
           </div>
           <div class="stat-card stat-card--info">
-            <div class="stat-card__icon">🛣</div>
+            <div class="stat-card__icon">??</div>
             <div class="stat-card__body">
-              <div class="stat-card__value" id="d-transit">—</div>
+              <div class="stat-card__value" id="d-transit">�</div>
               <div class="stat-card__label">In Transit</div>
             </div>
           </div>
           <div class="stat-card stat-card--success">
-            <div class="stat-card__icon">✅</div>
+            <div class="stat-card__icon">?</div>
             <div class="stat-card__body">
-              <div class="stat-card__value" id="d-delivered">—</div>
+              <div class="stat-card__value" id="d-delivered">�</div>
               <div class="stat-card__label">Delivered</div>
             </div>
           </div>
@@ -81,7 +81,7 @@
                     <th>Vendor</th>
                     <th>Vehicle</th>
                     <th>Driver</th>
-                    <th>From → To</th>
+                    <th>From ? To</th>
                     <th>Dispatch Date</th>
                     <th>Est. Arrival</th>
                     <th data-i18n="col.status"></th>
@@ -139,7 +139,7 @@
               <input type="text" class="form-input" id="dp-from" value="Guntur Market">
             </div>
             <div class="form-group">
-              <label class="form-label">To (Vendor City — auto-filled)</label>
+              <label class="form-label">To (Vendor City � auto-filled)</label>
               <input type="text" class="form-input" id="dp-to" readonly style="background:var(--color-bg);">
             </div>
           </div>
@@ -319,7 +319,7 @@
         document.getElementById('active-dispatches').innerHTML = '<div class="empty-state"><p class="empty-state__text">No active dispatches.</p></div>';
       } else {
         document.getElementById('active-dispatches').innerHTML =
-          `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1rem;">` +
+          `<div class="grid-cols-auto">` +
           active.map(d => {
     var order  = MockDB.getOrderById(d.orderId);
     var vendor = order ? MockDB.getVendorById(order.vendorId) : null;
@@ -328,17 +328,17 @@
               `<div style="text-align:center;flex:1;">
                 <div style="width:24px;height:24px;border-radius:50%;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;
                   background:${i < step ? 'var(--color-primary)' : 'var(--color-border)'};
-                  color:${i < step ? '#fff' : 'var(--color-text-secondary)'};">${i < step ? '✓' : i + 1}</div>
+                  color:${i < step ? '#fff' : 'var(--color-text-secondary)'};">${i < step ? '?' : i + 1}</div>
                 <div style="font-size:0.7rem;${i < step ? 'color:var(--color-primary);font-weight:600;' : 'color:var(--color-text-secondary);'}">${label}</div>
               </div>`).join('<div style="flex:1;height:2px;background:var(--color-border);margin-top:11px;"></div>');
             return `<div style="padding:1rem;border:1px solid var(--color-border);border-radius:8px;background:var(--color-surface);">
               <div style="display:flex;justify-content:space-between;margin-bottom:0.75rem;">
-                <div><strong>${d.id}</strong><br><span style="font-size:0.8rem;color:var(--color-text-secondary);">${d.orderId} — ${vendor ? vendor.businessName : ''}</span></div>
+                <div><strong>${d.id}</strong><br><span style="font-size:0.8rem;color:var(--color-text-secondary);">${d.orderId} � ${vendor ? vendor.businessName : ''}</span></div>
                 ${Utils.statusBadge(d.status)}
               </div>
               <div style="font-size:0.8rem;color:var(--color-text-secondary);margin-bottom:0.75rem;">
-                🚛 ${d.vehicleNo} | 👤 ${d.driverName}<br>
-                📍 ${d.from} → ${d.to} | Est: ${d.estimatedArrival ? Utils.formatDate(d.estimatedArrival) : '—'}
+                ?? ${d.vehicleNo} | ?? ${d.driverName}<br>
+                ?? ${d.from} ? ${d.to} | Est: ${d.estimatedArrival ? Utils.formatDate(d.estimatedArrival) : '�'}
               </div>
               <div style="display:flex;align-items:center;gap:0;margin-bottom:0.75rem;">${stepsHtml}</div>
               <button class="btn btn-sm btn-ghost" onclick="openStatusModal('${d.id}')">Update Status</button>
@@ -353,12 +353,12 @@
         return `<tr>
           <td><code>${d.id}</code></td>
           <td><code>${d.orderId}</code></td>
-          <td>${vendor ? vendor.businessName : '—'}</td>
+          <td>${vendor ? vendor.businessName : '�'}</td>
           <td><code>${d.vehicleNo}</code></td>
           <td>${d.driverName}</td>
-          <td>${d.from} → ${d.to}</td>
-          <td>${d.dispatchDate ? Utils.formatDate(d.dispatchDate) : '—'}</td>
-          <td>${d.estimatedArrival ? Utils.formatDate(d.estimatedArrival) : '—'}</td>
+          <td>${d.from} ? ${d.to}</td>
+          <td>${d.dispatchDate ? Utils.formatDate(d.dispatchDate) : '�'}</td>
+          <td>${d.estimatedArrival ? Utils.formatDate(d.estimatedArrival) : '�'}</td>
           <td>${Utils.statusBadge(d.status)}</td>
           <td><button class="btn btn-sm btn-ghost" onclick="openStatusModal('${d.id}')">Update</button></td>
         </tr>`;
@@ -374,14 +374,14 @@
         .filter(o => ['loading','stockAllocated'].includes(o.status))
         .forEach(o => {
     var vendor = MockDB.getVendorById(o.vendorId);
-          document.getElementById('dp-order').add(new Option(`${o.id} — ${vendor ? vendor.businessName : ''} [${o.status}]`, o.id));
+          document.getElementById('dp-order').add(new Option(`${o.id} � ${vendor ? vendor.businessName : ''} [${o.status}]`, o.id));
         });
 
       // Populate available vehicles
       MockDB.getVehicles()
         .filter(v => v.status === 'available')
         .forEach(v => {
-          document.getElementById('dp-vehicle').add(new Option(`${v.vehicleNo} (${v.type}) — ${v.driverName}`, v.id));
+          document.getElementById('dp-vehicle').add(new Option(`${v.vehicleNo} (${v.type}) � ${v.driverName}`, v.id));
         });
 
       document.getElementById('dp-date').value = new Date().toISOString().slice(0,16);

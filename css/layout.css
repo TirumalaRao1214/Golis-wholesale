@@ -1,6 +1,8 @@
 /* ==========================================================
    GOLIS Wholesale — layout.css
    Sidebar, topbar, page layout, responsive grid, utilities.
+   Mobile-first approach: base styles target smallest screens,
+   media queries progressively enhance for larger screens.
    Depends on: theme.css, components.css
    ========================================================== */
 
@@ -35,11 +37,25 @@
   scrollbar-width: thin;
   scrollbar-color: rgba(255,255,255,0.1) transparent;
   transition: transform var(--transition-slow);
+  /* Mobile: hidden off-canvas by default */
+  transform: translateX(-100%);
+}
+
+/* Tablet and up: always visible */
+@media (min-width: 769px) {
+  #sidebar {
+    transform: translateX(0);
+  }
 }
 
 #sidebar::-webkit-scrollbar       { width: 4px; }
 #sidebar::-webkit-scrollbar-track { background: transparent; }
 #sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: var(--radius-full); }
+
+/* Sidebar open state (mobile) */
+#sidebar.is-open {
+  transform: translateX(0);
+}
 
 /* Sidebar Logo / Brand Area */
 .sidebar-logo {
@@ -125,6 +141,8 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  /* Larger tap target on mobile */
+  min-height: 40px;
 }
 
 .sidebar-nav__item:hover {
@@ -270,11 +288,22 @@
    ────────────────────────────────────────────────────────── */
 #main-content {
   flex: 1;
-  margin-left: var(--sidebar-width);
+  /* Mobile: no margin — sidebar is off-canvas */
+  margin-left: 0;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   min-width: 0;
+  /* Prevent overflow from fixed-width children */
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Tablet and up: sidebar is visible, offset content */
+@media (min-width: 769px) {
+  #main-content {
+    margin-left: var(--sidebar-width);
+  }
 }
 
 /* ──────────────────────────────────────────────────────────
@@ -286,17 +315,26 @@
   border-bottom: 1px solid var(--color-border);
   display: flex;
   align-items: center;
-  padding: 0 var(--space-5);
-  gap: var(--space-3);
+  padding: 0 var(--space-4);
+  gap: var(--space-2);
   position: sticky;
   top: 0;
   z-index: var(--z-raised);
   box-shadow: var(--shadow-xs);
+  width: 100%;
+  box-sizing: border-box;
 }
 
-/* Hamburger (mobile only) */
+@media (min-width: 769px) {
+  #topbar {
+    padding: 0 var(--space-5);
+    gap: var(--space-3);
+  }
+}
+
+/* Hamburger — always visible in mobile, hidden on tablet+ */
 #sidebar-toggle {
-  display: none;
+  display: flex;
   width: 36px;
   height: 36px;
   border-radius: var(--radius-md);
@@ -312,6 +350,13 @@
 #sidebar-toggle:hover {
   background: var(--color-surface-hover);
   color: var(--color-text-primary);
+}
+
+/* Hide hamburger on tablet and up */
+@media (min-width: 769px) {
+  #sidebar-toggle {
+    display: none;
+  }
 }
 
 .topbar-page-info {
@@ -350,7 +395,7 @@
   flex-shrink: 0;
 }
 .lang-switcher__btn {
-  padding: 4px 10px;
+  padding: 4px 8px;
   font-size: var(--text-xs);
   font-weight: var(--font-semibold);
   color: var(--color-text-secondary);
@@ -359,6 +404,10 @@
   cursor: pointer;
   transition: background var(--transition-fast), color var(--transition-fast);
   line-height: 1.6;
+  white-space: nowrap;
+}
+@media (min-width: 480px) {
+  .lang-switcher__btn { padding: 4px 10px; }
 }
 .lang-switcher__btn:hover { background: var(--color-bg); }
 .lang-switcher__btn.active {
@@ -437,14 +486,31 @@
   font-weight: var(--font-medium);
   color: var(--color-text-primary);
   white-space: nowrap;
-  max-width: 120px;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  /* Hidden on small phones */
+  display: none;
 }
+@media (min-width: 480px) {
+  .topbar-user__name {
+    display: block;
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+@media (min-width: 769px) {
+  .topbar-user__name {
+    max-width: 120px;
+  }
+}
+
 .topbar-user__chevron {
   color: var(--color-text-secondary);
   width: 14px;
   height: 14px;
+  display: none;
+}
+@media (min-width: 480px) {
+  .topbar-user__chevron { display: block; }
 }
 
 /* ──────────────────────────────────────────────────────────
@@ -452,24 +518,45 @@
    ────────────────────────────────────────────────────────── */
 .page-content {
   flex: 1;
-  padding: var(--space-6) var(--space-6);
-  max-width: 1400px;
+  padding: var(--space-4);
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+@media (min-width: 769px) {
+  .page-content {
+    padding: var(--space-5);
+    max-width: 1400px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .page-content {
+    padding: var(--space-6);
+  }
 }
 
 .page-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: var(--space-4);
-  margin-bottom: var(--space-6);
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
   flex-wrap: wrap;
+}
+
+@media (max-width: 480px) {
+  .page-header {
+    flex-direction: column;
+    gap: var(--space-2);
+  }
 }
 
 .page-header__left { flex: 1; min-width: 0; }
 
 .page-title {
-  font-size: var(--text-2xl);
+  font-size: clamp(var(--text-xl), 3vw, var(--text-2xl));
   font-weight: var(--font-bold);
   color: var(--color-text-primary);
   line-height: var(--leading-tight);
@@ -483,12 +570,22 @@
   line-height: var(--leading-relaxed);
 }
 
+/* page-header-actions (used in HTML pages — no double underscore) */
+.page-header-actions,
 .page-header__actions {
   display: flex;
   align-items: center;
   gap: var(--space-2);
   flex-shrink: 0;
   flex-wrap: wrap;
+}
+
+@media (max-width: 480px) {
+  .page-header-actions,
+  .page-header__actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
 }
 
 /* Section heading within a page */
@@ -500,43 +597,155 @@
 }
 
 /* ──────────────────────────────────────────────────────────
-   GRID SYSTEM
+   RESPONSIVE GRID SYSTEM
+   Mobile-first: single column, progressively wider
    ────────────────────────────────────────────────────────── */
 .grid {
   display: grid;
-  gap: var(--space-5);
+  gap: var(--space-4);
 }
 
+@media (min-width: 769px) {
+  .grid { gap: var(--space-5); }
+}
+
+/* Fixed column grids — collapse on small screens */
 .grid-cols-1 { grid-template-columns: repeat(1, 1fr); }
-.grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
-.grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
-.grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
-.grid-cols-5 { grid-template-columns: repeat(5, 1fr); }
-.grid-cols-6 { grid-template-columns: repeat(6, 1fr); }
+
+.grid-cols-2 { grid-template-columns: 1fr; }
+@media (min-width: 540px) {
+  .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+}
+
+.grid-cols-3 { grid-template-columns: 1fr; }
+@media (min-width: 540px) {
+  .grid-cols-3 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 900px) {
+  .grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+}
+
+.grid-cols-4 { grid-template-columns: 1fr; }
+@media (min-width: 480px) {
+  .grid-cols-4 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 900px) {
+  .grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+}
+
+.grid-cols-5 { grid-template-columns: repeat(2, 1fr); }
+@media (min-width: 769px) {
+  .grid-cols-5 { grid-template-columns: repeat(3, 1fr); }
+}
+@media (min-width: 1100px) {
+  .grid-cols-5 { grid-template-columns: repeat(5, 1fr); }
+}
+
+.grid-cols-6 { grid-template-columns: repeat(2, 1fr); }
+@media (min-width: 769px) {
+  .grid-cols-6 { grid-template-columns: repeat(3, 1fr); }
+}
+@media (min-width: 1100px) {
+  .grid-cols-6 { grid-template-columns: repeat(6, 1fr); }
+}
 
 /* Auto-fit responsive */
 .grid-cols-auto {
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
 }
 .grid-cols-auto-sm {
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(160px, 100%), 1fr));
 }
 .grid-cols-auto-lg {
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
 }
 
-/* Mixed layout helpers */
+/* Mixed layout helpers — stack on mobile */
 .grid-sidebar-main {
-  grid-template-columns: 280px 1fr;
+  grid-template-columns: 1fr;
 }
+@media (min-width: 900px) {
+  .grid-sidebar-main { grid-template-columns: 280px 1fr; }
+}
+
 .grid-main-sidebar {
-  grid-template-columns: 1fr 320px;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 900px) {
+  .grid-main-sidebar { grid-template-columns: 1fr 320px; }
 }
 
 /* Column span helpers */
-.col-span-2 { grid-column: span 2; }
-.col-span-3 { grid-column: span 3; }
+.col-span-2 { grid-column: span 1; }
+.col-span-3 { grid-column: span 1; }
 .col-span-full { grid-column: 1 / -1; }
+
+@media (min-width: 540px) {
+  .col-span-2 { grid-column: span 2; }
+}
+@media (min-width: 900px) {
+  .col-span-3 { grid-column: span 3; }
+}
+
+/* ──────────────────────────────────────────────────────────
+   INLINE GRID OVERRIDE HELPERS
+   Used in HTML pages that have inline style grids.
+   These utility classes override inline styles via specificity.
+   ────────────────────────────────────────────────────────── */
+
+/* Generic responsive 2-col that collapses on mobile */
+.grid-2col {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+@media (min-width: 640px) {
+  .grid-2col { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Generic responsive 3-col */
+.grid-3col {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+@media (min-width: 640px) {
+  .grid-3col { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 900px) {
+  .grid-3col { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* Profile / detail page: form + sidebar panel */
+.grid-form-aside {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-5);
+  align-items: start;
+}
+@media (min-width: 900px) {
+  .grid-form-aside { grid-template-columns: 1fr 320px; }
+}
+
+/* Dashboard widget: main charts + narrow aside */
+.grid-charts-aside {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-5);
+}
+@media (min-width: 900px) {
+  .grid-charts-aside { grid-template-columns: 1fr 360px; }
+}
+
+/* Expense / cash page: narrow sidebar + main */
+.grid-aside-main {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-5);
+}
+@media (min-width: 900px) {
+  .grid-aside-main { grid-template-columns: 280px 1fr; }
+}
 
 /* ──────────────────────────────────────────────────────────
    UTILITY CLASSES
@@ -679,84 +888,3 @@
 /* Opacity */
 .opacity-50  { opacity: 0.5; }
 .opacity-70  { opacity: 0.7; }
-
-/* ──────────────────────────────────────────────────────────
-   RESPONSIVE — Mobile & Tablet
-   ────────────────────────────────────────────────────────── */
-
-/* Tablet: 768px–1024px */
-@media (max-width: 1024px) {
-  .grid-cols-4 { grid-template-columns: repeat(2, 1fr); }
-  .grid-cols-5 { grid-template-columns: repeat(3, 1fr); }
-  .grid-cols-6 { grid-template-columns: repeat(3, 1fr); }
-  .grid-sidebar-main  { grid-template-columns: 1fr; }
-  .grid-main-sidebar  { grid-template-columns: 1fr; }
-}
-
-/* Mobile: < 768px */
-@media (max-width: 768px) {
-
-  /* Sidebar collapses to off-canvas overlay */
-  #sidebar {
-    transform: translateX(-100%);
-  }
-  #sidebar.is-open {
-    transform: translateX(0);
-  }
-
-  /* Main content takes full width */
-  #main-content {
-    margin-left: 0;
-  }
-
-  /* Show hamburger */
-  #sidebar-toggle {
-    display: flex;
-  }
-
-  /* Topbar adjustments */
-  #topbar {
-    padding: 0 var(--space-4);
-    gap: var(--space-2);
-  }
-  .topbar-user__name { display: none; }
-
-  /* Page content */
-  .page-content {
-    padding: var(--space-4);
-  }
-
-  /* Page header stacks */
-  .page-header {
-    flex-direction: column;
-    gap: var(--space-3);
-  }
-  .page-header__actions {
-    width: 100%;
-    justify-content: flex-start;
-  }
-
-  /* Grids collapse to 1 column */
-  .grid-cols-2,
-  .grid-cols-3,
-  .grid-cols-4,
-  .grid-cols-5,
-  .grid-cols-6 {
-    grid-template-columns: 1fr;
-  }
-
-  /* Span helpers reset */
-  .col-span-2,
-  .col-span-3 {
-    grid-column: span 1;
-  }
-
-  /* Table */
-  .table-toolbar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .table-search { max-width: 100%; }
-
-  .page-title { font-size: var(--text-xl); }
-}

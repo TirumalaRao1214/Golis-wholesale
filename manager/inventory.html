@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
-  <title>Inventory — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
+  <title>Inventory � GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -19,7 +19,7 @@
           <h1 class="page-title" data-i18n="page.inventory"></h1>
           <div class="page-header-actions">
             <span class="badge badge--warning" id="low-stock-count"></span>
-            <span class="text-muted" style="font-size:0.8rem;">Read-only view — contact owner to adjust prices</span>
+            <span class="text-muted" style="font-size:0.8rem;">Read-only view � contact owner to adjust prices</span>
           </div>
         </div>
 
@@ -27,44 +27,44 @@
         <div id="low-stock-section" style="margin-bottom:1.25rem;display:none;">
           <div class="card" style="border-left:4px solid var(--color-danger);">
             <div class="card__header" style="padding-bottom:0.5rem;">
-              <h3 class="card__title" style="color:var(--color-danger);">⚠ Low Stock Alerts</h3>
+              <h3 class="card__title" style="color:var(--color-danger);">? Low Stock Alerts</h3>
             </div>
             <div class="card__body">
               <div id="low-stock-cards" style="display:flex;flex-wrap:wrap;gap:0.75rem;"></div>
               <div style="margin-top:1rem;padding:0.75rem;background:#fff3cd;border-radius:6px;font-size:0.875rem;color:#856404;">
-                💡 <strong>Reorder Suggestion:</strong> Flag these items to the owner for restocking. Current stock levels are below the recommended threshold of 200 kg.
+                ?? <strong>Reorder Suggestion:</strong> Flag these items to the owner for restocking. Current stock levels are below the recommended threshold of 200 kg.
               </div>
             </div>
           </div>
         </div>
 
         <!-- Summary Stats -->
-        <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:1.25rem;">
+        <div class="stats-grid stats-grid--4" style="margin-bottom:1.25rem;">
           <div class="stat-card stat-card--info">
             <div class="stat-card__icon">#</div>
             <div class="stat-card__body">
-              <div class="stat-card__value" id="inv-total-items">—</div>
+              <div class="stat-card__value" id="inv-total-items">�</div>
               <div class="stat-card__label">Total Inventory Lines</div>
             </div>
           </div>
           <div class="stat-card stat-card--success">
-            <div class="stat-card__icon">⚖</div>
+            <div class="stat-card__icon">?</div>
             <div class="stat-card__body">
-              <div class="stat-card__value" id="inv-total-stock">—</div>
+              <div class="stat-card__value" id="inv-total-stock">�</div>
               <div class="stat-card__label">Total Stock (kg)</div>
             </div>
           </div>
           <div class="stat-card stat-card--success">
-            <div class="stat-card__icon">₹</div>
+            <div class="stat-card__icon">?</div>
             <div class="stat-card__body">
-              <div class="stat-card__value" id="inv-stock-value">—</div>
+              <div class="stat-card__value" id="inv-stock-value">�</div>
               <div class="stat-card__label">Estimated Stock Value</div>
             </div>
           </div>
           <div class="stat-card stat-card--danger">
-            <div class="stat-card__icon">⚠</div>
+            <div class="stat-card__icon">?</div>
             <div class="stat-card__body">
-              <div class="stat-card__value" id="inv-low-count">—</div>
+              <div class="stat-card__value" id="inv-low-count">�</div>
               <div class="stat-card__label">Low Stock Items</div>
             </div>
           </div>
@@ -72,14 +72,14 @@
 
         <!-- Inventory Formula Info -->
         <div style="padding:0.75rem 1rem;background:var(--color-primary-pale);border-radius:8px;margin-bottom:1rem;font-size:0.8rem;color:var(--color-primary);">
-          <strong>Inventory Formula:</strong> Closing Stock = Opening + Purchased − Sold − Damaged − Wastage
+          <strong>Inventory Formula:</strong> Closing Stock = Opening + Purchased - Sold - Damaged - Wastage
         </div>
 
         <!-- Inventory Table -->
         <div class="card">
           <div class="card__header">
             <h3 class="card__title">Current Stock Levels</h3>
-            <input type="text" class="form-input" id="inv-search" placeholder="Search vegetable..." style="width:220px;font-size:0.875rem;padding:0.375rem 0.75rem;" oninput="renderInventory()">
+            <input type="text" class="form-input" id="inv-search" placeholder="Search vegetable..." style="width:clamp(140px,30vw,220px);font-size:0.875rem;padding:0.375rem 0.75rem;" oninput="renderInventory()">
           </div>
           <div class="card__body" style="padding:0;">
             <div class="table-responsive">
@@ -135,7 +135,7 @@
       document.getElementById('inv-total-stock').textContent  = totalStock.toLocaleString('en-IN') + ' kg';
       document.getElementById('inv-stock-value').textContent  = Utils.formatCurrency(stockValue);
       document.getElementById('inv-low-count').textContent    = lowCount;
-      document.getElementById('low-stock-count').textContent  = lowCount > 0 ? `⚠ ${lowCount} Low Stock Items` : '';
+      document.getElementById('low-stock-count').textContent  = lowCount > 0 ? `? ${lowCount} Low Stock Items` : '';
 
       // Low stock alert cards
     var lowItems = _inventory.filter(i => (i.closing || 0) < LOW_STOCK_THRESHOLD);
@@ -145,13 +145,13 @@
     var veg = MockDB.getVegetableById(i.vegId);
     var pct = Math.min(100, ((i.closing || 0) / LOW_STOCK_THRESHOLD) * 100);
           return `<div style="padding:0.75rem 1rem;background:white;border:1px solid var(--color-danger);border-radius:8px;min-width:180px;">
-            <div style="font-weight:600;font-size:0.875rem;">${veg ? veg.nameEn : i.vegId} — Grade ${i.grade}</div>
+            <div style="font-weight:600;font-size:0.875rem;">${veg ? veg.nameEn : i.vegId} � Grade ${i.grade}</div>
             <div style="font-size:1.25rem;font-weight:700;color:var(--color-danger);">${(i.closing || 0).toLocaleString('en-IN')} kg</div>
             <div style="background:#e5e7eb;border-radius:3px;height:4px;margin-top:0.5rem;">
               <div style="background:var(--color-danger);width:${pct}%;height:4px;border-radius:3px;"></div>
             </div>
             <div style="font-size:0.75rem;color:var(--color-text-secondary);margin-top:0.25rem;">Below ${LOW_STOCK_THRESHOLD} kg threshold</div>
-            <button class="btn btn-sm btn-ghost" style="margin-top:0.5rem;font-size:0.75rem;" onclick="Utils.showToast('Reorder flag sent to owner for ${veg ? veg.nameEn : ''} Grade ${i.grade}','info')">🚩 Flag to Owner</button>
+            <button class="btn btn-sm btn-ghost" style="margin-top:0.5rem;font-size:0.75rem;" onclick="Utils.showToast('Reorder flag sent to owner for ${veg ? veg.nameEn : ''} Grade ${i.grade}','info')">?? Flag to Owner</button>
           </div>`;
         }).join('');
       } else {
@@ -172,7 +172,7 @@
           <td class="text-warning">-${(i.damaged || 0).toLocaleString('en-IN')} kg</td>
           <td class="text-muted">-${(i.wastage || 0).toLocaleString('en-IN')} kg</td>
           <td><strong style="color:${isLow ? 'var(--color-danger)' : 'var(--color-success)'};">${closing.toLocaleString('en-IN')} kg</strong></td>
-          <td>${isLow ? '<span class="badge badge--danger">⚠ Low</span>' : '<span class="badge badge--success">OK</span>'}</td>
+          <td>${isLow ? '<span class="badge badge--danger">? Low</span>' : '<span class="badge badge--success">OK</span>'}</td>
         </tr>`;
       }).join('');
     }

@@ -1,10 +1,10 @@
-ï»¿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
-  <title>Loading Records â€” GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
+  <title>Loading Records — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -68,7 +68,7 @@
           </div>
           <div class="form-group">
             <label class="form-label">Assign Labour Workers (multi-select)</label>
-            <div id="ld-labour-checks" style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;padding:0.75rem;border:1px solid var(--color-border);border-radius:8px;max-height:160px;overflow-y:auto;"></div>
+            <div id="ld-labour-checks" class="grid-2col" style="padding:0.75rem;border:1px solid var(--color-border);border-radius:8px;max-height:160px;overflow-y:auto;"></div>
           </div>
           <div class="form-grid form-grid--2">
             <div class="form-group">
@@ -124,7 +124,7 @@
     var items = MockDB.getOrderItems(orderId);
     var totalQty = items.reduce((s, i) => s + i.qty, 0);
       document.getElementById('ld-order-info-text').innerHTML =
-        `<strong>${orderId}</strong> â€” ${vendor ? vendor.businessName : ''} â€” ${totalQty.toLocaleString('en-IN')} kg total â€” ${Utils.formatCurrency(order ? order.total : 0)}`;
+        `<strong>${orderId}</strong> — ${vendor ? vendor.businessName : ''} — ${totalQty.toLocaleString('en-IN')} kg total — ${Utils.formatCurrency(order ? order.total : 0)}`;
       info.style.display = '';
     }
 
@@ -141,13 +141,13 @@
         return `<tr>
           <td><code>${ld.id}</code></td>
           <td><strong>${ld.orderId}</strong></td>
-          <td>${vendor ? vendor.businessName : 'â€”'}</td>
-          <td>${ld.totalQty > 0 ? ld.totalQty.toLocaleString('en-IN') + ' kg' : 'â€”'}</td>
+          <td>${vendor ? vendor.businessName : '—'}</td>
+          <td>${ld.totalQty > 0 ? ld.totalQty.toLocaleString('en-IN') + ' kg' : '—'}</td>
           <td title="${workers}">${(ld.labourIds || []).length} worker(s)</td>
-          <td>${ld.startTime ? ld.startTime.replace('T', ' ') : 'â€”'}</td>
+          <td>${ld.startTime ? ld.startTime.replace('T', ' ') : '—'}</td>
           <td>${ld.endTime ? ld.endTime.replace('T', ' ') : '<span class="badge badge--warning">In Progress</span>'}</td>
           <td>${Utils.statusBadge(ld.status)}</td>
-          <td>${ld.labourCost > 0 ? Utils.formatCurrency(ld.labourCost) : 'â€”'}</td>
+          <td>${ld.labourCost > 0 ? Utils.formatCurrency(ld.labourCost) : '—'}</td>
         </tr>`;
       }).join('');
     }
@@ -190,7 +190,7 @@
     var orderSel = document.getElementById('ld-order');
       orders.forEach(o => {
     var v = MockDB.getVendorById(o.vendorId);
-        orderSel.add(new Option(`${o.id} â€” ${v ? v.businessName : ''} (${o.status})`, o.id));
+        orderSel.add(new Option(`${o.id} — ${v ? v.businessName : ''} (${o.status})`, o.id));
       });
 
       // Populate labour checkboxes

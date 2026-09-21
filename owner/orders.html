@@ -1,10 +1,10 @@
-ï»¿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
-  <title>Order Management â€” GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
+  <title>Order Management — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -23,25 +23,25 @@
         <div class="stats-grid stats-grid--4" style="margin-bottom:1rem;">
           <div class="stat-card stat-card--warning" style="cursor:pointer;" onclick="filterByStatus('pending')">
             <div class="stat-card__body">
-              <div class="stat-card__value" id="count-pending">â€”</div>
+              <div class="stat-card__value" id="count-pending">—</div>
               <div class="stat-card__label">Pending</div>
             </div>
           </div>
           <div class="stat-card stat-card--info" style="cursor:pointer;" onclick="filterByStatus('confirmed')">
             <div class="stat-card__body">
-              <div class="stat-card__value" id="count-confirmed">â€”</div>
+              <div class="stat-card__value" id="count-confirmed">—</div>
               <div class="stat-card__label">Confirmed</div>
             </div>
           </div>
           <div class="stat-card stat-card--success" style="cursor:pointer;" onclick="filterByStatus('inTransit')">
             <div class="stat-card__body">
-              <div class="stat-card__value" id="count-transit">â€”</div>
+              <div class="stat-card__value" id="count-transit">—</div>
               <div class="stat-card__label">In Transit</div>
             </div>
           </div>
           <div class="stat-card stat-card--success" style="cursor:pointer;" onclick="filterByStatus('delivered')">
             <div class="stat-card__body">
-              <div class="stat-card__value" id="count-delivered">â€”</div>
+              <div class="stat-card__value" id="count-delivered">—</div>
               <div class="stat-card__label">Delivered</div>
             </div>
           </div>
@@ -184,7 +184,7 @@
         return `<tr>
           <td><strong>${o.id}</strong></td>
           <td>${vendor ? vendor.businessName : o.vendorId}<br><small class="text-muted">${vendor ? vendor.city : ''}</small></td>
-          <td>${vendor ? vendor.city + ', ' + vendor.state : 'â€”'}</td>
+          <td>${vendor ? vendor.city + ', ' + vendor.state : '—'}</td>
           <td>${items.length} item${items.length !== 1 ? 's' : ''}</td>
           <td>${totalQty.toLocaleString('en-IN')} kg</td>
           <td><strong>${Utils.formatCurrency(o.total)}</strong></td>
@@ -235,24 +235,24 @@
       }).join('');
 
       document.getElementById('order-detail-body').innerHTML = `
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
+        <div class="grid-2col" style="margin-bottom:1.5rem;">
           <div><strong>Vendor:</strong> ${vendor ? vendor.businessName : order.vendorId}</div>
-          <div><strong>Contact:</strong> ${vendor ? vendor.contactPerson + ' â€” ' + vendor.mobile : 'â€”'}</div>
+          <div><strong>Contact:</strong> ${vendor ? vendor.contactPerson + ' — ' + vendor.mobile : '—'}</div>
           <div><strong>Order Date:</strong> ${Utils.formatDate(order.orderDate)}</div>
           <div><strong>Delivery Date:</strong> ${Utils.formatDate(order.deliveryDate)}</div>
           <div><strong>Status:</strong> ${Utils.statusBadge(order.status)}</div>
-          <div><strong>Notes:</strong> ${order.notes || 'â€”'}</div>
+          <div><strong>Notes:</strong> ${order.notes || '—'}</div>
         </div>
         <h4 style="margin-bottom:0.75rem;">Order Items</h4>
         <table class="data-table" style="margin-bottom:1.5rem;">
           <thead><tr><th>Vegetable</th><th>Grade</th><th>Qty</th><th>Rate</th><th>Amount</th></tr></thead>
           <tbody>${items.map(i => {
     var veg = MockDB.getVegetableById(i.vegId);
-            return `<tr><td>${veg ? veg.nameEn : i.vegId}</td><td>${i.grade}</td><td>${i.qty.toLocaleString('en-IN')} kg</td><td>â‚¹${i.rate}/kg</td><td>${Utils.formatCurrency(i.amount)}</td></tr>`;
+            return `<tr><td>${veg ? veg.nameEn : i.vegId}</td><td>${i.grade}</td><td>${i.qty.toLocaleString('en-IN')} kg</td><td>?${i.rate}/kg</td><td>${Utils.formatCurrency(i.amount)}</td></tr>`;
           }).join('')}</tbody>
           <tfoot><tr><th colspan="4">Total</th><th>${Utils.formatCurrency(order.total)}</th></tr></tfoot>
         </table>
-        ${order.status === 'partiallyFulfilled' ? `<div class="alert alert--warning"><strong>âš  Partial Fulfillment:</strong> ${order.notes || 'Some items could not be fully fulfilled due to stock shortage.'}</div>` : ''}
+        ${order.status === 'partiallyFulfilled' ? `<div class="alert alert--warning"><strong>? Partial Fulfillment:</strong> ${order.notes || 'Some items could not be fully fulfilled due to stock shortage.'}</div>` : ''}
         <h4 style="margin-bottom:0.75rem;">Status Timeline</h4>
         <div class="timeline">${timeline}</div>
       `;

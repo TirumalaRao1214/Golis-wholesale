@@ -1,14 +1,15 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
-  <title>My Attendance — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
+  <title>My Attendance � GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
   <style>
-    .calendar-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
+    .calendar-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; max-width:100%; overflow-x:auto; min-width:0; }
+    @media (max-width: 360px) { .calendar-grid { gap: 1px; } }
     .calendar-header { text-align:center; font-size:0.75rem; font-weight:700; color:var(--color-text-secondary); padding:0.5rem 0; }
     .calendar-day { aspect-ratio:1; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:var(--radius-md); border:1px solid transparent; cursor:default; font-size:0.85rem; }
     .cal-present  { background:#dcfce7; border-color:#86efac; color:#15803d; font-weight:700; }
@@ -32,8 +33,8 @@
           <h1 class="page-title">My Attendance</h1>
           <div class="page-header-actions">
             <div class="view-toggle">
-              <button class="active" id="btn-calendar-view" onclick="switchView('calendar')">📅 Calendar</button>
-              <button id="btn-table-view" onclick="switchView('table')">📋 Table</button>
+              <button class="active" id="btn-calendar-view" onclick="switchView('calendar')">?? Calendar</button>
+              <button id="btn-table-view" onclick="switchView('table')">?? Table</button>
             </div>
           </div>
         </div>
@@ -49,17 +50,17 @@
                 <button class="btn btn-secondary btn-sm" onclick="loadMonth()">Load</button>
               </div>
               <div style="display:flex;gap:1rem;flex-wrap:wrap;font-size:0.875rem;">
-                <span><span style="background:#dcfce7;padding:0.2rem 0.5rem;border-radius:4px;font-weight:600;color:#15803d;">■ Present</span></span>
-                <span><span style="background:#fef9c3;padding:0.2rem 0.5rem;border-radius:4px;font-weight:600;color:#a16207;">■ Half Day</span></span>
-                <span><span style="background:#fee2e2;padding:0.2rem 0.5rem;border-radius:4px;font-weight:600;color:#dc2626;">■ Absent</span></span>
-                <span><span style="background:var(--color-bg);padding:0.2rem 0.5rem;border-radius:4px;color:var(--color-text-secondary);">■ No Record</span></span>
+                <span><span style="background:#dcfce7;padding:0.2rem 0.5rem;border-radius:4px;font-weight:600;color:#15803d;">� Present</span></span>
+                <span><span style="background:#fef9c3;padding:0.2rem 0.5rem;border-radius:4px;font-weight:600;color:#a16207;">� Half Day</span></span>
+                <span><span style="background:#fee2e2;padding:0.2rem 0.5rem;border-radius:4px;font-weight:600;color:#dc2626;">� Absent</span></span>
+                <span><span style="background:var(--color-bg);padding:0.2rem 0.5rem;border-radius:4px;color:var(--color-text-secondary);">� No Record</span></span>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Monthly Summary Cards -->
-        <div class="stats-grid" style="grid-template-columns:repeat(5,1fr);margin-top:1.25rem;">
+        <div class="stats-grid stats-grid--5" style="margin-top:1.25rem;">
           <div class="stat-card stat-card--success">
             <div class="stat-card__body">
               <div class="stat-card__value" id="sum-present">0</div>
@@ -86,7 +87,7 @@
           </div>
           <div class="stat-card stat-card--success">
             <div class="stat-card__body">
-              <div class="stat-card__value" id="sum-monthly-wage">₹0</div>
+              <div class="stat-card__value" id="sum-monthly-wage">?0</div>
               <div class="stat-card__label">Monthly Wage</div>
             </div>
           </div>
@@ -120,7 +121,7 @@
                   <th>Date</th>
                   <th>Day</th>
                   <th>Status</th>
-                  <th class="text-right">Wage (₹)</th>
+                  <th class="text-right">Wage (?)</th>
                   <th>Notes</th>
                 </tr>
               </thead>
@@ -225,9 +226,9 @@
     var cls = 'cal-norecord';
     var emoji = '';
         if (att) {
-          if (att.status === 'present' || att.status === 'overtime') { cls = 'cal-present'; emoji = '✓'; }
-          else if (att.status === 'halfDay') { cls = 'cal-halfday'; emoji = '½'; }
-          else if (att.status === 'absent')  { cls = 'cal-absent';  emoji = '✗'; }
+          if (att.status === 'present' || att.status === 'overtime') { cls = 'cal-present'; emoji = '?'; }
+          else if (att.status === 'halfDay') { cls = 'cal-halfday'; emoji = '�'; }
+          else if (att.status === 'absent')  { cls = 'cal-absent';  emoji = '?'; }
         }
         calHTML += `<div class="calendar-day ${cls} ${isToday ? 'cal-today' : ''}" title="${att ? STATUS_LABELS[att.status] || att.status : 'No record'}">
           <span>${d}</span>
@@ -252,8 +253,8 @@
           <td>${Utils.formatDate(dateStr)}</td>
           <td>${DAYS[dateObj.getDay()]}</td>
           <td>${att ? `<span class="badge ${STATUS_CLS[att.status] || ''}">${STATUS_LABELS[att.status] || att.status}</span>` : '<span class="badge">No Record</span>'}</td>
-          <td class="text-right" style="font-weight:${wage > 0 ? '700' : '400'};">${wage > 0 ? '₹'+wage : '—'}</td>
-          <td class="text-muted">${att && att.notes ? att.notes : '—'}</td>
+          <td class="text-right" style="font-weight:${wage > 0 ? '700' : '400'};">${wage > 0 ? '?'+wage : '�'}</td>
+          <td class="text-muted">${att && att.notes ? att.notes : '�'}</td>
         </tr>`);
       }
       document.getElementById('attendance-tbody').innerHTML = rows.join('') || '<tr><td colspan="5" class="text-center text-muted">No records found</td></tr>';

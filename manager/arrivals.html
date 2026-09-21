@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
-  <title>Arrival Register — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
+  <title>Arrival Register � GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -23,25 +23,25 @@
         </div>
 
         <!-- Summary Cards -->
-        <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:1.25rem;">
+        <div class="stats-grid stats-grid--3" style="margin-bottom:1.25rem;">
           <div class="stat-card stat-card--info">
-            <div class="stat-card__icon">🚛</div>
+            <div class="stat-card__icon">??</div>
             <div class="stat-card__body">
-              <div class="stat-card__value" id="sum-today">—</div>
+              <div class="stat-card__value" id="sum-today">�</div>
               <div class="stat-card__label">Today's Arrivals</div>
             </div>
           </div>
           <div class="stat-card stat-card--warning">
-            <div class="stat-card__icon">⚖</div>
+            <div class="stat-card__icon">?</div>
             <div class="stat-card__body">
-              <div class="stat-card__value" id="sum-pending">—</div>
+              <div class="stat-card__value" id="sum-pending">�</div>
               <div class="stat-card__label">Awaiting Weighment</div>
             </div>
           </div>
           <div class="stat-card stat-card--success">
-            <div class="stat-card__icon">✅</div>
+            <div class="stat-card__icon">?</div>
             <div class="stat-card__body">
-              <div class="stat-card__value" id="sum-done">—</div>
+              <div class="stat-card__value" id="sum-done">�</div>
               <div class="stat-card__label">Completed</div>
             </div>
           </div>
@@ -236,7 +236,7 @@
               <td>${statusBadge}</td>
               <td>
                 <button class="btn btn-sm btn-ghost" onclick="openStatusModal('${a.id}')">Update Status</button>
-                ${canWeigh ? `<a href="weighment.html" class="btn btn-sm btn-primary" style="margin-left:0.25rem;">→ Weighment</a>` : ''}
+                ${canWeigh ? `<a href="weighment.html" class="btn btn-sm btn-primary" style="margin-left:0.25rem;">? Weighment</a>` : ''}
               </td>
             </tr>`;
           }).join('');
@@ -249,7 +249,7 @@
     var veg    = MockDB.getVegetableById(arrival.vegetableId);
       document.getElementById('status-arrival-id').value = id;
       document.getElementById('status-arrival-info').innerHTML =
-        `<strong>${id}</strong> — ${farmer ? farmer.name : ''} / ${veg ? veg.nameEn : ''} (${arrival.expectedQty} kg)`;
+        `<strong>${id}</strong> � ${farmer ? farmer.name : ''} / ${veg ? veg.nameEn : ''} (${arrival.expectedQty} kg)`;
       document.getElementById('status-new').value = arrival.status;
       document.getElementById('status-notes').value = arrival.notes || '';
       Utils.openModal('modal-status');

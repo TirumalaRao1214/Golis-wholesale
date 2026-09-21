@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
-  <title>Labour Dashboard — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
+  <title>Labour Dashboard � GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
   <style>
@@ -30,13 +30,13 @@
           </div>
         </div>
 
-        <div style="display:grid;grid-template-columns:1fr 380px;gap:1.5rem;">
+        <div class="grid-charts-aside">
           <!-- Left: Today's Assignment + Mark Attendance -->
           <div style="display:flex;flex-direction:column;gap:1.25rem;">
             <!-- Today's Assignment Card -->
             <div class="assignment-card">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-                <h2 style="font-size:1.15rem;font-weight:700;">📋 Today's Work Assignment</h2>
+                <h2 style="font-size:1.15rem;font-weight:700;">?? Today's Work Assignment</h2>
                 <span class="badge badge--info" id="assignment-status-badge">Loading...</span>
               </div>
               <div id="assignment-details">
@@ -51,7 +51,7 @@
                   </div>
                 </div>
                 <button class="btn btn-primary mark-attendance-btn" id="btn-mark-attendance" onclick="Utils.openModal('modal-attendance')">
-                  ✅ Mark Attendance for Today
+                  ? Mark Attendance for Today
                 </button>
               </div>
             </div>
@@ -59,8 +59,8 @@
             <!-- Recent Payments -->
             <div class="card">
               <div class="card__header">
-                <h3 class="card__title">💰 Recent Payments</h3>
-                <a href="attendance.html" class="btn btn-ghost btn-sm">View All →</a>
+                <h3 class="card__title">?? Recent Payments</h3>
+                <a href="attendance.html" class="btn btn-ghost btn-sm">View All ?</a>
               </div>
               <div class="card__body" style="padding:0;">
                 <table class="table">
@@ -83,25 +83,25 @@
           <!-- Right: KPI Cards -->
           <div style="display:flex;flex-direction:column;gap:1rem;">
             <div class="stat-card stat-card--success">
-              <div class="stat-card__icon">💵</div>
+              <div class="stat-card__icon">??</div>
               <div class="stat-card__body">
-                <div class="stat-card__value" id="kpi-today-wage">—</div>
+                <div class="stat-card__value" id="kpi-today-wage">�</div>
                 <div class="stat-card__label">Today's Wage</div>
                 <div class="stat-card__trend" id="kpi-today-wage-note">Based on attendance</div>
               </div>
             </div>
             <div class="stat-card stat-card--info">
-              <div class="stat-card__icon">📅</div>
+              <div class="stat-card__icon">??</div>
               <div class="stat-card__body">
-                <div class="stat-card__value" id="kpi-month-earnings">—</div>
+                <div class="stat-card__value" id="kpi-month-earnings">�</div>
                 <div class="stat-card__label">This Month Earnings</div>
                 <div class="stat-card__trend trend-up">Current month</div>
               </div>
             </div>
             <div class="stat-card stat-card--warning">
-              <div class="stat-card__icon">⏳</div>
+              <div class="stat-card__icon">?</div>
               <div class="stat-card__body">
-                <div class="stat-card__value" id="kpi-pending">—</div>
+                <div class="stat-card__value" id="kpi-pending">�</div>
                 <div class="stat-card__label">Pending Payment</div>
                 <div class="stat-card__trend trend-warning">Will be settled soon</div>
               </div>
@@ -111,9 +111,9 @@
             <div class="card">
               <div class="card__body">
                 <div style="display:flex;flex-direction:column;gap:0.5rem;">
-                  <a href="attendance.html" class="btn btn-secondary" style="text-align:center;">📅 My Attendance</a>
-                  <a href="work-history.html" class="btn btn-secondary" style="text-align:center;">📋 Work History</a>
-                  <a href="profile.html" class="btn btn-ghost" style="text-align:center;">👤 My Profile</a>
+                  <a href="attendance.html" class="btn btn-secondary" style="text-align:center;">?? My Attendance</a>
+                  <a href="work-history.html" class="btn btn-secondary" style="text-align:center;">?? Work History</a>
+                  <a href="profile.html" class="btn btn-ghost" style="text-align:center;">?? My Profile</a>
                 </div>
               </div>
             </div>
@@ -137,22 +137,22 @@
           <label style="display:flex;align-items:center;gap:0.75rem;padding:0.875rem;border:2px solid var(--color-border);border-radius:var(--radius-md);cursor:pointer;" id="att-opt-present">
             <input type="radio" name="attendance" value="present" style="width:18px;height:18px;">
             <div>
-              <div style="font-weight:600;">✅ Present</div>
+              <div style="font-weight:600;">? Present</div>
               <div class="text-muted" style="font-size:0.8rem;" id="att-wage-present">Full day wage</div>
             </div>
           </label>
           <label style="display:flex;align-items:center;gap:0.75rem;padding:0.875rem;border:2px solid var(--color-border);border-radius:var(--radius-md);cursor:pointer;" id="att-opt-halfday">
             <input type="radio" name="attendance" value="halfDay" style="width:18px;height:18px;">
             <div>
-              <div style="font-weight:600;">🌗 Half Day</div>
+              <div style="font-weight:600;">?? Half Day</div>
               <div class="text-muted" style="font-size:0.8rem;" id="att-wage-half">Half day wage</div>
             </div>
           </label>
           <label style="display:flex;align-items:center;gap:0.75rem;padding:0.875rem;border:2px solid var(--color-border);border-radius:var(--radius-md);cursor:pointer;" id="att-opt-absent">
             <input type="radio" name="attendance" value="absent" style="width:18px;height:18px;">
             <div>
-              <div style="font-weight:600;">❌ Absent</div>
-              <div class="text-muted" style="font-size:0.8rem;">₹0 — No wage</div>
+              <div style="font-weight:600;">? Absent</div>
+              <div class="text-muted" style="font-size:0.8rem;">?0 � No wage</div>
             </div>
           </label>
         </div>
@@ -185,8 +185,8 @@
       document.getElementById('modal-attendance-date').textContent = `Date: ${Utils.formatDate(today)}`;
 
       if (worker) {
-        document.getElementById('att-wage-present').textContent = `₹${worker.dailyWage} — Full day`;
-        document.getElementById('att-wage-half').textContent    = `₹${worker.dailyWage * 0.5} — Half day`;
+        document.getElementById('att-wage-present').textContent = `?${worker.dailyWage} � Full day`;
+        document.getElementById('att-wage-half').textContent    = `?${worker.dailyWage * 0.5} � Half day`;
       }
 
       // Today's assignment (demo: assigned to loading if L001, else based on work type)
@@ -199,7 +199,7 @@
     var demoAssignment = {
           workType:   worker.workType,
           location:   'Wholesale Market, Guntur',
-          time:       '6:00 AM – 10:00 AM',
+          time:       '6:00 AM � 10:00 AM',
           supervisor: 'Suresh Babu (Manager)',
           status:     'Assigned',
         };
@@ -227,9 +227,9 @@
 
       // Recent payments (demo: generate from attendance data)
       document.getElementById('recent-payments-tbody').innerHTML = `
-        <tr><td>${Utils.formatDate('2026-09-21')}</td><td>16–21 Sep</td><td class="text-right" style="font-weight:700;color:var(--color-success);">₹4,200</td><td><span class="badge badge--info">Cash</span></td></tr>
-        <tr><td>${Utils.formatDate('2026-09-14')}</td><td>09–14 Sep</td><td class="text-right" style="font-weight:700;color:var(--color-success);">₹3,850</td><td><span class="badge badge--info">UPI</span></td></tr>
-        <tr><td>${Utils.formatDate('2026-09-07')}</td><td>02–07 Sep</td><td class="text-right" style="font-weight:700;color:var(--color-success);">₹4,200</td><td><span class="badge badge--info">Cash</span></td></tr>`;
+        <tr><td>${Utils.formatDate('2026-09-21')}</td><td>16�21 Sep</td><td class="text-right" style="font-weight:700;color:var(--color-success);">?4,200</td><td><span class="badge badge--info">Cash</span></td></tr>
+        <tr><td>${Utils.formatDate('2026-09-14')}</td><td>09�14 Sep</td><td class="text-right" style="font-weight:700;color:var(--color-success);">?3,850</td><td><span class="badge badge--info">UPI</span></td></tr>
+        <tr><td>${Utils.formatDate('2026-09-07')}</td><td>02�07 Sep</td><td class="text-right" style="font-weight:700;color:var(--color-success);">?4,200</td><td><span class="badge badge--info">Cash</span></td></tr>`;
     });
 
     function updateAttendanceUI(record, dailyWage) {
@@ -249,7 +249,7 @@
     var s = statusMap[record.status] || { cls:'', lbl:record.status, wage:0 };
         badge.innerHTML = `<span class="badge ${s.cls}">${s.lbl}</span>`;
         curDiv.style.display = 'flex';
-        btn.textContent      = '✏️ Edit Attendance';
+        btn.textContent      = '?? Edit Attendance';
         kpi.textContent      = Utils.formatCurrency(s.wage);
         kpiNote.textContent  = s.lbl + ' today';
 
@@ -258,8 +258,8 @@
         if (radio) radio.checked = true;
       } else {
         curDiv.style.display = 'none';
-        btn.textContent      = '✅ Mark Attendance for Today';
-        kpi.textContent      = '₹0';
+        btn.textContent      = '? Mark Attendance for Today';
+        kpi.textContent      = '?0';
         kpiNote.textContent  = 'Not marked yet';
       }
     }
@@ -294,7 +294,7 @@
       Utils.closeModal('modal-attendance');
     var dailyWage = worker ? worker.dailyWage : 700;
       updateAttendanceUI(todayRecord, dailyWage);
-      Utils.showToast(`Attendance marked: ${status === 'present' ? 'Present' : status === 'halfDay' ? 'Half Day' : 'Absent'} ✅`, 'success');
+      Utils.showToast(`Attendance marked: ${status === 'present' ? 'Present' : status === 'halfDay' ? 'Half Day' : 'Absent'} ?`, 'success');
     }
 }());
 </script>

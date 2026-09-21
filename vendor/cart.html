@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
-  <title>Wholesale Cart — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
+  <title>Wholesale Cart � GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
   <style>
@@ -32,10 +32,10 @@
         <div class="page-header">
           <div>
             <h1 class="page-title">Wholesale Cart</h1>
-            <span style="background:#fef9c3;border:1px solid #fde68a;border-radius:var(--radius-sm);padding:0.2rem 0.6rem;font-size:0.8rem;color:#78350f;margin-left:0.75rem;">DEMO — Sample Data</span>
+            <span style="background:#fef9c3;border:1px solid #fde68a;border-radius:var(--radius-sm);padding:0.2rem 0.6rem;font-size:0.8rem;color:#78350f;margin-left:0.75rem;">DEMO � Sample Data</span>
           </div>
           <div class="page-header-actions">
-            <a href="prices.html" class="btn btn-ghost">← Continue Shopping</a>
+            <a href="prices.html" class="btn btn-ghost">? Continue Shopping</a>
           </div>
         </div>
 
@@ -44,15 +44,15 @@
           <!-- Empty state (shown by JS if needed) -->
           <div id="cart-empty" style="display:none;">
             <div class="empty-cart">
-              <div style="font-size:4rem;">🛒</div>
+              <div style="font-size:4rem;">??</div>
               <h3 style="margin-top:1rem;color:var(--color-text-secondary);">Your cart is empty</h3>
               <p class="text-muted">Browse today's wholesale prices and add items to your cart</p>
-              <a href="prices.html" class="btn btn-primary" style="margin-top:1rem;">Browse Prices →</a>
+              <a href="prices.html" class="btn btn-primary" style="margin-top:1rem;">Browse Prices ?</a>
             </div>
           </div>
 
           <!-- Cart with items -->
-          <div id="cart-content" style="display:grid;grid-template-columns:1fr 320px;gap:1.5rem;align-items:start;">
+          <div id="cart-content" class="grid-form-aside">
             <div>
               <div id="cart-items-list"></div>
             </div>
@@ -62,21 +62,21 @@
               <div id="summary-items"></div>
               <div class="summary-row">
                 <span>Subtotal</span>
-                <span id="summary-subtotal" style="font-weight:600;">₹0</span>
+                <span id="summary-subtotal" style="font-weight:600;">?0</span>
               </div>
               <div class="summary-row">
                 <span>GST</span>
-                <span style="color:var(--color-success);font-weight:600;">₹0 (0%)</span>
+                <span style="color:var(--color-success);font-weight:600;">?0 (0%)</span>
               </div>
               <div style="font-size:0.75rem;color:var(--color-text-secondary);padding:0.4rem 0;font-style:italic;">
-                ✅ Fresh vegetables are GST exempt under Indian tax law
+                ? Fresh vegetables are GST exempt under Indian tax law
               </div>
               <div class="summary-total">
                 <span>Grand Total</span>
-                <span id="summary-total">₹0</span>
+                <span id="summary-total">?0</span>
               </div>
               <button class="btn btn-primary" style="width:100%;margin-top:1.25rem;padding:0.875rem;font-size:1rem;" onclick="proceedToOrder()">
-                Proceed to Order →
+                Proceed to Order ?
               </button>
               <p style="font-size:0.75rem;color:var(--color-text-secondary);text-align:center;margin-top:0.75rem;">
                 Min order: 100 kg per item | Steps: 50 kg
@@ -124,7 +124,7 @@
               <div class="cart-item-name">${item.nameEn} <span class="cart-item-namete">(${item.nameTe})</span></div>
               <div style="margin-top:0.25rem;">
                 <span class="badge badge--info">Grade ${item.grade}</span>
-                <span class="text-muted" style="font-size:0.85rem;margin-left:0.5rem;">₹${item.rate}/kg × ${Utils.formatIndianNumber(item.qty)} kg</span>
+                <span class="text-muted" style="font-size:0.85rem;margin-left:0.5rem;">?${item.rate}/kg � ${Utils.formatIndianNumber(item.qty)} kg</span>
               </div>
             </div>
             <div style="text-align:right;">
@@ -134,7 +134,7 @@
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between;">
             <div class="qty-controls">
-              <button class="qty-btn" onclick="adjustQty(${idx}, -50)">− 50 kg</button>
+              <button class="qty-btn" onclick="adjustQty(${idx}, -50)">- 50 kg</button>
               <span class="qty-display">${Utils.formatIndianNumber(item.qty)} kg</span>
               <button class="qty-btn" onclick="adjustQty(${idx}, +50)">+ 50 kg</button>
             </div>
@@ -163,7 +163,7 @@
     var newQty = cart[idx].qty + delta;
       if (newQty < 100) { newQty = 100; }
       if (newQty > cart[idx].available) {
-        Utils.showToast(`⚠ Only ${Utils.formatWeight(cart[idx].available)} available. Adjusting to maximum.`, 'warning', 4000);
+        Utils.showToast(`? Only ${Utils.formatWeight(cart[idx].available)} available. Adjusting to maximum.`, 'warning', 4000);
         newQty = Math.floor(cart[idx].available / 50) * 50;
         if (newQty < 100) newQty = 100;
       }

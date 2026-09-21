@@ -1,10 +1,10 @@
-ï»¿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
-  <title>Cash Book â€” GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
+  <title>Cash Book — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -19,7 +19,7 @@
           <h1 class="page-title" data-i18n="page.cashBook"></h1>
           <div class="page-header-actions">
             <input type="date" class="form-input" id="cashbook-date" onchange="loadCashBook()">
-            <button class="btn btn-ghost" onclick="window.print()">ðŸ–¨ Print</button>
+            <button class="btn btn-ghost" onclick="window.print()">?? Print</button>
           </div>
         </div>
 
@@ -27,41 +27,41 @@
         <div class="stats-grid stats-grid--4" style="margin-bottom:1.25rem;">
           <div class="stat-card stat-card--info">
             <div class="stat-card__body">
-              <div class="stat-card__value" id="cb-opening">â€”</div>
+              <div class="stat-card__value" id="cb-opening">—</div>
               <div class="stat-card__label">Opening Balance</div>
             </div>
           </div>
           <div class="stat-card stat-card--success">
             <div class="stat-card__body">
-              <div class="stat-card__value" id="cb-receipts">â€”</div>
+              <div class="stat-card__value" id="cb-receipts">—</div>
               <div class="stat-card__label">Total Receipts</div>
             </div>
           </div>
           <div class="stat-card stat-card--warning">
             <div class="stat-card__body">
-              <div class="stat-card__value" id="cb-payments">â€”</div>
+              <div class="stat-card__value" id="cb-payments">—</div>
               <div class="stat-card__label">Total Payments</div>
             </div>
           </div>
           <div class="stat-card" id="cb-closing-card">
             <div class="stat-card__body">
-              <div class="stat-card__value" id="cb-closing">â€”</div>
+              <div class="stat-card__value" id="cb-closing">—</div>
               <div class="stat-card__label">Closing Balance</div>
             </div>
           </div>
         </div>
 
         <!-- Two-column cash book -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;">
+        <div class="grid-2col">
           <div class="card">
             <div class="card__header">
               <h3 class="card__title" style="color:var(--color-success);">Receipts (In)</h3>
             </div>
             <div class="card__body" style="padding:0;">
               <table class="data-table">
-                <thead><tr><th>Description</th><th>Amount (â‚¹)</th></tr></thead>
+                <thead><tr><th>Description</th><th>Amount (?)</th></tr></thead>
                 <tbody id="cb-receipts-tbody"></tbody>
-                <tfoot><tr><th>Total Receipts</th><th id="cb-receipts-total">â€”</th></tr></tfoot>
+                <tfoot><tr><th>Total Receipts</th><th id="cb-receipts-total">—</th></tr></tfoot>
               </table>
             </div>
           </div>
@@ -71,9 +71,9 @@
             </div>
             <div class="card__body" style="padding:0;">
               <table class="data-table">
-                <thead><tr><th>Description</th><th>Amount (â‚¹)</th></tr></thead>
+                <thead><tr><th>Description</th><th>Amount (?)</th></tr></thead>
                 <tbody id="cb-payments-tbody"></tbody>
-                <tfoot><tr><th>Total Payments</th><th id="cb-payments-total">â€”</th></tr></tfoot>
+                <tfoot><tr><th>Total Payments</th><th id="cb-payments-total">—</th></tr></tfoot>
               </table>
             </div>
           </div>
@@ -84,9 +84,9 @@
           <div class="card__body" style="display:flex;align-items:center;justify-content:space-between;padding:1.25rem;">
             <div>
               <div style="font-size:0.875rem;color:var(--color-text-secondary);">Net Balance for the Day</div>
-              <div style="font-size:0.75rem;color:var(--color-text-secondary);">Receipts âˆ’ Payments</div>
+              <div style="font-size:0.75rem;color:var(--color-text-secondary);">Receipts - Payments</div>
             </div>
-            <div id="cb-net-balance" style="font-size:1.75rem;font-weight:700;">â€”</div>
+            <div id="cb-net-balance" style="font-size:1.75rem;font-weight:700;">—</div>
           </div>
         </div>
       </main>
@@ -106,18 +106,18 @@
 
       // Receipts = vendor payments received (vendor paying us)
     var receipts = payments.filter(p => p.partyType === 'vendor').map(p => ({
-        desc: `${p.partyName} â€” ${p.mode} (${p.txnId})`,
+        desc: `${p.partyName} — ${p.mode} (${p.txnId})`,
         amount: p.amount,
       }));
 
       // Payments = farmer payments made + expenses
     var paymentItems = [
         ...payments.filter(p => p.partyType === 'farmer').map(p => ({
-          desc: `${p.partyName} â€” ${p.mode} (${p.notes || ''})`,
+          desc: `${p.partyName} — ${p.mode} (${p.notes || ''})`,
           amount: p.amount,
         })),
         ...expenses.map(e => ({
-          desc: `${e.category} â€” ${e.notes || ''}`,
+          desc: `${e.category} — ${e.notes || ''}`,
           amount: e.amount,
         })),
       ];

@@ -1492,3 +1492,571 @@ body.has-demo-banner {
 .badge--primary { background: var(--color-primary-pale); color: var(--color-primary); }
 .badge--muted   { background: #f3f4f6; color: #6b7280; }
 .badge--danger  { background: #fee2e2; color: #991b1b; }
+
+/* ==========================================================
+   GOLIS Wholesale — components.css RESPONSIVE ADDENDUM
+   All mobile-first responsive overrides for components.
+   Added to make the entire application work on 320px–1920px.
+   ========================================================== */
+
+/* ──────────────────────────────────────────────────────────
+   TABLE RESPONSIVE WRAPPER
+   Used as class="table-responsive" on table parent divs.
+   Enables horizontal scroll on mobile instead of overflow.
+   ────────────────────────────────────────────────────────── */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  /* Prevent the wrapper from stretching the page */
+  max-width: 100%;
+}
+
+/* Ensure tables inside responsive wrappers have minimum sensible width */
+.table-responsive .data-table {
+  min-width: 560px;
+}
+
+/* ──────────────────────────────────────────────────────────
+   TABLE TOOLBAR — mobile stacking
+   ────────────────────────────────────────────────────────── */
+@media (max-width: 540px) {
+  .table-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-2);
+  }
+  .table-search {
+    max-width: 100%;
+    min-width: unset;
+    width: 100%;
+  }
+  .table-filters {
+    width: 100%;
+  }
+  .table-filters select,
+  .table-filters input {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   STAT CARDS — responsive value font size
+   ────────────────────────────────────────────────────────── */
+.stat-card__value {
+  font-size: clamp(var(--text-xl), 3.5vw, var(--text-2xl));
+  font-weight: var(--font-bold);
+  color: var(--color-text-primary);
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+/* Stats grid — mobile-first: 1 col → 2 col → 3/4 col */
+.stats-grid {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 480px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-4); }
+}
+
+/* Specific named variants */
+.stats-grid--3 { grid-template-columns: 1fr; }
+.stats-grid--4 { grid-template-columns: 1fr; }
+.stats-grid--5 { grid-template-columns: repeat(2, 1fr); }
+
+@media (min-width: 480px) {
+  .stats-grid--3 { grid-template-columns: repeat(2, 1fr); }
+  .stats-grid--4 { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 769px) {
+  .stats-grid--3 { grid-template-columns: repeat(3, 1fr); }
+  .stats-grid--5 { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (min-width: 900px) {
+  .stats-grid--4 { grid-template-columns: repeat(4, 1fr); }
+}
+
+@media (min-width: 1100px) {
+  .stats-grid--5 { grid-template-columns: repeat(5, 1fr); }
+}
+
+/* Inline-style grid overrides for stats-grid (used in HTML with style attr) */
+/* We target the element by its class only — inline styles override these
+   so the HTML pages need to be updated to use classes instead of inline styles */
+
+/* ──────────────────────────────────────────────────────────
+   CHARTS GRID
+   ────────────────────────────────────────────────────────── */
+.charts-grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 769px) {
+  .charts-grid { gap: var(--space-5); }
+}
+
+.charts-grid--2col { grid-template-columns: 1fr; }
+
+@media (min-width: 769px) {
+  .charts-grid--2col { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Chart containers scale properly */
+.chart-container {
+  width: 100%;
+  max-width: 100%;
+  position: relative;
+  min-height: 180px;
+}
+
+/* ──────────────────────────────────────────────────────────
+   CARD — ensure no overflow on small screens
+   ────────────────────────────────────────────────────────── */
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* card__header / card__body / card__footer — matching HTML naming */
+.card__header,
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+@media (min-width: 769px) {
+  .card__header,
+  .card-header {
+    padding: var(--space-4) var(--space-5);
+  }
+}
+
+.card__header h2, .card__header h3,
+.card-header h2,  .card-header h3,
+.card__title,     .card-title {
+  font-size: var(--text-md);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.card__body,
+.card-body {
+  padding: var(--space-4);
+}
+
+@media (min-width: 769px) {
+  .card__body,
+  .card-body {
+    padding: var(--space-5);
+  }
+}
+
+.card__footer,
+.card-footer {
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--color-border);
+  background: var(--color-bg);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+@media (min-width: 769px) {
+  .card__footer,
+  .card-footer {
+    padding: var(--space-4) var(--space-5);
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   MODALS — responsive sizing
+   ────────────────────────────────────────────────────────── */
+.modal-overlay {
+  padding: var(--space-3);
+}
+
+.modal-dialog {
+  max-width: min(560px, 100%);
+  max-height: 92vh;
+  border-radius: var(--radius-lg);
+}
+
+.modal-dialog--sm  { max-width: min(400px, 100%); }
+.modal-dialog--lg  { max-width: min(720px, 100%); }
+.modal-dialog--xl  { max-width: min(960px, 100%); }
+
+/* Named variants used in some HTML pages */
+.modal {
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  width: 100%;
+  max-width: min(560px, 100%);
+  max-height: 92vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+.modal--lg  { max-width: min(720px, 100%); }
+.modal--xl  { max-width: min(960px, 100%); }
+.modal--sm  { max-width: min(400px, 100%); }
+
+.modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  background: var(--color-surface);
+  z-index: 1;
+  gap: var(--space-3);
+}
+
+.modal__title {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.modal__close {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  font-size: var(--text-xl);
+  flex-shrink: 0;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.modal__close:hover { background: var(--color-border); color: var(--color-text-primary); }
+
+.modal__body {
+  padding: var(--space-4) var(--space-5);
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modal__footer {
+  padding: var(--space-3) var(--space-5);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  background: var(--color-bg);
+  flex-wrap: wrap;
+}
+
+@media (max-width: 480px) {
+  .modal__footer { justify-content: stretch; }
+  .modal__footer .btn { flex: 1; justify-content: center; }
+  .modal-footer { justify-content: stretch; }
+  .modal-footer .btn { flex: 1; justify-content: center; }
+}
+
+/* ──────────────────────────────────────────────────────────
+   BUTTONS — touch-friendly on mobile
+   ────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .btn {
+    /* Minimum 44px tap target height on mobile */
+    min-height: 40px;
+  }
+  .btn-sm {
+    min-height: 32px;
+  }
+}
+
+/* Full-width button utility */
+.btn-full {
+  width: 100%;
+  justify-content: center;
+}
+
+/* ──────────────────────────────────────────────────────────
+   FILTER ROW — mobile wrapping
+   ────────────────────────────────────────────────────────── */
+.filter-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.filter-row .form-input,
+.filter-row .form-select {
+  flex: 1;
+  min-width: min(150px, 100%);
+  max-width: none; /* remove desktop max-width cap on mobile */
+}
+
+@media (min-width: 769px) {
+  .filter-row .form-input,
+  .filter-row .form-select {
+    max-width: 220px;
+  }
+}
+
+@media (max-width: 540px) {
+  .filter-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .filter-row .form-input,
+  .filter-row .form-select {
+    max-width: 100%;
+    width: 100%;
+    flex: unset;
+  }
+  .filter-row .btn { width: 100%; justify-content: center; }
+}
+
+/* ──────────────────────────────────────────────────────────
+   FORM GRID — mobile stacking
+   ────────────────────────────────────────────────────────── */
+.form-grid { display: grid; gap: var(--space-4); }
+.form-grid--2 { grid-template-columns: 1fr; }
+.form-grid--3 { grid-template-columns: 1fr; }
+.form-group--full { grid-column: 1 / -1; }
+
+@media (min-width: 540px) {
+  .form-grid--2 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 640px) {
+  .form-grid--3 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 900px) {
+  .form-grid--3 { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ──────────────────────────────────────────────────────────
+   FORM ROW (side-by-side)
+   ────────────────────────────────────────────────────────── */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+@media (min-width: 540px) {
+  .form-row {
+    grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   SUMMARY ROW — mobile stacking
+   ────────────────────────────────────────────────────────── */
+.summary-row {
+  display: flex;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background: var(--color-primary-pale);
+  border-radius: var(--radius-base);
+  flex-wrap: wrap;
+}
+
+@media (max-width: 540px) {
+  .summary-row {
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .summary-item {
+    width: 100%;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   PAGINATION — mobile friendly
+   ────────────────────────────────────────────────────────── */
+@media (max-width: 540px) {
+  .pagination {
+    flex-direction: column;
+    gap: var(--space-2);
+    align-items: flex-start;
+  }
+  .pagination__controls {
+    flex-wrap: wrap;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   TABS NAV — horizontal scroll on mobile
+   ────────────────────────────────────────────────────────── */
+.tabs__nav,
+.tabs {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.tabs__nav::-webkit-scrollbar,
+.tabs::-webkit-scrollbar { display: none; }
+
+/* ──────────────────────────────────────────────────────────
+   TIMELINE (Status flow) — allow scroll on very small phones
+   ────────────────────────────────────────────────────────── */
+.timeline {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ──────────────────────────────────────────────────────────
+   CALC DISPLAY — responsive formula wrapping
+   ────────────────────────────────────────────────────────── */
+.calc-display {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-primary-pale);
+  border: 1.5px solid var(--color-primary-light);
+  border-radius: var(--radius-base);
+  box-sizing: border-box;
+  width: 100%;
+}
+
+@media (min-width: 540px) {
+  .calc-display {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-4);
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   FORMULA DISPLAY — wrap on small screens
+   ────────────────────────────────────────────────────────── */
+.formula-display {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+}
+
+/* ──────────────────────────────────────────────────────────
+   EMPTY STATE — compact on mobile
+   ────────────────────────────────────────────────────────── */
+@media (max-width: 540px) {
+  .empty-state {
+    padding: var(--space-8) var(--space-4);
+  }
+  .empty-state-card {
+    padding: var(--space-5) var(--space-4);
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   TOAST — full width on mobile
+   ────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .toast-container {
+    top: auto;
+    bottom: var(--space-4);
+    left: var(--space-3);
+    right: var(--space-3);
+    width: auto;
+    max-width: 100%;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   DEMO BANNER — wrapping on small phones
+   ────────────────────────────────────────────────────────── */
+.demo-banner {
+  height: auto;
+  min-height: 28px;
+  padding: var(--space-1) var(--space-3);
+  font-size: 11px;
+  flex-wrap: wrap;
+  text-align: center;
+  line-height: 1.5;
+}
+
+@media (max-width: 480px) {
+  .demo-banner {
+    font-size: 10px;
+    padding: 4px var(--space-2);
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   BREADCRUMB — wrap on mobile
+   ────────────────────────────────────────────────────────── */
+.breadcrumb {
+  flex-wrap: wrap;
+  row-gap: 2px;
+}
+
+/* ──────────────────────────────────────────────────────────
+   ACTIVITY FEED — mobile height
+   ────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .activity-feed {
+    max-height: 280px;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────
+   STAT CARD — consolidate double-defined styles
+   ────────────────────────────────────────────────────────── */
+.stat-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+@media (min-width: 769px) {
+  .stat-card { padding: var(--space-5); gap: var(--space-3); }
+}
+
+/* ──────────────────────────────────────────────────────────
+   BODY OVERFLOW GUARD — prevent horizontal scroll at root
+   ────────────────────────────────────────────────────────── */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+/* When sidebar overlaid (mobile) — prevent body scroll */
+body.sidebar-open {
+  overflow: hidden;
+}

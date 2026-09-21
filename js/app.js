@@ -250,10 +250,12 @@ const APP = {
     toggle.addEventListener('click', () => {
       sidebar.classList.toggle('is-open');
       overlay.classList.toggle('is-open');
+      document.body.classList.toggle('sidebar-open', sidebar.classList.contains('is-open'));
     });
     overlay.addEventListener('click', () => {
       sidebar.classList.remove('is-open');
       overlay.classList.remove('is-open');
+      document.body.classList.remove('sidebar-open');
     });
   },
 

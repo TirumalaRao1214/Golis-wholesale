@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -176,7 +176,7 @@
     var purV = tp.reduce((s,p)=>s+p.total,0);
     var expV = te.reduce((s,e)=>s+e.amount,0);
         _reportData = [{ Date: today, Purchases: purV, Sales: sales, Expenses: expV, Profit: sales - purV - expV }];
-        body.innerHTML = `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;">
+        body.innerHTML = `<div class="stats-grid stats-grid--4">
           <div style="padding:1rem;background:var(--color-primary-pale);border-radius:8px;"><strong>Purchases</strong><div style="font-size:1.3rem;font-weight:700;color:var(--color-warning);">${Utils.formatCurrency(purV)}</div></div>
           <div style="padding:1rem;background:var(--color-primary-pale);border-radius:8px;"><strong>Sales</strong><div style="font-size:1.3rem;font-weight:700;color:var(--color-success);">${Utils.formatCurrency(sales)}</div></div>
           <div style="padding:1rem;background:var(--color-primary-pale);border-radius:8px;"><strong>Expenses</strong><div style="font-size:1.3rem;font-weight:700;color:var(--color-danger);">${Utils.formatCurrency(expV)}</div></div>
@@ -229,7 +229,7 @@
 
       // Add CSS for report cards inline since we need it
     var style = document.createElement('style');
-      style.textContent = `.report-selector{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;}.report-card{background:var(--color-surface);border:1.5px solid var(--color-border);border-radius:12px;padding:1.25rem;cursor:pointer;transition:all 0.2s;text-align:center;}.report-card:hover{border-color:var(--color-primary);box-shadow:0 4px 12px rgba(45,106,79,0.12);transform:translateY(-2px);}.report-card--active{border-color:var(--color-primary);background:var(--color-primary-pale);}.report-card__icon{font-size:2rem;margin-bottom:0.5rem;}.report-card__title{font-weight:600;font-size:0.9rem;color:var(--color-text-primary);margin-bottom:0.25rem;}.report-card__desc{font-size:0.75rem;color:var(--color-text-secondary);}`;
+      style.textContent = `.report-selector{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(200px,100%),1fr));gap:1rem;}.report-card{background:var(--color-surface);border:1.5px solid var(--color-border);border-radius:12px;padding:1.25rem;cursor:pointer;transition:all 0.2s;text-align:center;}.report-card:hover{border-color:var(--color-primary);box-shadow:0 4px 12px rgba(45,106,79,0.12);transform:translateY(-2px);}.report-card--active{border-color:var(--color-primary);background:var(--color-primary-pale);}.report-card__icon{font-size:2rem;margin-bottom:0.5rem;}.report-card__title{font-weight:600;font-size:0.9rem;color:var(--color-text-primary);margin-bottom:0.25rem;}.report-card__desc{font-size:0.75rem;color:var(--color-text-secondary);}`;
       document.head.appendChild(style);
     });
 }());

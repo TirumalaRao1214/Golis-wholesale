@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -188,7 +188,7 @@
         return;
       }
       document.getElementById('allocation-queue').innerHTML =
-        `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1rem;">` +
+        `<div class="grid-cols-auto">` +
         confirmed.map(o => {
     var vendor = MockDB.getVendorById(o.vendorId);
     var items  = MockDB.getOrderItems(o.id);

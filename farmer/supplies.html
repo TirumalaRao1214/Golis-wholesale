@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
-  <title>My Supplies — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
+  <title>My Supplies � GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -23,32 +23,32 @@
         </div>
 
         <!-- Summary Cards -->
-        <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);">
+        <div class="stats-grid stats-grid--4">
           <div class="stat-card stat-card--info">
-            <div class="stat-card__icon">📦</div>
+            <div class="stat-card__icon">??</div>
             <div class="stat-card__body">
-              <div class="stat-card__value" id="kpi-total-supplies">—</div>
+              <div class="stat-card__value" id="kpi-total-supplies">�</div>
               <div class="stat-card__label">Total Supplies</div>
             </div>
           </div>
           <div class="stat-card stat-card--success">
-            <div class="stat-card__icon">⚖️</div>
+            <div class="stat-card__icon">??</div>
             <div class="stat-card__body">
-              <div class="stat-card__value" id="kpi-month-qty">—</div>
+              <div class="stat-card__value" id="kpi-month-qty">�</div>
               <div class="stat-card__label">This Month Qty</div>
             </div>
           </div>
           <div class="stat-card stat-card--success">
-            <div class="stat-card__icon">₹</div>
+            <div class="stat-card__icon">?</div>
             <div class="stat-card__body">
-              <div class="stat-card__value" id="kpi-month-value">—</div>
+              <div class="stat-card__value" id="kpi-month-value">�</div>
               <div class="stat-card__label">This Month Value</div>
             </div>
           </div>
           <div class="stat-card stat-card--warning">
-            <div class="stat-card__icon">⏳</div>
+            <div class="stat-card__icon">?</div>
             <div class="stat-card__body">
-              <div class="stat-card__value" id="kpi-pending-count">—</div>
+              <div class="stat-card__value" id="kpi-pending-count">�</div>
               <div class="stat-card__label">Pending Payment</div>
             </div>
           </div>
@@ -57,7 +57,7 @@
         <!-- Filters -->
         <div class="card" style="margin-top:1.25rem;">
           <div class="card__body">
-            <div style="display:grid;grid-template-columns:repeat(4,1fr) auto;gap:0.75rem;align-items:end;">
+            <div class="filter-row" style="align-items:end;">
               <div class="form-group" style="margin:0;">
                 <label class="form-label">Vegetable</label>
                 <select class="form-select" id="filter-vegetable">
@@ -104,7 +104,7 @@
                   <th>Vegetable</th>
                   <th>Grade</th>
                   <th>Qty (kg)</th>
-                  <th>Rate (₹/kg)</th>
+                  <th>Rate (?/kg)</th>
                   <th>Total</th>
                   <th>Status</th>
                   <th>Notes</th>
@@ -129,7 +129,7 @@
       </div>
       <div class="modal__body">
         <form id="form-add-supply" onsubmit="submitSupply(event)">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div class="grid-2col">
             <div class="form-group">
               <label class="form-label">Vegetable <span class="text-danger">*</span></label>
               <select class="form-select" id="supply-vegetable" required>
@@ -150,7 +150,7 @@
               <input type="number" class="form-input" id="supply-qty" min="1" step="1" placeholder="e.g. 500" required>
             </div>
             <div class="form-group">
-              <label class="form-label">Expected Rate (₹/kg)</label>
+              <label class="form-label">Expected Rate (?/kg)</label>
               <input type="number" class="form-input" id="supply-rate" min="0" step="0.5" placeholder="e.g. 32">
             </div>
             <div class="form-group">
@@ -167,7 +167,7 @@
             <textarea class="form-textarea" id="supply-notes" rows="2" placeholder="Any notes about this supply..."></textarea>
           </div>
           <div style="background:var(--color-primary-pale);padding:0.75rem;border-radius:var(--radius-md);font-size:0.85rem;color:var(--color-primary);margin-bottom:1rem;">
-            ℹ️ Your supply will be recorded and the actual purchase price will be confirmed after quality inspection.
+            ?? Your supply will be recorded and the actual purchase price will be confirmed after quality inspection.
           </div>
           <div style="display:flex;gap:0.75rem;justify-content:flex-end;">
             <button type="button" class="btn btn-ghost" data-modal-close>Cancel</button>
@@ -248,10 +248,10 @@
           <td>${veg ? `${veg.emoji} ${veg.nameEn} <span class="text-muted" style="font-size:0.8em;">(${veg.nameTe})</span>` : p.vegetableId}</td>
           <td><span class="badge badge--info">Grade ${p.grade}</span></td>
           <td class="text-right">${Utils.formatIndianNumber(p.qty)}</td>
-          <td class="text-right">${p.rate ? '₹' + p.rate : '—'}</td>
+          <td class="text-right">${p.rate ? '?' + p.rate : '�'}</td>
           <td class="text-right" style="font-weight:600;">${Utils.formatCurrency(p.total)}</td>
           <td>${statusBadge(p.status)}</td>
-          <td class="text-muted">${p.notes || '—'}</td>
+          <td class="text-muted">${p.notes || '�'}</td>
         </tr>`;
       }).join('');
     }
@@ -303,7 +303,7 @@
 
       MockDB.saveRecord('_purchases', record);
       Utils.closeModal('modal-add-supply');
-      Utils.showToast('Supply registered successfully! 🌾', 'success');
+      Utils.showToast('Supply registered successfully! ??', 'success');
       document.getElementById('form-add-supply').reset();
       document.getElementById('supply-date').value = Utils.formatDateInput(new Date());
 

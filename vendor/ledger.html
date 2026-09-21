@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
-  <title>Account Statement — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
+  <title>Account Statement � GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -18,30 +18,30 @@
         <div class="page-header">
           <h1 class="page-title">Account Statement</h1>
           <div class="page-header-actions">
-            <button class="btn btn-secondary" onclick="exportCSV()">⬇ Export CSV</button>
+            <button class="btn btn-secondary" onclick="exportCSV()">? Export CSV</button>
           </div>
         </div>
 
         <!-- Summary -->
-        <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">
+        <div class="stats-grid stats-grid--3">
           <div class="stat-card stat-card--info">
-            <div class="stat-card__icon">📦</div>
+            <div class="stat-card__icon">??</div>
             <div class="stat-card__body">
-              <div class="stat-card__value" id="kpi-total-purchases">—</div>
+              <div class="stat-card__value" id="kpi-total-purchases">�</div>
               <div class="stat-card__label">Total Purchases</div>
             </div>
           </div>
           <div class="stat-card stat-card--success">
-            <div class="stat-card__icon">✅</div>
+            <div class="stat-card__icon">?</div>
             <div class="stat-card__body">
-              <div class="stat-card__value" id="kpi-total-paid">—</div>
+              <div class="stat-card__value" id="kpi-total-paid">�</div>
               <div class="stat-card__label">Total Paid</div>
             </div>
           </div>
           <div class="stat-card stat-card--danger">
-            <div class="stat-card__icon">⏳</div>
+            <div class="stat-card__icon">?</div>
             <div class="stat-card__body">
-              <div class="stat-card__value" id="kpi-outstanding">—</div>
+              <div class="stat-card__value" id="kpi-outstanding">�</div>
               <div class="stat-card__label">Outstanding</div>
             </div>
           </div>
@@ -68,7 +68,7 @@
         <!-- Ledger Table -->
         <div class="card" style="margin-top:1.25rem;">
           <div class="card__header">
-            <h3 class="card__title">📒 Account Ledger</h3>
+            <h3 class="card__title">?? Account Ledger</h3>
             <span class="badge badge--info" id="entry-count">0 entries</span>
           </div>
           <div class="card__body" style="padding:0;">
@@ -137,8 +137,8 @@
         return `<tr style="${rowStyle}">
           <td>${Utils.formatDate(e.date)}</td>
           <td>${e.description}</td>
-          <td class="text-right" style="font-weight:600;color:var(--color-warning);">${e.credit > 0 ? Utils.formatCurrency(e.credit) : '—'}</td>
-          <td class="text-right" style="font-weight:600;color:var(--color-danger);">${e.debit > 0 ? Utils.formatCurrency(e.debit) : '—'}</td>
+          <td class="text-right" style="font-weight:600;color:var(--color-warning);">${e.credit > 0 ? Utils.formatCurrency(e.credit) : '�'}</td>
+          <td class="text-right" style="font-weight:600;color:var(--color-danger);">${e.debit > 0 ? Utils.formatCurrency(e.debit) : '�'}</td>
           <td class="text-right" style="font-weight:700;color:${e.runningBalance > 0 ? 'var(--color-danger)' : 'var(--color-success)'};">${Utils.formatCurrency(Math.abs(e.runningBalance))} ${e.runningBalance > 0 ? 'Due' : 'Credit'}</td>
         </tr>`;
       }).join('');

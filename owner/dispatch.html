@@ -1,10 +1,10 @@
-ï»¿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
-  <title>Dispatch Management â€” GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
+  <title>Dispatch Management — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -26,19 +26,19 @@
         <div class="stats-grid stats-grid--3" style="margin-bottom:1rem;">
           <div class="stat-card stat-card--info">
             <div class="stat-card__body">
-              <div class="stat-card__value" id="disp-today">â€”</div>
+              <div class="stat-card__value" id="disp-today">—</div>
               <div class="stat-card__label">Today's Dispatches</div>
             </div>
           </div>
           <div class="stat-card stat-card--warning">
             <div class="stat-card__body">
-              <div class="stat-card__value" id="disp-transit">â€”</div>
+              <div class="stat-card__value" id="disp-transit">—</div>
               <div class="stat-card__label">In Transit</div>
             </div>
           </div>
           <div class="stat-card stat-card--success">
             <div class="stat-card__body">
-              <div class="stat-card__value" id="disp-delivered">â€”</div>
+              <div class="stat-card__value" id="disp-delivered">—</div>
               <div class="stat-card__label">Delivered Today</div>
             </div>
           </div>
@@ -157,7 +157,7 @@
     var order = MockDB.getOrderById(orderId);
     var vendor = order ? MockDB.getVendorById(order.vendorId) : null;
       document.getElementById('dp-order-info-text').innerHTML =
-        `<strong>${orderId}</strong> â€” ${vendor ? vendor.businessName + ', ' + vendor.city : ''} â€” ${Utils.formatCurrency(order ? order.total : 0)}`;
+        `<strong>${orderId}</strong> — ${vendor ? vendor.businessName + ', ' + vendor.city : ''} — ${Utils.formatCurrency(order ? order.total : 0)}`;
       if (vendor) document.getElementById('dp-to').value = vendor.city;
       info.style.display = '';
     }
@@ -180,12 +180,12 @@
         return `<tr>
           <td><code>${d.id}</code></td>
           <td><strong>${d.orderId}</strong></td>
-          <td>${vendor ? vendor.businessName : 'â€”'}</td>
+          <td>${vendor ? vendor.businessName : '—'}</td>
           <td>${d.to}</td>
           <td>${d.vehicleNo}</td>
           <td>${d.driverName}</td>
           <td>${Utils.formatDate(d.dispatchDate)}</td>
-          <td>${d.estimatedArrival ? Utils.formatDate(d.estimatedArrival) : 'â€”'}</td>
+          <td>${d.estimatedArrival ? Utils.formatDate(d.estimatedArrival) : '—'}</td>
           <td>${Utils.statusBadge(d.status)}</td>
           <td><button class="btn btn-sm btn-ghost" onclick="viewDispatch('${d.id}')">Timeline</button></td>
         </tr>`;
@@ -209,15 +209,15 @@
       }).join('');
 
       document.getElementById('dispatch-detail-body').innerHTML = `
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
+        <div class="grid-2col" style="margin-bottom:1.5rem;">
           <div><strong>Order:</strong> ${d.orderId}</div>
-          <div><strong>Vendor:</strong> ${vendor ? vendor.businessName : 'â€”'}</div>
+          <div><strong>Vendor:</strong> ${vendor ? vendor.businessName : '—'}</div>
           <div><strong>Vehicle:</strong> ${d.vehicleNo}</div>
           <div><strong>Driver:</strong> ${d.driverName}</div>
           <div><strong>From:</strong> ${d.from}</div>
           <div><strong>To:</strong> ${d.to}</div>
           <div><strong>Dispatch Date:</strong> ${Utils.formatDate(d.dispatchDate)}</div>
-          <div><strong>ETA:</strong> ${d.estimatedArrival ? Utils.formatDate(d.estimatedArrival) : 'â€”'}</div>
+          <div><strong>ETA:</strong> ${d.estimatedArrival ? Utils.formatDate(d.estimatedArrival) : '—'}</div>
           ${d.actualArrival ? `<div><strong>Actual Arrival:</strong> ${Utils.formatDate(d.actualArrival)}</div>` : ''}
         </div>
         <h4 style="margin-bottom:0.75rem;">Status Timeline</h4>
@@ -259,11 +259,11 @@
     var orderSel = document.getElementById('dp-order');
       orders.forEach(o => {
     var v = MockDB.getVendorById(o.vendorId);
-        orderSel.add(new Option(`${o.id} â€” ${v ? v.businessName : ''} (${o.status})`, o.id));
+        orderSel.add(new Option(`${o.id} — ${v ? v.businessName : ''} (${o.status})`, o.id));
       });
     var vehicles = MockDB.getVehicles().filter(v => v.status === 'available');
     var vehSel = document.getElementById('dp-vehicle');
-      vehicles.forEach(v => vehSel.add(new Option(`${v.vehicleNo} (${v.type}) â€” ${v.driverName}`, v.id)));
+      vehicles.forEach(v => vehSel.add(new Option(`${v.vehicleNo} (${v.type}) — ${v.driverName}`, v.id)));
 
       document.getElementById('dp-date').value = new Date().toISOString().split('T')[0];
       renderDispatchTable();

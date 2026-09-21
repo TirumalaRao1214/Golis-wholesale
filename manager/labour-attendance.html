@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
-  <title>Labour Attendance — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
+  <title>Labour Attendance � GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -18,7 +18,7 @@
         <div class="page-header">
           <h1 class="page-title">Labour Attendance</h1>
           <div class="page-header-actions">
-            <input type="date" class="form-input" id="att-date" style="width:170px;" onchange="loadAttendance()">
+            <input type="date" class="form-input" id="att-date" style="width:clamp(130px,40vw,170px);" onchange="loadAttendance()">
             <button class="btn btn-primary" id="save-btn" onclick="saveAttendance()">Save Attendance</button>
           </div>
         </div>
@@ -27,13 +27,13 @@
         <div style="padding:0.875rem 1.25rem;background:var(--color-primary-pale);border-radius:8px;margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:center;">
           <div>
             <span style="font-size:1.125rem;font-weight:700;color:var(--color-primary);" id="date-display">Date: 21 September 2026</span>
-            <span id="saved-badge" style="display:none;margin-left:0.75rem;" class="badge badge--success">✅ Saved</span>
+            <span id="saved-badge" style="display:none;margin-left:0.75rem;" class="badge badge--success">? Saved</span>
           </div>
           <button class="btn btn-ghost" id="edit-btn" style="display:none;" onclick="enableEditing()">Edit</button>
         </div>
 
         <!-- Attendance Cards Grid -->
-        <div id="attendance-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;margin-bottom:1.5rem;"></div>
+        <div id="attendance-grid" class="grid-cols-auto" style="margin-bottom:1.5rem;"></div>
 
         <!-- Summary Row -->
         <div class="card">
@@ -41,25 +41,25 @@
             <h3 class="card__title">Daily Summary</h3>
           </div>
           <div class="card__body">
-            <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;text-align:center;">
+            <div class="stats-grid stats-grid--5" style="text-align:center;">
               <div>
-                <div style="font-size:1.5rem;font-weight:700;color:var(--color-success);" id="sum-present">—</div>
+                <div style="font-size:1.5rem;font-weight:700;color:var(--color-success);" id="sum-present">�</div>
                 <div style="font-size:0.8rem;color:var(--color-text-secondary);">Present</div>
               </div>
               <div>
-                <div style="font-size:1.5rem;font-weight:700;color:var(--color-warning);" id="sum-halfday">—</div>
+                <div style="font-size:1.5rem;font-weight:700;color:var(--color-warning);" id="sum-halfday">�</div>
                 <div style="font-size:0.8rem;color:var(--color-text-secondary);">Half Day</div>
               </div>
               <div>
-                <div style="font-size:1.5rem;font-weight:700;color:var(--color-danger);" id="sum-absent">—</div>
+                <div style="font-size:1.5rem;font-weight:700;color:var(--color-danger);" id="sum-absent">�</div>
                 <div style="font-size:0.8rem;color:var(--color-text-secondary);">Absent</div>
               </div>
               <div>
-                <div style="font-size:1.5rem;font-weight:700;color:var(--color-info);" id="sum-overtime">—</div>
+                <div style="font-size:1.5rem;font-weight:700;color:var(--color-info);" id="sum-overtime">�</div>
                 <div style="font-size:0.8rem;color:var(--color-text-secondary);">Overtime</div>
               </div>
               <div style="background:var(--color-primary-pale);border-radius:8px;padding:0.5rem;">
-                <div style="font-size:1.25rem;font-weight:700;color:var(--color-primary);" id="sum-wage">—</div>
+                <div style="font-size:1.25rem;font-weight:700;color:var(--color-primary);" id="sum-wage">�</div>
                 <div style="font-size:0.8rem;color:var(--color-primary);">Total Wage Today</div>
               </div>
             </div>
@@ -75,9 +75,9 @@
   <script>
 (function () {
 'use strict';
-    var OT_RATE_PER_HOUR = 100; // ₹100 per overtime hour
+    var OT_RATE_PER_HOUR = 100; // ?100 per overtime hour
     var _labour     = [];
-    var _attendance = {};  // map labourId → { status, overtimeHours }
+    var _attendance = {};  // map labourId ? { status, overtimeHours }
     var _isSaved    = false;
     var _editing    = true;
 
@@ -154,26 +154,26 @@
             </div>
             <div style="text-align:right;">
               <div style="font-size:0.75rem;color:var(--color-text-secondary);">Daily Wage</div>
-              <div style="font-weight:700;color:var(--color-primary);">₹${l.dailyWage}</div>
+              <div style="font-weight:700;color:var(--color-primary);">?${l.dailyWage}</div>
             </div>
           </div>
           <div style="margin-bottom:0.75rem;">
             <label style="font-size:0.8rem;color:var(--color-text-secondary);display:block;margin-bottom:0.25rem;">Attendance Status</label>
             <select class="form-select" ${disabled} onchange="onStatusChange('${l.id}',this)" style="font-size:0.875rem;">
-              <option value="present"  ${att.status === 'present'  ? 'selected' : ''}>✅ Present (₹${l.dailyWage})</option>
-              <option value="halfDay"  ${att.status === 'halfDay'  ? 'selected' : ''}>🌓 Half Day (₹${Math.round(l.dailyWage*0.5)})</option>
-              <option value="absent"   ${att.status === 'absent'   ? 'selected' : ''}>❌ Absent (₹0)</option>
-              <option value="overtime" ${att.status === 'overtime' ? 'selected' : ''}>⏱ Overtime</option>
+              <option value="present"  ${att.status === 'present'  ? 'selected' : ''}>? Present (?${l.dailyWage})</option>
+              <option value="halfDay"  ${att.status === 'halfDay'  ? 'selected' : ''}>?? Half Day (?${Math.round(l.dailyWage*0.5)})</option>
+              <option value="absent"   ${att.status === 'absent'   ? 'selected' : ''}>? Absent (?0)</option>
+              <option value="overtime" ${att.status === 'overtime' ? 'selected' : ''}>? Overtime</option>
             </select>
           </div>
           <div id="ot-${l.id}" style="display:${att.status === 'overtime' ? 'flex' : 'none'};align-items:center;gap:0.5rem;margin-bottom:0.75rem;">
             <label style="font-size:0.8rem;white-space:nowrap;">OT Hours:</label>
             <input type="number" class="form-input" ${disabled} value="${att.overtimeHours || 0}" min="0" max="8" step="0.5"
               oninput="onOtChange('${l.id}',this)" style="width:80px;padding:0.25rem 0.5rem;font-size:0.875rem;">
-            <span style="font-size:0.8rem;color:var(--color-text-secondary);">× ₹${OT_RATE_PER_HOUR}/hr</span>
+            <span style="font-size:0.8rem;color:var(--color-text-secondary);">� ?${OT_RATE_PER_HOUR}/hr</span>
           </div>
           <div style="font-size:0.875rem;text-align:right;color:${statusColors[att.status] || 'var(--color-text-primary)'};font-weight:600;">
-            Wage Today: ₹${statusWage[att.status] !== undefined ? statusWage[att.status] : l.dailyWage}
+            Wage Today: ?${statusWage[att.status] !== undefined ? statusWage[att.status] : l.dailyWage}
           </div>
         </div>`;
       }).join('');

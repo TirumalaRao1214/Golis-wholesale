@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
-  <title>Daily Closing — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
+  <title>Daily Closing � GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -24,7 +24,7 @@
 
         <!-- Day closed banner (hidden by default) -->
         <div id="day-closed-banner" style="display:none;" class="alert alert--success" style="margin-bottom:1rem;">
-          ✅ Day has been closed. Final closing saved.
+          ? Day has been closed. Final closing saved.
         </div>
 
         <!-- Today's Profit / Loss Hero Card -->
@@ -32,17 +32,17 @@
           <div class="card__body" style="display:flex;align-items:center;justify-content:space-between;padding:1.5rem;">
             <div>
               <div style="font-size:0.875rem;opacity:0.8;">Today's Net Profit / Loss</div>
-              <div style="font-size:2.5rem;font-weight:800;" id="dc-hero-profit">—</div>
+              <div style="font-size:2.5rem;font-weight:800;" id="dc-hero-profit">�</div>
             </div>
             <div style="text-align:right;">
-              <div style="font-size:0.875rem;opacity:0.8;">Sales − Purchases − Expenses</div>
+              <div style="font-size:0.875rem;opacity:0.8;">Sales - Purchases - Expenses</div>
               <div id="dc-hero-formula" style="font-size:0.9rem;opacity:0.9;"></div>
             </div>
           </div>
         </div>
 
         <!-- Summary Sections Grid -->
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.25rem;margin-bottom:1.25rem;">
+        <div class="grid-3col" style="margin-bottom:1.25rem;">
           <!-- Purchases -->
           <div class="card">
             <div class="card__header"><h3 class="card__title">1. Purchases</h3></div>
@@ -60,7 +60,7 @@
           </div>
         </div>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.25rem;margin-bottom:1.25rem;">
+        <div class="grid-3col" style="margin-bottom:1.25rem;">
           <!-- Inventory -->
           <div class="card">
             <div class="card__header"><h3 class="card__title">4. Inventory (Closing)</h3></div>
@@ -86,7 +86,7 @@
               <div style="font-size:0.875rem;color:var(--color-text-secondary);">This will save all today's data as a daily closing record.</div>
             </div>
             <button class="btn btn-primary btn-lg" id="close-day-btn" onclick="closeDay()" style="background:var(--color-success);border-color:var(--color-success);min-width:160px;">
-              ✅ Close Day
+              ? Close Day
             </button>
           </div>
         </div>
@@ -121,7 +121,7 @@
       // Hero profit
       document.getElementById('dc-hero-profit').textContent = Utils.formatCurrency(netProfit);
       document.getElementById('dc-hero-profit').style.color = netProfit >= 0 ? '#d1fae5' : '#fca5a5';
-      document.getElementById('dc-hero-formula').textContent = `${Utils.formatCurrency(totalSales)} − ${Utils.formatCurrency(totalPurchases)} − ${Utils.formatCurrency(totalExpenses)}`;
+      document.getElementById('dc-hero-formula').textContent = `${Utils.formatCurrency(totalSales)} - ${Utils.formatCurrency(totalPurchases)} - ${Utils.formatCurrency(totalExpenses)}`;
 
       // Section 1: Purchases
       document.getElementById('dc-purchases').innerHTML = `
@@ -178,7 +178,7 @@
       if (closedDates.includes(today)) {
         document.getElementById('day-closed-banner').style.display = '';
         document.getElementById('close-day-btn').disabled = true;
-        document.getElementById('close-day-btn').textContent = '✅ Day Already Closed';
+        document.getElementById('close-day-btn').textContent = '? Day Already Closed';
         document.getElementById('close-day-btn').style.opacity = '0.5';
       }
     }
@@ -192,7 +192,7 @@
 
         document.getElementById('day-closed-banner').style.display = '';
         document.getElementById('close-day-btn').disabled = true;
-        document.getElementById('close-day-btn').textContent = '✅ Day Already Closed';
+        document.getElementById('close-day-btn').textContent = '? Day Already Closed';
         document.getElementById('close-day-btn').style.opacity = '0.5';
         Utils.showToast('Day closed successfully. Records saved.', 'success');
       }, { confirmLabel: 'Close Day', cancelLabel: 'Cancel' });
