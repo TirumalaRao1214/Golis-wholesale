@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -767,7 +767,7 @@
         setTimeout(() => {
     var result = APP.login(email, password);
           if (result && result.success) {
-            showToast(t('toast.login.success') || 'Login successful!', 'success');
+            Utils.showToast(t('toast.login.success') || 'Login successful!', 'success');
             setTimeout(() => redirectToDashboard(result.role || (result.user && result.user.role)), 500);
           } else {
             errorEl.textContent = t('auth.invalidCredentials') || 'Invalid email or password. Please try again.';

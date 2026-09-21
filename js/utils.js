@@ -644,3 +644,19 @@ const Utils = {
     return String(str).length > len ? String(str).substring(0, len) + '…' : String(str);
   },
 };
+
+/* ──────────────────────────────────────────────────────────────────
+   GLOBAL ALIAS — window.showToast
+   Exposes Utils.showToast as a plain global function so that any
+   inline script or page can call showToast(...) directly without
+   needing to reference the Utils object.
+
+   Usage:
+     showToast('Saved!', 'success')
+     showToast('Invalid credentials', 'error')
+     showToast('Low stock warning', 'warning')
+     showToast('Order placed', 'info', 5000)
+   ────────────────────────────────────────────────────────────────── */
+window.showToast = function (message, type, duration) {
+  return Utils.showToast(message, type, duration);
+};
