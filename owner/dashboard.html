@@ -204,7 +204,7 @@
       // Today date
       document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-IN', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
 
-      // Charts
+      // Charts — convenience renderers use built-in demo figures when no data args are passed
       Charts.renderSalesTrend('chart-sales-trend');
       Charts.renderProfitTrend('chart-profit-trend');
       Charts.renderStockDonut('chart-veg-donut');

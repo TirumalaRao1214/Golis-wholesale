@@ -55,6 +55,30 @@
     if (!container) return;
     options = options || {};
 
+    /* Guard: datasets must be a non-empty array */
+    if (!Array.isArray(datasets) || datasets.length === 0) {
+      console.warn('renderLine: no datasets for #' + containerId);
+      container.innerHTML = '<p style="color:#9ca3af;text-align:center;padding:40px 0;font-size:13px;">No chart data available</p>';
+      return;
+    }
+
+    /* Guard: each dataset's data array must be valid */
+    datasets = datasets.map(function (ds) {
+      if (!Array.isArray(ds.data)) {
+        console.warn('renderLine: dataset "' + (ds.label || '?') + '" has no data array — skipping dataset');
+        return Object.assign({}, ds, { data: [] });
+      }
+      return ds;
+    });
+
+    /* Drop datasets that are empty after sanitisation */
+    var validDatasets = datasets.filter(function (ds) { return ds.data.length > 0; });
+    if (validDatasets.length === 0) {
+      container.innerHTML = '<p style="color:#9ca3af;text-align:center;padding:40px 0;font-size:13px;">No chart data available</p>';
+      return;
+    }
+    datasets = validDatasets;
+
     var W = container.clientWidth || 560;
     var H = options.height || 220;
     var PAD = { top: 30, right: 20, bottom: 50, left: 55 };
@@ -165,6 +189,11 @@
   }
 
   function _renderVerticalBar(container, labels, datasets, options) {
+    /* Guard: each dataset data must be an array */
+    datasets = (datasets || []).map(function (ds) {
+      return Array.isArray(ds.data) ? ds : Object.assign({}, ds, { data: [] });
+    });
+
     var W = container.clientWidth || 560;
     var H = options.height || 220;
     var PAD = { top: 20, right: 20, bottom: 50, left: 55 };
@@ -253,6 +282,14 @@
     if (!container) return;
     options = options || {};
 
+    /* Guard: data and labels must be valid arrays */
+    if (!Array.isArray(data) || data.length === 0) {
+      console.warn('renderDoughnut: no data for #' + containerId);
+      container.innerHTML = '<p style="color:#9ca3af;text-align:center;padding:40px 0;font-size:13px;">No data available</p>';
+      return;
+    }
+    labels = Array.isArray(labels) ? labels : data.map(function (_, i) { return 'Item ' + (i + 1); });
+
     var SIZE   = options.size || Math.min(container.clientWidth || 200, 200);
     var CX     = SIZE / 2;
     var CY     = SIZE / 2;
@@ -324,42 +361,60 @@
 
   /* ══════════════════════════════════════════════════════════
      DASHBOARD CONVENIENCE RENDERERS
-     These match the signatures previously used with Chart.js
+     Each function accepts optional data arguments.
+     When called without data (demo/dashboard usage) they fall
+     back to representative demo figures so the page never
+     crashes with undefined.
      ══════════════════════════════════════════════════════════ */
 
+  /* Demo week labels shared by trend charts */
+  var DEMO_WEEK_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
   function renderSalesTrend(containerId, salesData, purchaseData, labels) {
-    renderLine(containerId, labels || ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], [
-      { label: 'Sales',     data: salesData,    color: PALETTE.green[0] },
-      { label: 'Purchases', data: purchaseData, color: PALETTE.amber[0] }
+    /* Use provided arrays or fall back to demo figures */
+    var sales     = Array.isArray(salesData)    ? salesData    : [385000, 420000, 465000, 510000, 495000, 572000, 530000];
+    var purchases = Array.isArray(purchaseData) ? purchaseData : [320000, 355000, 390000, 430000, 415000, 485000, 450000];
+    renderLine(containerId, labels || DEMO_WEEK_LABELS, [
+      { label: 'Sales',     data: sales,     color: PALETTE.green[0] },
+      { label: 'Purchases', data: purchases, color: PALETTE.amber[0] }
     ], { fill: false, height: 200 });
   }
 
   function renderProfitTrend(containerId, profitData, labels) {
-    renderArea(containerId, labels || ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], [
-      { label: 'Profit', data: profitData, color: PALETTE.green[1] }
+    var profit = Array.isArray(profitData) ? profitData : [65000, 65000, 75000, 80000, 80000, 87000, 80000];
+    renderArea(containerId, labels || DEMO_WEEK_LABELS, [
+      { label: 'Profit', data: profit, color: PALETTE.green[1] }
     ], { height: 180 });
   }
 
   function renderStockDonut(containerId, labels, data) {
-    renderDoughnut(containerId, labels, data, {
+    var lbls = Array.isArray(labels) ? labels : ['Tomato', 'Onion', 'Potato', 'Brinjal', 'Others'];
+    var vals = Array.isArray(data)   ? data   : [3200, 4800, 5600, 1400, 3200];
+    renderDoughnut(containerId, lbls, vals, {
       colors: PALETTE.mixed, size: 180, centerText: 'Stock'
     });
   }
 
   function renderExpenseBreakdown(containerId, labels, data) {
-    renderDoughnut(containerId, labels, data, {
+    var lbls = Array.isArray(labels) ? labels : ['Labour', 'Transport', 'Market', 'Packaging', 'Other'];
+    var vals = Array.isArray(data)   ? data   : [18500, 9200, 6800, 4200, 3800];
+    renderDoughnut(containerId, lbls, vals, {
       colors: PALETTE.amber, size: 180, centerText: 'Expenses'
     });
   }
 
   function renderVendorVolumeBar(containerId, labels, data) {
-    renderBar(containerId, labels, [{ data: data, colors: PALETTE.mixed }], {
+    var lbls = Array.isArray(labels) ? labels : ['Sri Ram', 'Deccan Veg', 'Chennai Fresh', 'Bangalore', 'Mumbai Mandi'];
+    var vals = Array.isArray(data)   ? data   : [84000, 215000, 128000, 56000, 342000];
+    renderBar(containerId, lbls, [{ data: vals, colors: PALETTE.mixed }], {
       horizontal: true
     });
   }
 
   function renderFarmerSupplyBar(containerId, labels, data) {
-    renderBar(containerId, labels, [{ data: data, colors: PALETTE.green }], {
+    var lbls = Array.isArray(labels) ? labels : ['Venkatesh', 'Krishna Rao', 'Lakshmaiah', 'Nagaraju', 'Siva Prasad'];
+    var vals = Array.isArray(data)   ? data   : [426000, 294000, 207200, 348000, 186000];
+    renderBar(containerId, lbls, [{ data: vals, colors: PALETTE.green }], {
       horizontal: true
     });
   }
