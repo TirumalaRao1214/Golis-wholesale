@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
-  <title>Farmer Management — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
+  <title>Farmer Management ï¿½ GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -26,7 +26,7 @@
         <div class="card" style="margin-bottom:1rem;">
           <div class="card__body">
             <div class="filter-row">
-              <input type="text" class="form-input" id="farmer-search" placeholder="Search by name, mobile, village…" oninput="renderFarmerTable()">
+              <input type="text" class="form-input" id="farmer-search" placeholder="Search by name, mobile, villageï¿½" oninput="renderFarmerTable()">
               <select class="form-select" id="farmer-district-filter" onchange="renderFarmerTable()">
                 <option value="">All Districts</option>
                 <option>Guntur</option><option>Krishna</option><option>Prakasam</option><option>Nellore</option>
@@ -165,7 +165,7 @@
       // Pagination
     var totalPages = Math.ceil(data.length / PAGE_SIZE);
     var pag = document.getElementById('farmers-pagination');
-      pag.innerHTML = `<div class="pagination"><span class="pagination__info">Showing ${start+1}–${Math.min(start+PAGE_SIZE, data.length)} of ${data.length}</span><div class="pagination__controls">${_currentPage > 1 ? `<button class="btn btn-sm btn-ghost" onclick="goPage(${_currentPage-1})">? Prev</button>` : ''} Page ${_currentPage}/${totalPages} ${_currentPage < totalPages ? `<button class="btn btn-sm btn-ghost" onclick="goPage(${_currentPage+1})">Next ?</button>` : ''}</div></div>`;
+      pag.innerHTML = `<div class="pagination"><span class="pagination__info">Showing ${start+1}ï¿½${Math.min(start+PAGE_SIZE, data.length)} of ${data.length}</span><div class="pagination__controls">${_currentPage > 1 ? `<button class="btn btn-sm btn-ghost" onclick="goPage(${_currentPage-1})">? Prev</button>` : ''} Page ${_currentPage}/${totalPages} ${_currentPage < totalPages ? `<button class="btn btn-sm btn-ghost" onclick="goPage(${_currentPage+1})">Next ?</button>` : ''}</div></div>`;
     }
 
     function goPage(p) { _currentPage = p; renderFarmerTable(); }
@@ -235,13 +235,15 @@
           <div><strong>Joined:</strong> ${Utils.formatDate(f.joinedDate)}</div>
         </div>
         <h4 style="margin-bottom:0.75rem;">Supply History (${purchases.length} records)</h4>
-        <table class="data-table" style="margin-bottom:1rem;">
+        <div class="table-responsive" style="margin-bottom:1rem;">
+        <table class="data-table">
           <thead><tr><th>ID</th><th>Date</th><th>Vegetable</th><th>Grade</th><th>Qty</th><th>Rate</th><th>Total</th></tr></thead>
           <tbody>${purchases.map(p => {
     var veg = MockDB.getVegetableById(p.vegetableId);
-            return `<tr><td>${p.id}</td><td>${Utils.formatDate(p.date)}</td><td>${veg ? veg.nameEn : p.vegetableId}</td><td>${p.grade}</td><td>${p.qty} kg</td><td>?${p.rate}/kg</td><td>${Utils.formatCurrency(p.total)}</td></tr>`;
+            return `<tr><td>${p.id}</td><td>${Utils.formatDate(p.date)}</td><td>${veg ? veg.nameEn : p.vegetableId}</td><td>${p.grade}</td><td>${p.qty} kg</td><td>â‚¹${p.rate}/kg</td><td>${Utils.formatCurrency(p.total)}</td></tr>`;
           }).join('')}</tbody>
         </table>
+        </div>
         <div style="display:flex;gap:2rem;padding:0.75rem;background:var(--color-bg);border-radius:8px;">
           <div><strong>Total Purchased:</strong> ${Utils.formatCurrency(purchases.reduce((s,p)=>s+p.total,0))}</div>
           <div><strong>Total Paid:</strong> ${Utils.formatCurrency(payments.reduce((s,p)=>s+p.amount,0))}</div>

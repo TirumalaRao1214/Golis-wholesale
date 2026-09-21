@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -10,12 +10,14 @@
   <style>
     .price-table-row { cursor:pointer; transition:background 0.15s; }
     .price-table-row:hover { background:var(--color-primary-pale) !important; }
-    .qty-input { width:80px; text-align:center; border:1px solid var(--color-border); border-radius:var(--radius-sm); padding:0.25rem 0.5rem; font-size:0.9rem; }
+    .qty-input { width:80px; min-width:60px; text-align:center; border:1px solid var(--color-border); border-radius:var(--radius-sm); padding:0.25rem 0.5rem; font-size:0.9rem; }
+    @media (max-width:540px) { .qty-input { width:60px; min-width:50px; } }
     .change-badge-up   { background:#dcfce7; color:#16a34a; padding:0.2rem 0.5rem; border-radius:999px; font-size:0.75rem; font-weight:600; }
     .change-badge-down { background:#fee2e2; color:#dc2626; padding:0.2rem 0.5rem; border-radius:999px; font-size:0.75rem; font-weight:600; }
     .change-badge-neutral { background:var(--color-bg); color:var(--color-text-secondary); padding:0.2rem 0.5rem; border-radius:999px; font-size:0.75rem; }
-    .cart-bar { position:fixed; bottom:0; left:var(--sidebar-width,260px); right:0; background:var(--color-primary); color:white; padding:0.75rem 1.5rem; display:flex; justify-content:space-between; align-items:center; z-index:100; transform:translateY(100%); transition:transform 0.3s; }
+    .cart-bar { position:fixed; bottom:0; left:0; right:0; background:var(--color-primary); color:white; padding:0.75rem 1rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; z-index:100; transform:translateY(100%); transition:transform 0.3s; }
     .cart-bar.visible { transform:translateY(0); }
+    @media (min-width:769px) { .cart-bar { left:var(--sidebar-width,260px); padding:0.75rem 1.5rem; } }
   </style>
 </head>
 <body>

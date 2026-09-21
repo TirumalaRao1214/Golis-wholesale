@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
-  <title>Vendor Management — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
+  <title>Vendor Management ï¿½ GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -25,7 +25,7 @@
         <div class="card" style="margin-bottom:1rem;">
           <div class="card__body">
             <div class="filter-row">
-              <input type="text" class="form-input" id="vendor-search" placeholder="Search name, city, GST…" oninput="renderVendorTable()">
+              <input type="text" class="form-input" id="vendor-search" placeholder="Search name, city, GSTï¿½" oninput="renderVendorTable()">
               <select class="form-select" id="vendor-state-filter" onchange="renderVendorTable()">
                 <option value="">All States</option>
                 <option value="TS">Telangana (TS)</option>
@@ -251,10 +251,12 @@
           <div><strong>Joined:</strong> ${Utils.formatDate(v.joinedDate)}</div>
         </div>
         <h4 style="margin-bottom:0.75rem;">Order History (${orders.length} orders)</h4>
-        <table class="data-table" style="margin-bottom:1rem;">
+        <div class="table-responsive" style="margin-bottom:1rem;">
+        <table class="data-table">
           <thead><tr><th>Order ID</th><th>Date</th><th>Delivery</th><th>Total</th><th>Status</th></tr></thead>
           <tbody>${orders.map(o => `<tr><td>${o.id}</td><td>${Utils.formatDate(o.orderDate)}</td><td>${Utils.formatDate(o.deliveryDate)}</td><td>${Utils.formatCurrency(o.total)}</td><td>${Utils.statusBadge(o.status)}</td></tr>`).join('')}</tbody>
         </table>
+        </div>
         <div style="display:flex;gap:2rem;padding:0.75rem;background:var(--color-bg);border-radius:8px;">
           <div><strong>Total Orders:</strong> ${Utils.formatCurrency(orders.reduce((s,o)=>s+o.total,0))}</div>
           <div><strong>Total Received:</strong> ${Utils.formatCurrency(payments.reduce((s,p)=>s+p.amount,0))}</div>

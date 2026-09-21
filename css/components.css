@@ -2060,3 +2060,194 @@ html, body {
 body.sidebar-open {
   overflow: hidden;
 }
+
+/* ──────────────────────────────────────────────────────────
+   GLOBAL MOBILE SAFETY NET
+   Ensures inline-style flex containers don't overflow on
+   phones. These rules target the repeating patterns found
+   across all app HTML pages.
+   ────────────────────────────────────────────────────────── */
+
+/* Every modal respects viewport on small screens */
+@media (max-width: 540px) {
+  .modal,
+  .modal-dialog,
+  [style*="max-width:560px"],
+  [style*="max-width:680px"],
+  [style*="max-width:480px"],
+  [style*="max-width:440px"],
+  [style*="max-width:420px"],
+  [style*="max-width:380px"] {
+    max-width: calc(100vw - 2rem) !important;
+    width: 100% !important;
+  }
+}
+
+/* Inline flex containers: ensure wrapping on small phones.
+   Targets the pattern style="display:flex;justify-content:space-between…"
+   used across all role dashboards and modal footers.          */
+@media (max-width: 540px) {
+  /* Summary rows that use display:flex with a large gap */
+  [style*="display:flex"][style*="gap:2rem"],
+  [style*="display:flex"][style*="gap: 2rem"] {
+    flex-wrap: wrap !important;
+    gap: 0.75rem !important;
+  }
+
+  /* Card/modal footer button rows — should always wrap and stretch */
+  .card__footer > [style*="display:flex"],
+  .modal__footer > [style*="display:flex"],
+  .modal-footer  > [style*="display:flex"],
+  .modal__body > [style*="display:flex"][style*="justify-content:flex-end"],
+  .card__body  > [style*="display:flex"][style*="justify-content:flex-end"] {
+    flex-wrap: wrap !important;
+    justify-content: flex-start !important;
+  }
+
+  /* Quick-action button rows (display:flex;flex-wrap:wrap already set,
+     but ensure gap is touch-friendly on phones) */
+  [style*="display:flex"][style*="flex-wrap:wrap"] {
+    gap: 0.5rem !important;
+  }
+}
+
+/* Inputs with fixed pixel widths in table cells — make them fluid */
+@media (max-width: 640px) {
+  td [style*="width:80px"],
+  td [style*="width:90px"],
+  td [style*="width:100px"] {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+}
+
+/* Ledger/summary header rows (label + select on same line) */
+@media (max-width: 480px) {
+  [style*="white-space:nowrap"] {
+    white-space: normal !important;
+  }
+}
+
+/* stat-card body — ensure text doesn't overflow */
+.stat-card__body {
+  min-width: 0;
+  flex: 1;
+}
+.stat-card__value {
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Tables directly inside card body or modal body (without .table-responsive
+   wrapper) get overflow-x:auto so they never break the mobile layout */
+.card__body > .data-table,
+.card-body  > .data-table,
+.card__body > table,
+.card-body  > table,
+.modal__body > .data-table,
+.modal__body > table,
+.modal-body  > .data-table,
+.modal-body  > table {
+  display: block;
+  overflow-x: auto;
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+}
+
+/* ──────────────────────────────────────────────────────────
+   KEY-VALUE ROW — reusable pattern for profile/stats panels
+   Used across farmer/profile, vendor/profile, labour/profile,
+   farmer/prices, vendor/prices, manager pages, etc.
+   ────────────────────────────────────────────────────────── */
+.kv-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.75rem;
+  padding: 0.5rem;
+  border-radius: var(--radius-md);
+}
+.kv-row + .kv-row {
+  margin-top: 0.375rem;
+}
+.kv-row .kv-val {
+  font-weight: 600;
+  text-align: right;
+  word-break: break-word;
+}
+
+/* Inline flex space-between rows — wrap on mobile so they
+   don't cause horizontal overflow on narrow screens.
+   This targets every pattern: display:flex;justify-content:space-between  */
+@media (max-width: 480px) {
+  [style*="justify-content:space-between"],
+  [style*="justify-content: space-between"] {
+    flex-wrap: wrap !important;
+  }
+  /* Profit hero / daily-closing hero card rows */
+  [style*="justify-content:space-between"] > [style*="text-align:right"] {
+    text-align: left !important;
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+}
+
+/* Quick-action button columns (display:flex;flex-direction:column) — fine on mobile */
+/* Assignment card on labour dashboard — ensure min touch target */
+.assignment-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+}
+.mark-attendance-btn {
+  width: 100%;
+  justify-content: center;
+}
+
+/* Attendance option labels — full width touch targets */
+@media (max-width: 480px) {
+  [style*="display:flex;align-items:center;gap:0.75rem;padding:0.875rem;border:2px solid"] {
+    flex-wrap: wrap;
+  }
+}
+
+/* Report filter row — wrap on mobile */
+@media (max-width: 540px) {
+  .card__header [style*="display:flex;gap:0.5rem"],
+  .card__header [style*="display:flex;gap: 0.5rem"] {
+    flex-wrap: wrap !important;
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+  .card__header [style*="display:flex;gap:0.5rem"] .form-input,
+  .card__header [style*="display:flex;gap:0.5rem"] .form-select {
+    flex: 1;
+    min-width: 120px;
+  }
+}
+
+/* Step progress row in dispatch — scrollable on mobile */
+@media (max-width: 540px) {
+  [style*="display:flex;align-items:center;gap:0;margin-bottom:0.75rem"] {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Card hero rows (profit/cash balance) — stack on very small */
+@media (max-width: 480px) {
+  .card__body[style*="display:flex;align-items:center;justify-content:space-between"] {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.75rem !important;
+  }
+  /* Close day button — full width on mobile */
+  .card__body[style*="display:flex;align-items:center;justify-content:space-between"] .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
