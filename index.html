@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -92,28 +92,78 @@
         <span></span><span></span><span></span>
       </button>
     </div>
-
-    <!-- Mobile Drawer -->
-    <nav class="public-nav__mobile" id="mobile-nav" aria-label="Mobile navigation" aria-hidden="true">
-      <a href="#home"       class="public-nav__link" data-i18n="pub.nav.home">Home</a>
-      <a href="#about"      class="public-nav__link" data-i18n="pub.nav.about">About</a>
-      <a href="#how"        class="public-nav__link" data-i18n="pub.nav.how">How It Works</a>
-      <a href="#farmers"    class="public-nav__link" data-i18n="pub.nav.farmers">Farmers</a>
-      <a href="#buyers"     class="public-nav__link" data-i18n="pub.nav.buyers">Wholesale Buyers</a>
-      <a href="#vegetables" class="public-nav__link" data-i18n="pub.nav.vegetables">Vegetables</a>
-      <a href="#contact"    class="public-nav__link" data-i18n="pub.nav.contact">Contact</a>
-      <div class="public-nav__mobile-divider"></div>
-      <div class="lang-switcher lang-switcher--mobile" role="group" aria-label="Language selector">
-        <button class="lang-btn lang-btn--active" data-lang-btn="en" aria-pressed="true">EN</button>
-        <span class="lang-sep" aria-hidden="true">|</span>
-        <button class="lang-btn" data-lang-btn="te" aria-pressed="false">తెలుగు</button>
-      </div>
-      <div class="mobile-login-links">
-        <a href="login.html?role=farmer" class="btn btn-primary btn-sm" data-i18n="pub.login.farmer">Farmer Login</a>
-        <a href="login.html?role=vendor" class="btn btn-accent btn-sm" data-i18n="pub.login.vendor">Vendor Login</a>
-      </div>
-    </nav>
   </header>
+
+  <!-- Mobile Nav Overlay -->
+  <div class="mobile-nav-overlay" id="mobile-nav-overlay" aria-hidden="true"></div>
+
+  <!-- Mobile Full-Screen Drawer -->
+  <nav class="public-nav__mobile" id="mobile-nav" role="dialog" aria-modal="true" aria-label="Mobile navigation" aria-hidden="true">
+    <!-- Drawer Header -->
+    <div class="mobile-drawer__header">
+      <a href="index.html" class="public-nav__logo" aria-label="GOLIS Wholesale — Home" tabindex="-1">
+        <div class="public-nav__logo-mark" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="16" cy="16" r="16" fill="#2d6a4f"/>
+            <path d="M16 6C16 6 8 10 8 18C8 22.4 11.6 26 16 26C16 26 16 18 22 12C19.5 9.5 16 6 16 6Z" fill="#52b788"/>
+            <path d="M16 26C16 26 16 18 22 12" stroke="#d8f3dc" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span class="public-nav__brand" data-i18n="app.name">GOLIS Wholesale</span>
+      </a>
+      <button class="mobile-drawer__close" id="mobile-nav-close" aria-label="Close navigation menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Nav Links -->
+    <div class="mobile-drawer__links">
+      <a href="#home"       class="mobile-drawer__link" data-i18n="pub.nav.home">Home</a>
+      <a href="#about"      class="mobile-drawer__link" data-i18n="pub.nav.about">About</a>
+      <a href="#how"        class="mobile-drawer__link" data-i18n="pub.nav.how">How It Works</a>
+      <a href="#farmers"    class="mobile-drawer__link" data-i18n="pub.nav.farmers">Farmers</a>
+      <a href="#buyers"     class="mobile-drawer__link" data-i18n="pub.nav.buyers">Wholesale Buyers</a>
+      <a href="#vegetables" class="mobile-drawer__link" data-i18n="pub.nav.vegetables">Vegetables</a>
+      <a href="#contact"    class="mobile-drawer__link" data-i18n="pub.nav.contact">Contact</a>
+    </div>
+
+    <!-- Divider -->
+    <div class="public-nav__mobile-divider"></div>
+
+    <!-- Language Switcher -->
+    <div class="mobile-drawer__section">
+      <div class="mobile-drawer__label">Language / భాష</div>
+      <div class="lang-switcher" role="group" aria-label="Language selector">
+        <button class="lang-btn lang-btn--active" data-lang-btn="en" aria-pressed="true" aria-label="Switch to English">EN</button>
+        <span class="lang-sep" aria-hidden="true">|</span>
+        <button class="lang-btn" data-lang-btn="te" aria-pressed="false" aria-label="తెలుగుకు మారండి">తెలుగు</button>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <div class="public-nav__mobile-divider"></div>
+
+    <!-- Login Buttons -->
+    <div class="mobile-drawer__section">
+      <div class="mobile-drawer__label">Login / లాగిన్</div>
+      <div class="mobile-drawer__login-btns">
+        <a href="login.html?role=farmer" class="mobile-drawer__login-btn mobile-drawer__login-btn--primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span data-i18n="pub.login.farmer">Farmer Login</span>
+        </a>
+        <a href="login.html?role=vendor" class="mobile-drawer__login-btn mobile-drawer__login-btn--accent">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          <span data-i18n="pub.login.vendor">Vendor Login</span>
+        </a>
+        <a href="login.html" class="mobile-drawer__login-btn mobile-drawer__login-btn--muted">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+          <span data-i18n="pub.login.all">All Logins</span>
+        </a>
+      </div>
+    </div>
+  </nav>
 
   <main id="main-content">
 
@@ -854,24 +904,54 @@
 
   /* ── Mobile Nav ──────────────────────────────────── */
   function initMobileNav() {
-    var btn   = document.getElementById('hamburger-btn');
-    var nav   = document.getElementById('mobile-nav');
+    var btn     = document.getElementById('hamburger-btn');
+    var nav     = document.getElementById('mobile-nav');
+    var overlay = document.getElementById('mobile-nav-overlay');
+    var closeBtn= document.getElementById('mobile-nav-close');
     if (!btn || !nav) return;
 
+    function openDrawer() {
+      nav.classList.add('is-open');
+      overlay && overlay.classList.add('is-open');
+      btn.setAttribute('aria-expanded', 'true');
+      nav.setAttribute('aria-hidden', 'false');
+      overlay && overlay.setAttribute('aria-hidden', 'false');
+      btn.setAttribute('aria-label', 'Close navigation menu');
+      document.body.style.overflow = 'hidden';
+      // Focus first link inside drawer for accessibility
+      var firstFocusable = nav.querySelector('a, button');
+      if (firstFocusable) setTimeout(() => firstFocusable.focus(), 50);
+    }
+
+    function closeDrawer() {
+      nav.classList.remove('is-open');
+      overlay && overlay.classList.remove('is-open');
+      btn.setAttribute('aria-expanded', 'false');
+      nav.setAttribute('aria-hidden', 'true');
+      overlay && overlay.setAttribute('aria-hidden', 'true');
+      btn.setAttribute('aria-label', 'Open navigation menu');
+      document.body.style.overflow = '';
+      btn.focus();
+    }
+
     btn.addEventListener('click', () => {
-    var open = nav.classList.toggle('is-open');
-      btn.setAttribute('aria-expanded', String(open));
-      nav.setAttribute('aria-hidden', String(!open));
-      btn.setAttribute('aria-label', open ? 'Close navigation menu' : 'Open navigation menu');
+      nav.classList.contains('is-open') ? closeDrawer() : openDrawer();
     });
 
-    // Close on anchor click
-    nav.querySelectorAll('a').forEach(a => {
-      a.addEventListener('click', () => {
-        nav.classList.remove('is-open');
-        btn.setAttribute('aria-expanded', 'false');
-        nav.setAttribute('aria-hidden', 'true');
-      });
+    // Close button inside drawer
+    if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+
+    // Close on overlay click
+    if (overlay) overlay.addEventListener('click', closeDrawer);
+
+    // Close on ESC
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && nav.classList.contains('is-open')) closeDrawer();
+    });
+
+    // Close on nav link click (anchor navigation)
+    nav.querySelectorAll('.mobile-drawer__link').forEach(a => {
+      a.addEventListener('click', closeDrawer);
     });
   }
 
