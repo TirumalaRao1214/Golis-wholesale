@@ -31,20 +31,25 @@
   top: 0;
   left: 0;
   bottom: 0;
-  z-index: var(--z-sticky);
+  /* Must be above #main-content's stacking context (overflow-x:hidden creates one).
+     Use --z-overlay (300) so the sidebar always paints on top. */
+  z-index: var(--z-overlay);
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
   scrollbar-color: rgba(255,255,255,0.1) transparent;
-  transition: transform var(--transition-slow);
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
   /* Mobile: hidden off-canvas by default */
-  transform: translateX(-100%);
+  transform: translateX(-105%);
+  /* Ensure no parent transform clips us */
+  will-change: transform;
 }
 
-/* Tablet and up: always visible */
+/* Tablet and up: always visible, no transition needed */
 @media (min-width: 769px) {
   #sidebar {
     transform: translateX(0);
+    transition: none;
   }
 }
 
@@ -52,9 +57,14 @@
 #sidebar::-webkit-scrollbar-track { background: transparent; }
 #sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: var(--radius-full); }
 
-/* Sidebar open state (mobile) */
+/* Sidebar open state (mobile) — toggled by _initSidebarToggle() */
 #sidebar.is-open {
   transform: translateX(0);
+}
+
+/* Prevent body scroll when sidebar is open on mobile */
+body.sidebar-open {
+  overflow: hidden;
 }
 
 /* Sidebar Logo / Brand Area */
@@ -270,18 +280,21 @@
   text-transform: capitalize;
 }
 
-/* Sidebar overlay (mobile) */
+/* Sidebar overlay (mobile) — sits just below the sidebar */
 #sidebar-overlay {
-  display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
-  z-index: calc(var(--z-sticky) - 1);
-  animation: fadeIn 0.2s ease;
+  background: rgba(0, 0, 0, 0.5);
+  /* One below sidebar so sidebar is always on top */
+  z-index: calc(var(--z-overlay) - 1);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s ease;
 }
-#sidebar-overlay.is-open { display: block; }
-
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+#sidebar-overlay.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
 
 /* ──────────────────────────────────────────────────────────
    MAIN CONTENT AREA

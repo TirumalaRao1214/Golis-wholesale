@@ -36,11 +36,12 @@ const APP = {
     }
 
     // 5. Render authenticated shell
+    // Note: renderTopbar() internally calls _initSidebarToggle() after rendering
+    // the toggle button, so we do NOT call it again here.
     if (requiredRole && this.user) {
       this.renderDemoBanner();
       this.renderSidebar(this.user.role);
       this.renderTopbar();
-      this._initSidebarToggle();
       this._highlightActiveNavItem();
     }
 
@@ -232,30 +233,57 @@ const APP = {
 
   /* ──────────────────────────────────────────────────────────
      SIDEBAR TOGGLE (mobile hamburger)
+     Called once from renderTopbar() after #sidebar-toggle exists.
      ────────────────────────────────────────────────────────── */
   _initSidebarToggle() {
     const toggle  = document.getElementById('sidebar-toggle');
     const sidebar = document.getElementById('sidebar');
-    let overlay   = document.getElementById('sidebar-overlay');
 
-    if (!toggle || !sidebar) return;
+    if (!toggle || !sidebar) {
+      console.warn('GOLIS: sidebar toggle elements not found', { toggle, sidebar });
+      return;
+    }
 
-    // Create overlay if not present
+    // Create overlay if not already in DOM
+    let overlay = document.getElementById('sidebar-overlay');
     if (!overlay) {
       overlay = document.createElement('div');
       overlay.id = 'sidebar-overlay';
+      // Must be a direct child of body so position:fixed works correctly
       document.body.appendChild(overlay);
     }
 
-    toggle.addEventListener('click', () => {
-      sidebar.classList.toggle('is-open');
-      overlay.classList.toggle('is-open');
-      document.body.classList.toggle('sidebar-open', sidebar.classList.contains('is-open'));
-    });
-    overlay.addEventListener('click', () => {
+    // Remove any previously-bound listeners by cloning the toggle button
+    const freshToggle = toggle.cloneNode(true);
+    toggle.parentNode.replaceChild(freshToggle, toggle);
+
+    const openSidebar = () => {
+      sidebar.classList.add('is-open');
+      overlay.classList.add('is-open');
+      freshToggle.setAttribute('aria-expanded', 'true');
+      sidebar.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('sidebar-open');
+    };
+
+    const closeSidebar = () => {
       sidebar.classList.remove('is-open');
       overlay.classList.remove('is-open');
+      freshToggle.setAttribute('aria-expanded', 'false');
+      sidebar.setAttribute('aria-hidden', 'true');
       document.body.classList.remove('sidebar-open');
+    };
+
+    freshToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      sidebar.classList.contains('is-open') ? closeSidebar() : openSidebar();
+    });
+
+    overlay.addEventListener('click', closeSidebar);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && sidebar.classList.contains('is-open')) {
+        closeSidebar();
+      }
     });
   },
 
