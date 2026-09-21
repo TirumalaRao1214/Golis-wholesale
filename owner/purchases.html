@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Purchase Records — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>Purchase Records — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -162,21 +160,20 @@
         <button class="btn btn-primary" onclick="savePurchase()">Save Purchase</button>
       </div>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
-    let _purchases = [];
+(function () {
+'use strict';
+    var _purchases = [];
 
     function calcPurchaseTotal() {
-      const qty = Number(document.getElementById('p-qty').value) || 0;
-      const rate = Number(document.getElementById('p-rate').value) || 0;
-      const total = qty * rate;
+    var qty = Number(document.getElementById('p-qty').value) || 0;
+    var rate = Number(document.getElementById('p-rate').value) || 0;
+    var total = qty * rate;
       document.querySelector('#p-total-display .calc-display__value').textContent = Utils.formatCurrency(total);
       document.getElementById('p-formula').textContent = `${qty} kg × ₹${rate}/kg = ${Utils.formatCurrency(total)}`;
       document.querySelector('#p-total-display .calc-display__value').classList.add('calc-highlight');
@@ -184,11 +181,11 @@
     }
 
     function renderPurchaseTable() {
-      const farmerId = document.getElementById('pur-filter-farmer').value;
-      const vegId = document.getElementById('pur-filter-veg').value;
-      const from = document.getElementById('pur-filter-from').value;
-      const to = document.getElementById('pur-filter-to').value;
-      const data = _purchases.filter(p => {
+    var farmerId = document.getElementById('pur-filter-farmer').value;
+    var vegId = document.getElementById('pur-filter-veg').value;
+    var from = document.getElementById('pur-filter-from').value;
+    var to = document.getElementById('pur-filter-to').value;
+    var data = _purchases.filter(p => {
         if (farmerId && p.farmerId !== farmerId) return false;
         if (vegId && p.vegetableId !== vegId) return false;
         if (from && p.date < from) return false;
@@ -196,8 +193,8 @@
         return true;
       });
       document.getElementById('purchases-tbody').innerHTML = data.map(p => {
-        const farmer = MockDB.getFarmerById(p.farmerId);
-        const veg = MockDB.getVegetableById(p.vegetableId);
+    var farmer = MockDB.getFarmerById(p.farmerId);
+    var veg = MockDB.getVegetableById(p.vegetableId);
         return `<tr>
           <td><code>${p.id}</code></td>
           <td>${Utils.formatDate(p.date)}</td>
@@ -222,12 +219,12 @@
     }
 
     function savePurchase() {
-      const farmerId = document.getElementById('p-farmer').value;
-      const vegId = document.getElementById('p-veg').value;
-      const qty = Number(document.getElementById('p-qty').value);
-      const rate = Number(document.getElementById('p-rate').value);
+    var farmerId = document.getElementById('p-farmer').value;
+    var vegId = document.getElementById('p-veg').value;
+    var qty = Number(document.getElementById('p-qty').value);
+    var rate = Number(document.getElementById('p-rate').value);
       if (!farmerId || !vegId || !qty || !rate) { Utils.showToast('Please fill all required fields.', 'error'); return; }
-      const record = {
+    var record = {
         id: Utils.generateId('PUR'),
         farmerId,
         vegetableId: vegId,
@@ -250,10 +247,10 @@
     }
 
     function updateSummaryCards() {
-      const today = new Date().toISOString().split('T')[0];
-      const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
-      const weekStr = weekAgo.toISOString().split('T')[0];
-      const monthStr = today.substring(0, 7);
+    var today = new Date().toISOString().split('T')[0];
+    var weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
+    var weekStr = weekAgo.toISOString().split('T')[0];
+    var monthStr = today.substring(0, 7);
       document.getElementById('pur-today').textContent = Utils.formatCurrency(_purchases.filter(p => p.date === today).reduce((s,p)=>s+p.total,0));
       document.getElementById('pur-week').textContent = Utils.formatCurrency(_purchases.filter(p => p.date >= weekStr).reduce((s,p)=>s+p.total,0));
       document.getElementById('pur-month').textContent = Utils.formatCurrency(_purchases.filter(p => p.date.startsWith(monthStr)).reduce((s,p)=>s+p.total,0));
@@ -264,12 +261,12 @@
       _purchases = MockDB.getPurchases();
 
       // Populate filters
-      const farmers = MockDB.getFarmers();
-      const vegs = MockDB.getVegetables();
-      const farmerSel = document.getElementById('pur-filter-farmer');
-      const vegSel = document.getElementById('pur-filter-veg');
-      const pFarmer = document.getElementById('p-farmer');
-      const pVeg = document.getElementById('p-veg');
+    var farmers = MockDB.getFarmers();
+    var vegs = MockDB.getVegetables();
+    var farmerSel = document.getElementById('pur-filter-farmer');
+    var vegSel = document.getElementById('pur-filter-veg');
+    var pFarmer = document.getElementById('p-farmer');
+    var pVeg = document.getElementById('p-veg');
       farmers.forEach(f => {
         farmerSel.add(new Option(f.name, f.id));
         pFarmer.add(new Option(f.name, f.id));
@@ -283,6 +280,7 @@
       updateSummaryCards();
       renderPurchaseTable();
     });
-  </script>
+}());
+</script>
 </body>
 </html>

@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Payments — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>My Payments — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -107,30 +105,27 @@
         </div>
       </main>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
+(function () {
+'use strict';
     document.addEventListener('DOMContentLoaded', () => {
       APP.init('farmer');
-      const user       = APP.user;
-      const farmerId   = user.refId;
-      const purchases  = MockDB.getPurchases().filter(p => p.farmerId === farmerId);
-      const payments   = MockDB.getPayments().filter(p => p.partyId === farmerId && p.partyType === 'farmer');
-      const vegetables = MockDB.getVegetables();
-
-      const totalEarned  = purchases.reduce((s, p) => s + p.total, 0);
-      const totalReceived = payments.reduce((s, p) => s + p.amount, 0);
-      const pending       = Math.max(0, totalEarned - totalReceived);
-
-      const now        = new Date();
-      const monthStart = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-      const monthPaid  = payments.filter(p => p.date && p.date.startsWith(monthStart)).reduce((s,p) => s+p.amount, 0);
+    var user       = APP.user;
+    var farmerId   = user.refId;
+    var purchases  = MockDB.getPurchases().filter(p => p.farmerId === farmerId);
+    var payments   = MockDB.getPayments().filter(p => p.partyId === farmerId && p.partyType === 'farmer');
+    var vegetables = MockDB.getVegetables();
+    var totalEarned  = purchases.reduce((s, p) => s + p.total, 0);
+    var totalReceived = payments.reduce((s, p) => s + p.amount, 0);
+    var pending       = Math.max(0, totalEarned - totalReceived);
+    var now        = new Date();
+    var monthStart = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    var monthPaid  = payments.filter(p => p.date && p.date.startsWith(monthStart)).reduce((s,p) => s+p.amount, 0);
 
       document.getElementById('kpi-total-earned').textContent = Utils.formatCurrency(totalEarned);
       document.getElementById('kpi-received').textContent     = Utils.formatCurrency(totalReceived);
@@ -138,18 +133,17 @@
       document.getElementById('kpi-this-month').textContent   = Utils.formatCurrency(monthPaid);
 
       // Pending entries (purchases without full payment)
-      const pendingPurchases = purchases.filter(p => p.status === 'pending' || p.status === 'paymentPending');
+    var pendingPurchases = purchases.filter(p => p.status === 'pending' || p.status === 'paymentPending');
       document.getElementById('pending-badge').textContent = `${pendingPurchases.length} pending`;
-
-      const pendingTbody = document.getElementById('pending-tbody');
+    var pendingTbody = document.getElementById('pending-tbody');
       if (!pendingPurchases.length) {
         pendingTbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No pending payments — all settled 🎉</td></tr>';
       } else {
         pendingTbody.innerHTML = pendingPurchases.map(p => {
-          const veg     = vegetables.find(v => v.id === p.vegetableId);
-          const advance = 0; // demo
-          const balance = p.total - advance;
-          const expectedDate = new Date(p.date);
+    var veg     = vegetables.find(v => v.id === p.vegetableId);
+    var advance = 0; // demo
+    var balance = p.total - advance;
+    var expectedDate = new Date(p.date);
           expectedDate.setDate(expectedDate.getDate() + 3);
           return `<tr>
             <td>${Utils.formatDate(p.date)}</td>
@@ -165,8 +159,8 @@
       }
 
       // Payment history
-      const histTbody = document.getElementById('history-tbody');
-      const sortedPay  = [...payments].sort((a, b) => b.date.localeCompare(a.date));
+    var histTbody = document.getElementById('history-tbody');
+    var sortedPay  = [...payments].sort((a, b) => b.date.localeCompare(a.date));
       if (!sortedPay.length) {
         histTbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No payment history found</td></tr>';
       } else {
@@ -183,6 +177,7 @@
     function raiseQuery() {
       Utils.showToast('Query submitted. You will be contacted within 24 hours. 📞', 'success', 5000);
     }
-  </script>
+}());
+</script>
 </body>
 </html>

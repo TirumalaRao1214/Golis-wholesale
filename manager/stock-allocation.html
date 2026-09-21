@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Stock Allocation — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>Stock Allocation — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -97,33 +95,32 @@
         <button class="btn btn-primary" onclick="confirmAllocation()">Confirm Allocation</button>
       </div>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
-    let _orders         = [];
-    let _currentOrderId = null;
+(function () {
+'use strict';
+    var _orders         = [];
+    var _currentOrderId = null;
 
     function openAllocationModal(orderId) {
       _currentOrderId = orderId;
-      const order  = MockDB.getOrderById(orderId);
-      const vendor = order ? MockDB.getVendorById(order.vendorId) : null;
-      const items  = MockDB.getOrderItems(orderId);
+    var order  = MockDB.getOrderById(orderId);
+    var vendor = order ? MockDB.getVendorById(order.vendorId) : null;
+    var items  = MockDB.getOrderItems(orderId);
 
       document.getElementById('alloc-order-id').textContent = orderId;
       document.getElementById('alloc-order-info').innerHTML =
         `<strong>${vendor ? vendor.businessName : ''}</strong> | ${vendor ? vendor.city : ''} | Total: ${Utils.formatCurrency(order ? order.total : 0)} | Delivery: ${order ? Utils.formatDate(order.deliveryDate) : ''}`;
 
       document.getElementById('alloc-items-tbody').innerHTML = items.map(item => {
-        const veg  = MockDB.getVegetableById(item.vegId);
-        const inv  = MockDB.getInventoryByVegetable(item.vegId, item.grade);
-        const avail = inv ? (inv.closing || 0) : 0;
-        const defaultAlloc = Math.min(item.qty, avail);
+    var veg  = MockDB.getVegetableById(item.vegId);
+    var inv  = MockDB.getInventoryByVegetable(item.vegId, item.grade);
+    var avail = inv ? (inv.closing || 0) : 0;
+    var defaultAlloc = Math.min(item.qty, avail);
         return `<tr>
           <td>${veg ? veg.nameEn : item.vegId}</td>
           <td><span class="badge badge--success">Grade ${item.grade}</span></td>
@@ -141,8 +138,8 @@
     }
 
     function updateAllocSummary() {
-      const inputs = document.querySelectorAll('[data-item-id]');
-      let totalOrdered = 0, totalAlloc = 0;
+    var inputs = document.querySelectorAll('[data-item-id]');
+    var totalOrdered = 0, totalAlloc = 0;
       inputs.forEach(inp => {
         totalOrdered += Number(inp.dataset.ordered) || 0;
         totalAlloc   += Number(inp.value) || 0;
@@ -155,21 +152,21 @@
     }
 
     function confirmAllocation() {
-      const inputs = document.querySelectorAll('[data-item-id]');
+    var inputs = document.querySelectorAll('[data-item-id]');
       if (!_currentOrderId) return;
 
       // Reduce inventory for each allocated item
-      const items = MockDB.getOrderItems(_currentOrderId);
+    var items = MockDB.getOrderItems(_currentOrderId);
       inputs.forEach(inp => {
-        const itemId   = inp.dataset.itemId;
-        const allocQty = Number(inp.value) || 0;
+    var itemId   = inp.dataset.itemId;
+    var allocQty = Number(inp.value) || 0;
         if (allocQty <= 0) return;
-        const item = items.find(i => i.id === itemId);
+    var item = items.find(i => i.id === itemId);
         if (!item) return;
-        const inv  = MockDB.getInventoryByVegetable(item.vegId, item.grade);
+    var inv  = MockDB.getInventoryByVegetable(item.vegId, item.grade);
         if (inv) {
-          const newClosing = Math.max(0, (inv.closing || 0) - allocQty);
-          const newSold    = (inv.sold || 0) + allocQty;
+    var newClosing = Math.max(0, (inv.closing || 0) - allocQty);
+    var newSold    = (inv.sold || 0) + allocQty;
           MockDB.updateRecord('_inventory', inv.id, { closing: newClosing, sold: newSold });
         }
       });
@@ -184,7 +181,7 @@
     }
 
     function renderAllocationQueue() {
-      const confirmed = _orders.filter(o => o.status === 'confirmed');
+    var confirmed = _orders.filter(o => o.status === 'confirmed');
       document.getElementById('queue-badge').textContent = confirmed.length + ' orders awaiting';
       if (confirmed.length === 0) {
         document.getElementById('allocation-queue').innerHTML = '<div class="empty-state"><p class="empty-state__text">No confirmed orders awaiting allocation.</p></div>';
@@ -193,8 +190,8 @@
       document.getElementById('allocation-queue').innerHTML =
         `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1rem;">` +
         confirmed.map(o => {
-          const vendor = MockDB.getVendorById(o.vendorId);
-          const items  = MockDB.getOrderItems(o.id);
+    var vendor = MockDB.getVendorById(o.vendorId);
+    var items  = MockDB.getOrderItems(o.id);
           return `<div style="padding:1rem;border:1px solid var(--color-border);border-radius:8px;background:var(--color-surface);">
             <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.75rem;">
               <div>
@@ -205,10 +202,10 @@
             </div>
             <div style="font-size:0.8rem;margin-bottom:0.75rem;">
               ${items.map(i => {
-                const v   = MockDB.getVegetableById(i.vegId);
-                const inv = MockDB.getInventoryByVegetable(i.vegId, i.grade);
-                const avail = inv ? (inv.closing || 0) : 0;
-                const ok = avail >= i.qty;
+    var v   = MockDB.getVegetableById(i.vegId);
+    var inv = MockDB.getInventoryByVegetable(i.vegId, i.grade);
+    var avail = inv ? (inv.closing || 0) : 0;
+    var ok = avail >= i.qty;
                 return `<div style="display:flex;justify-content:space-between;padding:2px 0;font-size:0.8rem;">
                   <span>${v ? v.nameEn : ''} Grade ${i.grade}</span>
                   <span style="color:${ok ? 'var(--color-success)' : 'var(--color-warning)'};">${i.qty} kg ${ok ? '✅' : '⚠'}</span>
@@ -224,11 +221,11 @@
     }
 
     function renderAllocatedTable() {
-      const allocated = _orders.filter(o => ['stockAllocated','loading','dispatched','delivered'].includes(o.status));
+    var allocated = _orders.filter(o => ['stockAllocated','loading','dispatched','delivered'].includes(o.status));
       document.getElementById('allocated-tbody').innerHTML = allocated.length === 0
         ? '<tr><td colspan="5" class="empty-row">No allocated orders yet.</td></tr>'
         : allocated.map(o => {
-            const vendor = MockDB.getVendorById(o.vendorId);
+    var vendor = MockDB.getVendorById(o.vendorId);
             return `<tr>
               <td><code>${o.id}</code></td>
               <td>${vendor ? vendor.businessName : o.vendorId}</td>
@@ -245,6 +242,7 @@
       renderAllocationQueue();
       renderAllocatedTable();
     });
-  </script>
+}());
+</script>
 </body>
 </html>

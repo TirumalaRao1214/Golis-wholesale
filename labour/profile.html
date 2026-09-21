@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Profile — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>My Profile — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -149,23 +147,22 @@
 
       </main>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
-    let currentWorker = null;
+(function () {
+'use strict';
+    var currentWorker = null;
 
     document.addEventListener('DOMContentLoaded', () => {
       APP.init('labour');
-      const user    = APP.user;
+    var user    = APP.user;
       currentWorker = MockDB._labour.find(l => l.id === user.refId);
-      const stats   = MockDB.getLabourStats(user.refId);
-      const att     = MockDB.getAttendance().filter(a => a.labourId === user.refId);
+    var stats   = MockDB.getLabourStats(user.refId);
+    var att     = MockDB.getAttendance().filter(a => a.labourId === user.refId);
 
       if (currentWorker) {
         document.getElementById('f-name').value      = currentWorker.name     || '';
@@ -181,19 +178,18 @@
       }
 
       // Statistics
-      const presentDays = att.filter(a => a.status === 'present' || a.status === 'overtime').length;
-      const halfDays    = att.filter(a => a.status === 'halfDay').length;
-      const totalDays   = att.length;
-      const attendanceRate = totalDays > 0 ? Math.round((presentDays + halfDays * 0.5) / totalDays * 100) : 0;
-
-      const now        = new Date();
-      const monthStart = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-      const monthAtt   = att.filter(a => a.date.startsWith(monthStart));
-      const monthPresent = monthAtt.filter(a => a.status === 'present' || a.status === 'overtime').length;
-      const monthHalf    = monthAtt.filter(a => a.status === 'halfDay').length;
-      const dailyWage    = currentWorker ? currentWorker.dailyWage : 700;
-      const monthEarned  = (monthPresent * dailyWage) + (monthHalf * dailyWage * 0.5);
-      const totalEarned  = stats.totalEarnings || ((presentDays * dailyWage) + (halfDays * dailyWage * 0.5));
+    var presentDays = att.filter(a => a.status === 'present' || a.status === 'overtime').length;
+    var halfDays    = att.filter(a => a.status === 'halfDay').length;
+    var totalDays   = att.length;
+    var attendanceRate = totalDays > 0 ? Math.round((presentDays + halfDays * 0.5) / totalDays * 100) : 0;
+    var now        = new Date();
+    var monthStart = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    var monthAtt   = att.filter(a => a.date.startsWith(monthStart));
+    var monthPresent = monthAtt.filter(a => a.status === 'present' || a.status === 'overtime').length;
+    var monthHalf    = monthAtt.filter(a => a.status === 'halfDay').length;
+    var dailyWage    = currentWorker ? currentWorker.dailyWage : 700;
+    var monthEarned  = (monthPresent * dailyWage) + (monthHalf * dailyWage * 0.5);
+    var totalEarned  = stats.totalEarnings || ((presentDays * dailyWage) + (halfDays * dailyWage * 0.5));
 
       document.getElementById('stat-total-days').textContent     = presentDays + halfDays;
       document.getElementById('stat-total-earned').textContent   = Utils.formatCurrency(totalEarned);
@@ -219,7 +215,7 @@
 
     function saveProfile(e) {
       e.preventDefault();
-      const updates = {
+    var updates = {
         name:   document.getElementById('f-name').value.trim(),
         mobile: document.getElementById('f-mobile').value.trim(),
       };
@@ -232,6 +228,7 @@
       document.getElementById('btn-edit').style.display = 'inline-flex';
       Utils.showToast('Profile updated successfully ✅', 'success');
     }
-  </script>
+}());
+</script>
 </body>
 </html>

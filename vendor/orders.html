@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Orders — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>Orders — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
   <style>
@@ -195,36 +193,34 @@
         </div>
       </div>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
-    let allOrders    = [];
-    let allOrderItems = [];
-
-    const statusMap = {
+(function () {
+'use strict';
+    var allOrders    = [];
+    var allOrderItems = [];
+    var statusMap = {
       pending:'badge--warning', confirmed:'badge--info', preparing:'badge--info',
       stockAllocated:'badge--info', loading:'badge--info', dispatched:'badge--primary',
       inTransit:'badge--primary', delivered:'badge--success', partiallyFulfilled:'badge--warning',
     };
-    const statusLabels = {
+    var statusLabels = {
       pending:'Pending', confirmed:'Confirmed', preparing:'Preparing',
       stockAllocated:'Stock Ready', loading:'Loading', dispatched:'Dispatched',
       inTransit:'In Transit', delivered:'Delivered', partiallyFulfilled:'Partially Fulfilled',
     };
-    const TIMELINE_STEPS = ['pending','confirmed','preparing','stockAllocated','loading','dispatched','inTransit','delivered'];
+    var TIMELINE_STEPS = ['pending','confirmed','preparing','stockAllocated','loading','dispatched','inTransit','delivered'];
 
     document.addEventListener('DOMContentLoaded', () => {
       APP.init('vendor');
-      const user   = APP.user;
-      const vendor = MockDB.getVendorById(user.refId);
-      const params = new URLSearchParams(window.location.search);
-      const action = params.get('action');
+    var user   = APP.user;
+    var vendor = MockDB.getVendorById(user.refId);
+    var params = new URLSearchParams(window.location.search);
+    var action = params.get('action');
 
       allOrders = MockDB.getOrders().filter(o => o.vendorId === user.refId);
 
@@ -250,16 +246,16 @@
       }
 
       // Delivery date default: 2 days from now
-      const d = new Date(); d.setDate(d.getDate() + 2);
+    var d = new Date(); d.setDate(d.getDate() + 2);
       document.getElementById('co-delivery-date').value = Utils.formatDateInput(d);
 
       // Show cart summary
-      const cart = JSON.parse(localStorage.getItem('golis_cart') || '[]');
-      const vegetables = MockDB.getVegetables();
-      const total = cart.reduce((s, c) => s + c.total, 0);
+    var cart = JSON.parse(localStorage.getItem('golis_cart') || '[]');
+    var vegetables = MockDB.getVegetables();
+    var total = cart.reduce((s, c) => s + c.total, 0);
       document.getElementById('checkout-total').textContent = Utils.formatCurrency(total);
       document.getElementById('checkout-items').innerHTML = cart.map(c => {
-        const veg = vegetables.find(v => v.id === c.vegetableId);
+    var veg = vegetables.find(v => v.id === c.vegetableId);
         return `<tr>
           <td>${veg ? veg.emoji : ''} ${c.nameEn} <span class="badge badge--info" style="font-size:0.7rem;">Gr.${c.grade}</span></td>
           <td class="text-right">${Utils.formatIndianNumber(c.qty)} kg</td>
@@ -275,17 +271,17 @@
     }
 
     function renderOrders(data) {
-      const tbody = document.getElementById('orders-tbody');
+    var tbody = document.getElementById('orders-tbody');
       if (!data.length) {
         tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No orders found</td></tr>';
         return;
       }
-      const vegs = MockDB.getVegetables();
+    var vegs = MockDB.getVegetables();
       tbody.innerHTML = [...data].sort((a, b) => b.orderDate.localeCompare(a.orderDate)).map(o => {
-        const items = MockDB.getOrderItems(o.id);
-        const totalQty = items.reduce((s, i) => s + i.qty, 0);
-        const itemSummary = items.slice(0, 2).map(i => {
-          const v = vegs.find(v2 => v2.id === i.vegId);
+    var items = MockDB.getOrderItems(o.id);
+    var totalQty = items.reduce((s, i) => s + i.qty, 0);
+    var itemSummary = items.slice(0, 2).map(i => {
+    var v = vegs.find(v2 => v2.id === i.vegId);
           return v ? `${v.nameEn} ${i.grade}` : i.vegId;
         }).join(', ') + (items.length > 2 ? ` +${items.length-2} more` : '');
         return `<tr>
@@ -301,35 +297,33 @@
     }
 
     function applyFilter() {
-      const status = document.getElementById('filter-status').value;
-      const from   = document.getElementById('filter-date-from').value;
-      let filtered = [...allOrders];
+    var status = document.getElementById('filter-status').value;
+    var from   = document.getElementById('filter-date-from').value;
+    var filtered = [...allOrders];
       if (status) filtered = filtered.filter(o => o.status === status);
       if (from)   filtered = filtered.filter(o => o.orderDate >= from);
       renderOrders(filtered);
     }
 
     function viewOrderDetail(orderId) {
-      const order = allOrders.find(o => o.id === orderId);
+    var order = allOrders.find(o => o.id === orderId);
       if (!order) return;
-      const items  = MockDB.getOrderItems(orderId);
-      const vegs   = MockDB.getVegetables();
-      const vendor = MockDB.getVendorById(APP.user.refId);
-
-      const stepIdx  = TIMELINE_STEPS.indexOf(order.status);
-      const timeline = TIMELINE_STEPS.map((step, i) => {
-        const cls = i < stepIdx ? 'done' : i === stepIdx ? 'active' : '';
-        const lbl = statusLabels[step] || step;
+    var items  = MockDB.getOrderItems(orderId);
+    var vegs   = MockDB.getVegetables();
+    var vendor = MockDB.getVendorById(APP.user.refId);
+    var stepIdx  = TIMELINE_STEPS.indexOf(order.status);
+    var timeline = TIMELINE_STEPS.map((step, i) => {
+    var cls = i < stepIdx ? 'done' : i === stepIdx ? 'active' : '';
+    var lbl = statusLabels[step] || step;
         return `<div class="timeline-step">
           <div class="timeline-dot ${cls}">${i < stepIdx ? '✓' : i+1}</div>
           <div class="timeline-label ${cls === 'active' ? 'active' : ''}">${lbl}</div>
         </div>`;
       }).join('');
-
-      const itemRows = items.map(item => {
-        const veg = vegs.find(v => v.id === item.vegId);
-        const confirmedQty = item.qty; // demo: same as ordered
-        const shortage = Math.max(0, item.qty - confirmedQty);
+    var itemRows = items.map(item => {
+    var veg = vegs.find(v => v.id === item.vegId);
+    var confirmedQty = item.qty; // demo: same as ordered
+    var shortage = Math.max(0, item.qty - confirmedQty);
         return `<tr>
           <td>${veg ? `${veg.emoji} ${veg.nameEn}` : item.vegId}</td>
           <td><span class="badge badge--info">Grade ${item.grade}</span></td>
@@ -366,21 +360,19 @@
 
     function placeOrder(e) {
       e.preventDefault();
-      const cart   = JSON.parse(localStorage.getItem('golis_cart') || '[]');
-      const user   = APP.user;
-      const vendor = MockDB.getVendorById(user.refId);
+    var cart   = JSON.parse(localStorage.getItem('golis_cart') || '[]');
+    var user   = APP.user;
+    var vendor = MockDB.getVendorById(user.refId);
 
       if (!cart.length) {
         Utils.showToast('Cart is empty. Add items first.', 'error');
         return;
       }
-
-      const orderId    = Utils.generateId('ORD');
-      const total      = cart.reduce((s, c) => s + c.total, 0);
-      const orderDate  = new Date().toISOString().split('T')[0];
-      const deliveryDate = document.getElementById('co-delivery-date').value;
-
-      const order = {
+    var orderId    = Utils.generateId('ORD');
+    var total      = cart.reduce((s, c) => s + c.total, 0);
+    var orderDate  = new Date().toISOString().split('T')[0];
+    var deliveryDate = document.getElementById('co-delivery-date').value;
+    var order = {
         id:           orderId,
         vendorId:     user.refId,
         orderDate,
@@ -397,9 +389,9 @@
       MockDB.saveRecord('_orders', order);
 
       // Save order items
-      const vegetables = MockDB.getVegetables();
+    var vegetables = MockDB.getVegetables();
       cart.forEach(c => {
-        const veg = vegetables.find(v => v.id === c.vegetableId);
+    var veg = vegetables.find(v => v.id === c.vegetableId);
         MockDB.saveRecord('_orderItems', {
           id:      Utils.generateId('OI'),
           orderId: orderId,
@@ -422,6 +414,7 @@
       Utils.closeModal('modal-order-success');
       window.location.href = 'orders.html';
     }
-  </script>
+}());
+</script>
 </body>
 </html>

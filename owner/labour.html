@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Labour Management — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>Labour Management — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -129,26 +127,24 @@
         <button class="btn btn-primary" onclick="saveLabour()" data-i18n="common.save"></button>
       </div>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
-    let _labour = [];
-
-    const WORK_TYPE_COLORS = { Loading: 'badge--success', Unloading: 'badge--info', Sorting: 'badge--warning', Packing: 'badge--primary', Cleaning: 'badge--muted' };
+(function () {
+'use strict';
+    var _labour = [];
+    var WORK_TYPE_COLORS = { Loading: 'badge--success', Unloading: 'badge--info', Sorting: 'badge--warning', Packing: 'badge--primary', Cleaning: 'badge--muted' };
 
     function renderLabourTable() {
-      const today = new Date().toISOString().split('T')[0];
-      const attendance = MockDB.getAttendance(today);
+    var today = new Date().toISOString().split('T')[0];
+    var attendance = MockDB.getAttendance(today);
       document.getElementById('labour-tbody').innerHTML = _labour.map(w => {
-        const att = attendance.find(a => a.labourId === w.id);
-        const todayStatus = att ? att.status : 'absent';
-        const colorClass = WORK_TYPE_COLORS[w.workType] || 'badge--muted';
+    var att = attendance.find(a => a.labourId === w.id);
+    var todayStatus = att ? att.status : 'absent';
+    var colorClass = WORK_TYPE_COLORS[w.workType] || 'badge--muted';
         return `<tr>
           <td><code>${w.id}</code></td>
           <td><strong>${w.name}</strong></td>
@@ -164,10 +160,10 @@
       }).join('');
 
       // Summary cards
-      const today2 = new Date().toISOString().split('T')[0];
-      const att2 = MockDB.getAttendance(today2);
-      const present = att2.filter(a => ['present','overtime'].includes(a.status)).length;
-      const monthlyWage = _labour.reduce((s, w) => s + w.dailyWage * 26, 0); // ~26 working days
+    var today2 = new Date().toISOString().split('T')[0];
+    var att2 = MockDB.getAttendance(today2);
+    var present = att2.filter(a => ['present','overtime'].includes(a.status)).length;
+    var monthlyWage = _labour.reduce((s, w) => s + w.dailyWage * 26, 0); // ~26 working days
       document.getElementById('lab-total').textContent = _labour.length;
       document.getElementById('lab-present').textContent = present;
       document.getElementById('lab-monthly-wage').textContent = Utils.formatCurrency(monthlyWage);
@@ -182,7 +178,7 @@
     }
 
     function editLabour(id) {
-      const w = _labour.find(x => x.id === id);
+    var w = _labour.find(x => x.id === id);
       if (!w) return;
       document.getElementById('labour-modal-title').textContent = 'Edit Labour Worker';
       document.getElementById('labour-edit-id').value = id;
@@ -195,10 +191,10 @@
     }
 
     function saveLabour() {
-      const name = document.getElementById('l-name').value.trim();
+    var name = document.getElementById('l-name').value.trim();
       if (!name) { Utils.showToast('Labour name is required.', 'error'); return; }
-      const editId = document.getElementById('labour-edit-id').value;
-      const record = {
+    var editId = document.getElementById('labour-edit-id').value;
+    var record = {
         name,
         mobile: document.getElementById('l-mobile').value.trim(),
         workType: document.getElementById('l-type').value,
@@ -223,6 +219,7 @@
       _labour = MockDB.getLabour();
       renderLabourTable();
     });
-  </script>
+}());
+</script>
 </body>
 </html>

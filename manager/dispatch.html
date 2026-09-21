@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dispatch Management — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>Dispatch Management — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -198,39 +196,38 @@
         <button class="btn btn-primary" onclick="saveDispatchStatus()">Update</button>
       </div>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
-    let _dispatches = [];
+(function () {
+'use strict';
+    var _dispatches = [];
 
     function onOrderSelect() {
-      const orderId = document.getElementById('dp-order').value;
+    var orderId = document.getElementById('dp-order').value;
       if (!orderId) { document.getElementById('dp-to').value = ''; return; }
-      const order  = MockDB.getOrderById(orderId);
-      const vendor = order ? MockDB.getVendorById(order.vendorId) : null;
+    var order  = MockDB.getOrderById(orderId);
+    var vendor = order ? MockDB.getVendorById(order.vendorId) : null;
       if (vendor) document.getElementById('dp-to').value = vendor.city;
       // Estimate delivery based on city
-      const deliveryDays = { Hyderabad: 1, Vijayawada: 1, Chennai: 2, Bangalore: 2, Mumbai: 3 };
-      const city = vendor ? vendor.city : '';
-      const days = deliveryDays[city] || 2;
-      const delivDate = new Date(); delivDate.setDate(delivDate.getDate() + days);
+    var deliveryDays = { Hyderabad: 1, Vijayawada: 1, Chennai: 2, Bangalore: 2, Mumbai: 3 };
+    var city = vendor ? vendor.city : '';
+    var days = deliveryDays[city] || 2;
+    var delivDate = new Date(); delivDate.setDate(delivDate.getDate() + days);
       document.getElementById('dp-delivery').value = delivDate.toISOString().split('T')[0];
     }
 
     function onVehicleSelect() {
-      const vehicleId = document.getElementById('dp-vehicle').value;
+    var vehicleId = document.getElementById('dp-vehicle').value;
       if (!vehicleId) {
         document.getElementById('dp-driver').value        = '';
         document.getElementById('dp-driver-mobile').value = '';
         return;
       }
-      const vehicle = MockDB.getVehicles().find(v => v.id === vehicleId);
+    var vehicle = MockDB.getVehicles().find(v => v.id === vehicleId);
       if (vehicle) {
         document.getElementById('dp-driver').value        = vehicle.driverName || '';
         document.getElementById('dp-driver-mobile').value = vehicle.driverMobile || '';
@@ -238,7 +235,7 @@
     }
 
     function openStatusModal(dispatchId) {
-      const dsp = _dispatches.find(d => d.id === dispatchId);
+    var dsp = _dispatches.find(d => d.id === dispatchId);
       document.getElementById('dsp-status-id').value   = dispatchId;
       document.getElementById('dsp-new-status').value  = dsp ? dsp.status : 'dispatched';
       document.getElementById('actual-arrival-grp').style.display = dsp && dsp.status === 'inTransit' ? '' : 'none';
@@ -249,20 +246,20 @@
     }
 
     function saveDispatchStatus() {
-      const id        = document.getElementById('dsp-status-id').value;
-      const newStatus = document.getElementById('dsp-new-status').value;
-      const arrival   = document.getElementById('dsp-actual-arrival').value;
-      const updates   = { status: newStatus };
+    var id        = document.getElementById('dsp-status-id').value;
+    var newStatus = document.getElementById('dsp-new-status').value;
+    var arrival   = document.getElementById('dsp-actual-arrival').value;
+    var updates   = { status: newStatus };
       if (newStatus === 'delivered' && arrival) updates.actualArrival = arrival;
       MockDB.updateRecord('_dispatches', id, updates);
       // If delivered, update order status too
       if (newStatus === 'delivered') {
-        const dsp = _dispatches.find(d => d.id === id);
+    var dsp = _dispatches.find(d => d.id === id);
         if (dsp) MockDB.updateRecord('_orders', dsp.orderId, { status: 'delivered' });
         // Free up vehicle
-        const dspUpdated = MockDB.getDispatches().find(d => d.id === id);
+    var dspUpdated = MockDB.getDispatches().find(d => d.id === id);
         if (dspUpdated) {
-          const veh = MockDB.getVehicles().find(v => v.vehicleNo === dspUpdated.vehicleNo);
+    var veh = MockDB.getVehicles().find(v => v.vehicleNo === dspUpdated.vehicleNo);
           if (veh) MockDB.updateRecord('_vehicles', veh.id, { status: 'available' });
         }
       }
@@ -273,14 +270,14 @@
     }
 
     function saveDispatch() {
-      const orderId   = document.getElementById('dp-order').value;
-      const vehicleId = document.getElementById('dp-vehicle').value;
-      const dpDate    = document.getElementById('dp-date').value;
+    var orderId   = document.getElementById('dp-order').value;
+    var vehicleId = document.getElementById('dp-vehicle').value;
+    var dpDate    = document.getElementById('dp-date').value;
       if (!orderId || !vehicleId || !dpDate) {
         Utils.showToast('Order, Vehicle, and Dispatch Date are required.', 'error'); return;
       }
-      const vehicle = MockDB.getVehicles().find(v => v.id === vehicleId);
-      const record  = {
+    var vehicle = MockDB.getVehicles().find(v => v.id === vehicleId);
+    var record  = {
         id: Utils.generateId('DSP'),
         orderId,
         vehicleId,
@@ -305,12 +302,11 @@
       Utils.showToast('Dispatch created! Vehicle marked as In Use.', 'success');
       renderDispatches();
     }
-
-    const STATUS_STEPS = { loading: 1, dispatched: 2, inTransit: 3, delivered: 4 };
-    const STEP_LABELS  = ['Loading', 'Dispatched', 'In Transit', 'Delivered'];
+    var STATUS_STEPS = { loading: 1, dispatched: 2, inTransit: 3, delivered: 4 };
+    var STEP_LABELS  = ['Loading', 'Dispatched', 'In Transit', 'Delivered'];
 
     function renderDispatches() {
-      const counts = { loading: 0, dispatched: 0, inTransit: 0, delivered: 0 };
+    var counts = { loading: 0, dispatched: 0, inTransit: 0, delivered: 0 };
       _dispatches.forEach(d => { if (counts[d.status] !== undefined) counts[d.status]++; });
       document.getElementById('d-loading').textContent   = counts.loading;
       document.getElementById('d-dispatched').textContent= counts.dispatched;
@@ -318,17 +314,17 @@
       document.getElementById('d-delivered').textContent = counts.delivered;
 
       // Active dispatches (not delivered/cancelled)
-      const active = _dispatches.filter(d => d.status !== 'delivered' && d.status !== 'cancelled');
+    var active = _dispatches.filter(d => d.status !== 'delivered' && d.status !== 'cancelled');
       if (active.length === 0) {
         document.getElementById('active-dispatches').innerHTML = '<div class="empty-state"><p class="empty-state__text">No active dispatches.</p></div>';
       } else {
         document.getElementById('active-dispatches').innerHTML =
           `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1rem;">` +
           active.map(d => {
-            const order  = MockDB.getOrderById(d.orderId);
-            const vendor = order ? MockDB.getVendorById(order.vendorId) : null;
-            const step   = STATUS_STEPS[d.status] || 1;
-            const stepsHtml = STEP_LABELS.map((label, i) =>
+    var order  = MockDB.getOrderById(d.orderId);
+    var vendor = order ? MockDB.getVendorById(order.vendorId) : null;
+    var step   = STATUS_STEPS[d.status] || 1;
+    var stepsHtml = STEP_LABELS.map((label, i) =>
               `<div style="text-align:center;flex:1;">
                 <div style="width:24px;height:24px;border-radius:50%;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;
                   background:${i < step ? 'var(--color-primary)' : 'var(--color-border)'};
@@ -352,8 +348,8 @@
 
       // History table
       document.getElementById('dispatch-tbody').innerHTML = _dispatches.map(d => {
-        const order  = MockDB.getOrderById(d.orderId);
-        const vendor = order ? MockDB.getVendorById(order.vendorId) : null;
+    var order  = MockDB.getOrderById(d.orderId);
+    var vendor = order ? MockDB.getVendorById(order.vendorId) : null;
         return `<tr>
           <td><code>${d.id}</code></td>
           <td><code>${d.orderId}</code></td>
@@ -377,7 +373,7 @@
       MockDB.getOrders()
         .filter(o => ['loading','stockAllocated'].includes(o.status))
         .forEach(o => {
-          const vendor = MockDB.getVendorById(o.vendorId);
+    var vendor = MockDB.getVendorById(o.vendorId);
           document.getElementById('dp-order').add(new Option(`${o.id} — ${vendor ? vendor.businessName : ''} [${o.status}]`, o.id));
         });
 
@@ -391,6 +387,7 @@
       document.getElementById('dp-date').value = new Date().toISOString().slice(0,16);
       renderDispatches();
     });
-  </script>
+}());
+</script>
 </body>
 </html>

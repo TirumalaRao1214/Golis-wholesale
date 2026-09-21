@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>Dashboard — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -179,20 +177,19 @@
 
       </main>
     </div>
-  </div>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
+(function () {
+'use strict';
     document.addEventListener('DOMContentLoaded', () => {
       APP.init('owner');
-
-      const stats = MockDB.getTodayDashboardStats();
-      const farmers = MockDB.getFarmers();
-      const vendors = MockDB.getVendors();
+    var stats = MockDB.getTodayDashboardStats();
+    var farmers = MockDB.getFarmers();
+    var vendors = MockDB.getVendors();
 
       // KPIs — use demo values since today's date won't match seed data
       document.getElementById('kpi-purchases').textContent  = Utils.formatCurrency(485000);
@@ -216,7 +213,7 @@
       Charts.renderFarmerSupplyBar('chart-farmer-bar');
 
       // Activity Feed
-      const activities = [
+    var activities = [
         { icon: '🚛', text: 'ARR003 — Lakshmaiah arrived with Potato (900 kg)', time: '08:15' },
         { icon: '⚖️', text: 'WGT007 — Onion weighment completed: 500 kg net', time: '08:00' },
         { icon: '✅', text: 'QC007 — Onion quality check: Grade A 420 kg', time: '07:45' },
@@ -228,14 +225,15 @@
         { icon: '🌿', text: 'ARR001 — Venkatesh Reddy arrival completed', time: '06:00' },
         { icon: '💳', text: 'PAY014 — ₹1,00,000 advance received from Deccan Veg', time: '05:30' },
       ];
-      const feed = document.getElementById('activity-feed');
+    var feed = document.getElementById('activity-feed');
       activities.forEach(a => {
-        const li = document.createElement('li');
+    var li = document.createElement('li');
         li.className = 'activity-item';
         li.innerHTML = `<span class="activity-icon">${a.icon}</span><div class="activity-body"><span class="activity-text">${a.text}</span><span class="activity-time">${a.time}</span></div>`;
         feed.appendChild(li);
       });
     });
-  </script>
+}());
+</script>
 </body>
 </html>

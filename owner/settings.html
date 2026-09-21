@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Settings — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>Settings — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -121,16 +119,15 @@
         </div>
       </main>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
-    let _vegs = [];
+(function () {
+'use strict';
+    var _vegs = [];
 
     function switchSettingsTab(tab) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-btn--active'));
@@ -148,7 +145,7 @@
     function renderPriceManagement() {
       _vegs = MockDB.getVegetables();
       document.getElementById('price-mgmt-tbody').innerHTML = _vegs.map(v => {
-        const change = v.currentSellPrice > v.prevSellPrice ? 'up' : v.currentSellPrice < v.prevSellPrice ? 'down' : 'neutral';
+    var change = v.currentSellPrice > v.prevSellPrice ? 'up' : v.currentSellPrice < v.prevSellPrice ? 'down' : 'neutral';
         return `<tr>
           <td><strong>${v.emoji || ''} ${v.nameEn}</strong></td>
           <td class="telugu-text">${v.nameTe}</td>
@@ -161,17 +158,17 @@
     }
 
     function updatePriceChange(vegId) {
-      const v = _vegs.find(x => x.id === vegId);
+    var v = _vegs.find(x => x.id === vegId);
       if (!v) return;
-      const newSell = Number(document.getElementById(`pm-sell-${vegId}`).value);
-      const change = newSell > v.prevSellPrice ? 'up' : newSell < v.prevSellPrice ? 'down' : 'neutral';
+    var newSell = Number(document.getElementById(`pm-sell-${vegId}`).value);
+    var change = newSell > v.prevSellPrice ? 'up' : newSell < v.prevSellPrice ? 'down' : 'neutral';
       document.getElementById(`pm-change-${vegId}`).innerHTML = Utils.priceIcon(change);
     }
 
     function savePriceManagement() {
       _vegs.forEach(v => {
-        const buyInput = document.getElementById(`pm-buy-${v.id}`);
-        const sellInput = document.getElementById(`pm-sell-${v.id}`);
+    var buyInput = document.getElementById(`pm-buy-${v.id}`);
+    var sellInput = document.getElementById(`pm-sell-${v.id}`);
         if (buyInput && sellInput) {
           MockDB.updateRecord('_vegetables', v.id, {
             currentBuyPrice: Number(buyInput.value),
@@ -186,8 +183,8 @@
     }
 
     function renderUserManagement() {
-      const users = MockDB.getUsers();
-      const ROLE_COLORS = { owner: 'badge--success', manager: 'badge--info', farmer: 'badge--warning', vendor: 'badge--primary', labour: 'badge--muted' };
+    var users = MockDB.getUsers();
+    var ROLE_COLORS = { owner: 'badge--success', manager: 'badge--info', farmer: 'badge--warning', vendor: 'badge--primary', labour: 'badge--muted' };
       document.getElementById('users-tbody').innerHTML = users.map(u => `
         <tr>
           <td><code>${u.id}</code></td>
@@ -209,6 +206,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       APP.init('owner');
     });
-  </script>
+}());
+</script>
 </body>
 </html>

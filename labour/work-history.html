@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Work History — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>Work History — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -96,27 +94,24 @@
         </div>
       </main>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
-    let allAssignments = [];
-    let worker = null;
-
-    const WORK_TYPE_BADGES = {
+(function () {
+'use strict';
+    var allAssignments = [];
+    var worker = null;
+    var WORK_TYPE_BADGES = {
       Loading:   'badge--info',
       Unloading: 'badge--success',
       Sorting:   'badge--primary',
       Packing:   'badge--warning',
       Cleaning:  '',
     };
-
-    const STATUS_BADGES = {
+    var STATUS_BADGES = {
       Assigned:    'badge--info',
       'In Progress':'badge--warning',
       Completed:   'badge--success',
@@ -125,33 +120,33 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       APP.init('labour');
-      const user = APP.user;
+    var user = APP.user;
       worker     = MockDB._labour.find(l => l.id === user.refId);
-      const dailyWage = worker ? worker.dailyWage : 700;
+    var dailyWage = worker ? worker.dailyWage : 700;
 
       // Build work history from loading records + attendance
-      const loadingRecords = MockDB.getLoadingRecords().filter(r => r.labourIds && r.labourIds.includes(user.refId));
-      const attendance     = MockDB.getAttendance().filter(a => a.labourId === user.refId);
-      const orders         = MockDB.getOrders();
+    var loadingRecords = MockDB.getLoadingRecords().filter(r => r.labourIds && r.labourIds.includes(user.refId));
+    var attendance     = MockDB.getAttendance().filter(a => a.labourId === user.refId);
+    var orders         = MockDB.getOrders();
 
       // Build assignments from attendance (one per present day)
       allAssignments = attendance.map(att => {
-        const loadRec = loadingRecords.find(lr => {
-          const lrDate = lr.startTime ? lr.startTime.split('T')[0] : '';
+    var loadRec = loadingRecords.find(lr => {
+    var lrDate = lr.startTime ? lr.startTime.split('T')[0] : '';
           return lrDate === att.date;
         });
-        const order = loadRec ? orders.find(o => o.id === loadRec.orderId) : null;
-        const workType = worker ? worker.workType : 'Loading';
-        const status   = att.status === 'absent' ? 'Absent'
+    var order = loadRec ? orders.find(o => o.id === loadRec.orderId) : null;
+    var workType = worker ? worker.workType : 'Loading';
+    var status   = att.status === 'absent' ? 'Absent'
                        : loadRec && loadRec.status === 'completed' ? 'Completed'
                        : loadRec && loadRec.status === 'inProgress' ? 'In Progress'
                        : att.status === 'present' || att.status === 'overtime' ? 'Assigned'
                        : 'Assigned';
-        const wage = att.status === 'present' || att.status === 'overtime' ? dailyWage
+    var wage = att.status === 'present' || att.status === 'overtime' ? dailyWage
                    : att.status === 'halfDay'   ? dailyWage * 0.5
                    : 0;
-        const startTime = loadRec && loadRec.startTime ? new Date(loadRec.startTime).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' }) : '6:00 AM';
-        const endTime   = loadRec && loadRec.endTime   ? new Date(loadRec.endTime).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' })   : '10:00 AM';
+    var startTime = loadRec && loadRec.startTime ? new Date(loadRec.startTime).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' }) : '6:00 AM';
+    var endTime   = loadRec && loadRec.endTime   ? new Date(loadRec.endTime).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' })   : '10:00 AM';
 
         return {
           date:       att.date,
@@ -170,16 +165,15 @@
 
     function renderTable(data, dailyWage) {
       document.getElementById('record-count').textContent = data.length + ' records';
-      const completed = data.filter(d => d.status === 'Completed').length;
-      const now        = new Date();
-      const monthStart = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-      const monthEarnings = data.filter(d => d.date.startsWith(monthStart)).reduce((s, d) => s + d.wage, 0);
+    var completed = data.filter(d => d.status === 'Completed').length;
+    var now        = new Date();
+    var monthStart = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    var monthEarnings = data.filter(d => d.date.startsWith(monthStart)).reduce((s, d) => s + d.wage, 0);
 
       document.getElementById('summary-total').textContent     = data.length;
       document.getElementById('summary-completed').textContent = completed;
       document.getElementById('summary-earnings').textContent  = Utils.formatCurrency(monthEarnings);
-
-      const tbody = document.getElementById('work-history-tbody');
+    var tbody = document.getElementById('work-history-tbody');
       if (!data.length) {
         tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No work records found</td></tr>';
         return;
@@ -196,16 +190,17 @@
     }
 
     function applyFilter() {
-      const type = document.getElementById('filter-work-type').value;
-      const from = document.getElementById('filter-from').value;
-      const to   = document.getElementById('filter-to').value;
-      let filtered = [...allAssignments];
+    var type = document.getElementById('filter-work-type').value;
+    var from = document.getElementById('filter-from').value;
+    var to   = document.getElementById('filter-to').value;
+    var filtered = [...allAssignments];
       if (type) filtered = filtered.filter(a => a.workType === type);
       if (from) filtered = filtered.filter(a => a.date >= from);
       if (to)   filtered = filtered.filter(a => a.date <= to);
-      const dailyWage = worker ? worker.dailyWage : 700;
+    var dailyWage = worker ? worker.dailyWage : 700;
       renderTable(filtered, dailyWage);
     }
-  </script>
+}());
+</script>
 </body>
 </html>

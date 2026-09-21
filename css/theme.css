@@ -4,8 +4,9 @@
    border-radius, z-index, and base CSS reset.
    ========================================================== */
 
-/* ─── Google Fonts ───────────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap');
+/* ─── System Font Stack (no external dependencies) ───────── */
+/* Telugu is supported by Nirmala UI (Windows), Lohit Telugu (Linux),
+   and Kohinoor Telugu (macOS/iOS) — all system fonts.          */
 
 /* ─── Design Tokens ──────────────────────────────────────── */
 :root {
@@ -52,8 +53,8 @@
   --color-neutral-text:   #4b5563;
 
   /* ─── Typography ─────────────────────────────────────── */
-  --font-primary:   'Inter', 'Noto Sans Telugu', sans-serif;
-  --font-telugu:    'Noto Sans Telugu', sans-serif;
+  --font-primary:   'Segoe UI', 'Nirmala UI', 'Noto Sans Telugu', 'Lohit Telugu', 'Kohinoor Telugu', Arial, sans-serif;
+  --font-telugu:    'Nirmala UI', 'Noto Sans Telugu', 'Lohit Telugu', 'Kohinoor Telugu', 'Gautami', sans-serif;
   --font-mono:      'Menlo', 'Consolas', monospace;
 
   /* Type Scale */

@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cash Book — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>Cash Book — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -93,29 +91,27 @@
         </div>
       </main>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
+(function () {
+'use strict';
     function loadCashBook() {
-      const date = document.getElementById('cashbook-date').value || new Date().toISOString().split('T')[0];
-
-      const payments = MockDB.getPayments().filter(p => p.date === date);
-      const expenses = MockDB.getExpenses().filter(e => e.date === date);
+    var date = document.getElementById('cashbook-date').value || new Date().toISOString().split('T')[0];
+    var payments = MockDB.getPayments().filter(p => p.date === date);
+    var expenses = MockDB.getExpenses().filter(e => e.date === date);
 
       // Receipts = vendor payments received (vendor paying us)
-      const receipts = payments.filter(p => p.partyType === 'vendor').map(p => ({
+    var receipts = payments.filter(p => p.partyType === 'vendor').map(p => ({
         desc: `${p.partyName} — ${p.mode} (${p.txnId})`,
         amount: p.amount,
       }));
 
       // Payments = farmer payments made + expenses
-      const paymentItems = [
+    var paymentItems = [
         ...payments.filter(p => p.partyType === 'farmer').map(p => ({
           desc: `${p.partyName} — ${p.mode} (${p.notes || ''})`,
           amount: p.amount,
@@ -125,11 +121,10 @@
           amount: e.amount,
         })),
       ];
-
-      const totalReceipts = receipts.reduce((s, r) => s + r.amount, 0);
-      const totalPayments = paymentItems.reduce((s, p) => s + p.amount, 0);
-      const opening = 85000; // demo opening balance
-      const closing = opening + totalReceipts - totalPayments;
+    var totalReceipts = receipts.reduce((s, r) => s + r.amount, 0);
+    var totalPayments = paymentItems.reduce((s, p) => s + p.amount, 0);
+    var opening = 85000; // demo opening balance
+    var closing = opening + totalReceipts - totalPayments;
 
       // Update summary
       document.getElementById('cb-opening').textContent = Utils.formatCurrency(opening);
@@ -138,10 +133,9 @@
       document.getElementById('cb-closing').textContent = Utils.formatCurrency(closing);
       document.getElementById('cb-receipts-total').textContent = Utils.formatCurrency(totalReceipts);
       document.getElementById('cb-payments-total').textContent = Utils.formatCurrency(totalPayments);
-
-      const closingCard = document.getElementById('cb-closing-card');
-      const netEl = document.getElementById('cb-net-balance');
-      const net = totalReceipts - totalPayments;
+    var closingCard = document.getElementById('cb-closing-card');
+    var netEl = document.getElementById('cb-net-balance');
+    var net = totalReceipts - totalPayments;
       closingCard.className = `stat-card ${closing >= 0 ? 'stat-card--success' : 'stat-card--danger'}`;
       netEl.textContent = Utils.formatCurrency(net);
       netEl.style.color = net >= 0 ? 'var(--color-success)' : 'var(--color-danger)';
@@ -162,6 +156,7 @@
       document.getElementById('cashbook-date').value = new Date().toISOString().split('T')[0];
       loadCashBook();
     });
-  </script>
+}());
+</script>
 </body>
 </html>

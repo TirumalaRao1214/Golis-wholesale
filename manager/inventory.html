@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Inventory — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>Inventory — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -106,34 +104,33 @@
         </div>
       </main>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
-    const LOW_STOCK_THRESHOLD = 200;
-    let _inventory  = [];
-    let _vegetables = [];
+(function () {
+'use strict';
+    var LOW_STOCK_THRESHOLD = 200;
+    var _inventory  = [];
+    var _vegetables = [];
 
     function renderInventory() {
-      const search = (document.getElementById('inv-search').value || '').toLowerCase();
-      const list = _inventory.filter(i => {
-        const veg = MockDB.getVegetableById(i.vegId);
+    var search = (document.getElementById('inv-search').value || '').toLowerCase();
+    var list = _inventory.filter(i => {
+    var veg = MockDB.getVegetableById(i.vegId);
         return !search || (veg && veg.nameEn.toLowerCase().includes(search));
       });
 
       // Summary stats
-      const totalStock = _inventory.reduce((s, i) => s + (i.closing || 0), 0);
-      let stockValue = 0;
+    var totalStock = _inventory.reduce((s, i) => s + (i.closing || 0), 0);
+    var stockValue = 0;
       _inventory.forEach(i => {
-        const veg = MockDB.getVegetableById(i.vegId);
+    var veg = MockDB.getVegetableById(i.vegId);
         if (veg) stockValue += (i.closing || 0) * veg.currentSellPrice;
       });
-      const lowCount = _inventory.filter(i => (i.closing || 0) < LOW_STOCK_THRESHOLD).length;
+    var lowCount = _inventory.filter(i => (i.closing || 0) < LOW_STOCK_THRESHOLD).length;
       document.getElementById('inv-total-items').textContent  = _inventory.length;
       document.getElementById('inv-total-stock').textContent  = totalStock.toLocaleString('en-IN') + ' kg';
       document.getElementById('inv-stock-value').textContent  = Utils.formatCurrency(stockValue);
@@ -141,12 +138,12 @@
       document.getElementById('low-stock-count').textContent  = lowCount > 0 ? `⚠ ${lowCount} Low Stock Items` : '';
 
       // Low stock alert cards
-      const lowItems = _inventory.filter(i => (i.closing || 0) < LOW_STOCK_THRESHOLD);
+    var lowItems = _inventory.filter(i => (i.closing || 0) < LOW_STOCK_THRESHOLD);
       if (lowItems.length > 0) {
         document.getElementById('low-stock-section').style.display = '';
         document.getElementById('low-stock-cards').innerHTML = lowItems.map(i => {
-          const veg = MockDB.getVegetableById(i.vegId);
-          const pct = Math.min(100, ((i.closing || 0) / LOW_STOCK_THRESHOLD) * 100);
+    var veg = MockDB.getVegetableById(i.vegId);
+    var pct = Math.min(100, ((i.closing || 0) / LOW_STOCK_THRESHOLD) * 100);
           return `<div style="padding:0.75rem 1rem;background:white;border:1px solid var(--color-danger);border-radius:8px;min-width:180px;">
             <div style="font-weight:600;font-size:0.875rem;">${veg ? veg.nameEn : i.vegId} — Grade ${i.grade}</div>
             <div style="font-size:1.25rem;font-weight:700;color:var(--color-danger);">${(i.closing || 0).toLocaleString('en-IN')} kg</div>
@@ -163,9 +160,9 @@
 
       // Table
       document.getElementById('inventory-tbody').innerHTML = list.map(i => {
-        const veg = MockDB.getVegetableById(i.vegId);
-        const closing = i.closing || (i.opening + i.purchased - i.sold - i.damaged - i.wastage);
-        const isLow   = closing < LOW_STOCK_THRESHOLD;
+    var veg = MockDB.getVegetableById(i.vegId);
+    var closing = i.closing || (i.opening + i.purchased - i.sold - i.damaged - i.wastage);
+    var isLow   = closing < LOW_STOCK_THRESHOLD;
         return `<tr ${isLow ? 'style="background:#fff5f5;"' : ''}>
           <td><strong>${veg ? veg.nameEn : i.vegId}</strong>${veg ? `<br><span style="font-size:0.75rem;color:var(--color-text-secondary);">${veg.nameTe}</span>` : ''}</td>
           <td><span class="badge badge--${i.grade === 'A' ? 'success' : i.grade === 'B' ? 'info' : 'warning'}">Grade ${i.grade}</span></td>
@@ -186,6 +183,7 @@
       _vegetables = MockDB.getVegetables();
       renderInventory();
     });
-  </script>
+}());
+</script>
 </body>
 </html>

@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Labour Dashboard — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>Labour Dashboard — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
   <style>
@@ -164,24 +162,23 @@
         </div>
       </div>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
-    let worker      = null;
-    let todayRecord = null;
-    const today     = new Date().toISOString().split('T')[0];
+(function () {
+'use strict';
+    var worker      = null;
+    var todayRecord = null;
+    var today     = new Date().toISOString().split('T')[0];
 
     document.addEventListener('DOMContentLoaded', () => {
       APP.init('labour');
-      const user    = APP.user;
+    var user    = APP.user;
       worker        = MockDB.getLabourById ? MockDB.getLabourById(user.refId) : MockDB._labour.find(l => l.id === user.refId);
-      const stats   = MockDB.getLabourStats(user.refId);
+    var stats   = MockDB.getLabourStats(user.refId);
 
       document.getElementById('welcome-heading').textContent = `Welcome, ${user.name}`;
       document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-IN', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
@@ -193,14 +190,13 @@
       }
 
       // Today's assignment (demo: assigned to loading if L001, else based on work type)
-      const loading  = MockDB.getLoadingRecords().filter(r => r.labourIds && r.labourIds.includes(user.refId) && r.date !== 'completed');
-      const assignment = loading.length ? loading[0] : null;
-
-      const assignDetails = document.getElementById('assignment-details');
-      const badge         = document.getElementById('assignment-status-badge');
+    var loading  = MockDB.getLoadingRecords().filter(r => r.labourIds && r.labourIds.includes(user.refId) && r.date !== 'completed');
+    var assignment = loading.length ? loading[0] : null;
+    var assignDetails = document.getElementById('assignment-details');
+    var badge         = document.getElementById('assignment-status-badge');
 
       if (worker) {
-        const demoAssignment = {
+    var demoAssignment = {
           workType:   worker.workType,
           location:   'Wholesale Market, Guntur',
           time:       '6:00 AM – 10:00 AM',
@@ -221,7 +217,7 @@
       }
 
       // Check today's attendance
-      const todayAtt = MockDB.getAttendance(today).find(a => a.labourId === user.refId);
+    var todayAtt = MockDB.getAttendance(today).find(a => a.labourId === user.refId);
       todayRecord    = todayAtt;
       updateAttendanceUI(todayAtt, worker ? worker.dailyWage : 700);
 
@@ -237,20 +233,20 @@
     });
 
     function updateAttendanceUI(record, dailyWage) {
-      const btn    = document.getElementById('btn-mark-attendance');
-      const curDiv = document.getElementById('attendance-current');
-      const badge  = document.getElementById('current-attendance-badge');
-      const kpi    = document.getElementById('kpi-today-wage');
-      const kpiNote= document.getElementById('kpi-today-wage-note');
+    var btn    = document.getElementById('btn-mark-attendance');
+    var curDiv = document.getElementById('attendance-current');
+    var badge  = document.getElementById('current-attendance-badge');
+    var kpi    = document.getElementById('kpi-today-wage');
+    var kpiNote= document.getElementById('kpi-today-wage-note');
 
       if (record && record.status !== undefined) {
-        const statusMap = {
+    var statusMap = {
           present:  { cls:'badge--success', lbl:'Present', wage: dailyWage },
           halfDay:  { cls:'badge--warning', lbl:'Half Day',wage: dailyWage * 0.5 },
           absent:   { cls:'badge--danger',  lbl:'Absent',  wage: 0 },
           overtime: { cls:'badge--info',    lbl:'Overtime',wage: dailyWage + (record.overtimeHours || 0) * (dailyWage / 8) },
         };
-        const s = statusMap[record.status] || { cls:'', lbl:record.status, wage:0 };
+    var s = statusMap[record.status] || { cls:'', lbl:record.status, wage:0 };
         badge.innerHTML = `<span class="badge ${s.cls}">${s.lbl}</span>`;
         curDiv.style.display = 'flex';
         btn.textContent      = '✏️ Edit Attendance';
@@ -258,7 +254,7 @@
         kpiNote.textContent  = s.lbl + ' today';
 
         // Pre-select radio
-        const radio = document.querySelector(`input[name="attendance"][value="${record.status}"]`);
+    var radio = document.querySelector(`input[name="attendance"][value="${record.status}"]`);
         if (radio) radio.checked = true;
       } else {
         curDiv.style.display = 'none';
@@ -269,13 +265,13 @@
     }
 
     function confirmAttendance() {
-      const selected = document.querySelector('input[name="attendance"]:checked');
+    var selected = document.querySelector('input[name="attendance"]:checked');
       if (!selected) {
         Utils.showToast('Please select an attendance status', 'warning');
         return;
       }
-      const status   = selected.value;
-      const labourId = APP.user.refId;
+    var status   = selected.value;
+    var labourId = APP.user.refId;
 
       if (todayRecord) {
         // Update existing
@@ -283,7 +279,7 @@
         todayRecord.status = status;
       } else {
         // Create new
-        const newRecord = {
+    var newRecord = {
           id:            Utils.generateId('ATT'),
           labourId,
           date:          today,
@@ -296,10 +292,11 @@
       }
 
       Utils.closeModal('modal-attendance');
-      const dailyWage = worker ? worker.dailyWage : 700;
+    var dailyWage = worker ? worker.dailyWage : 700;
       updateAttendanceUI(todayRecord, dailyWage);
       Utils.showToast(`Attendance marked: ${status === 'present' ? 'Present' : status === 'halfDay' ? 'Half Day' : 'Absent'} ✅`, 'success');
     }
-  </script>
+}());
+</script>
 </body>
 </html>

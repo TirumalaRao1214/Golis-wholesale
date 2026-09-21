@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Expense Management — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>Expense Management — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -131,22 +129,21 @@
         <button class="btn btn-primary" onclick="saveExpense()">Save Expense</button>
       </div>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
-    let _expenses = [];
+(function () {
+'use strict';
+    var _expenses = [];
 
     function renderExpenses() {
-      const cat = document.getElementById('exp-filter-cat').value;
-      const from = document.getElementById('exp-filter-from').value;
-      const to = document.getElementById('exp-filter-to').value;
-      const data = _expenses.filter(e => {
+    var cat = document.getElementById('exp-filter-cat').value;
+    var from = document.getElementById('exp-filter-from').value;
+    var to = document.getElementById('exp-filter-to').value;
+    var data = _expenses.filter(e => {
         if (cat && e.category !== cat) return false;
         if (from && e.date < from) return false;
         if (to && e.date > to) return false;
@@ -167,19 +164,19 @@
     }
 
     function updateSummaryCards() {
-      const today = new Date().toISOString().split('T')[0];
-      const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
-      const weekStr = weekAgo.toISOString().split('T')[0];
-      const monthStr = today.substring(0, 7);
+    var today = new Date().toISOString().split('T')[0];
+    var weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
+    var weekStr = weekAgo.toISOString().split('T')[0];
+    var monthStr = today.substring(0, 7);
       document.getElementById('exp-today').textContent = Utils.formatCurrency(_expenses.filter(e => e.date === today).reduce((s,e)=>s+e.amount,0));
       document.getElementById('exp-week').textContent = Utils.formatCurrency(_expenses.filter(e => e.date >= weekStr).reduce((s,e)=>s+e.amount,0));
       document.getElementById('exp-month').textContent = Utils.formatCurrency(_expenses.filter(e => e.date.startsWith(monthStr)).reduce((s,e)=>s+e.amount,0));
     }
 
     function saveExpense() {
-      const amount = Number(document.getElementById('ex-amount').value);
+    var amount = Number(document.getElementById('ex-amount').value);
       if (!amount) { Utils.showToast('Amount is required.', 'error'); return; }
-      const record = {
+    var record = {
         id: Utils.generateId('EXP'),
         category: document.getElementById('ex-cat').value,
         amount,
@@ -199,6 +196,7 @@
       document.getElementById('ex-date').value = new Date().toISOString().split('T')[0];
       renderExpenses();
     });
-  </script>
+}());
+</script>
 </body>
 </html>

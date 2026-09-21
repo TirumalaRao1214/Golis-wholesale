@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Attendance — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>My Attendance — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
   <style>
@@ -133,41 +131,39 @@
 
       </main>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
-    let worker     = null;
-    let currentView = 'calendar';
-
-    const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-    const DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-    const STATUS_LABELS = { present:'Present', halfDay:'Half Day', absent:'Absent', overtime:'Overtime' };
-    const STATUS_CLS    = { present:'badge--success', halfDay:'badge--warning', absent:'badge--danger', overtime:'badge--info' };
+(function () {
+'use strict';
+    var worker     = null;
+    var currentView = 'calendar';
+    var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    var DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    var STATUS_LABELS = { present:'Present', halfDay:'Half Day', absent:'Absent', overtime:'Overtime' };
+    var STATUS_CLS    = { present:'badge--success', halfDay:'badge--warning', absent:'badge--danger', overtime:'badge--info' };
 
     document.addEventListener('DOMContentLoaded', () => {
       APP.init('labour');
-      const user = APP.user;
+    var user = APP.user;
       worker     = MockDB._labour.find(l => l.id === user.refId);
 
       // Populate month/year selectors
-      const now   = new Date();
-      const ms    = document.getElementById('month-select');
-      const ys    = document.getElementById('year-select');
+    var now   = new Date();
+    var ms    = document.getElementById('month-select');
+    var ys    = document.getElementById('year-select');
       MONTHS.forEach((m, i) => {
-        const opt = document.createElement('option');
+    var opt = document.createElement('option');
         opt.value = i + 1;
         opt.textContent = m;
         if (i === now.getMonth()) opt.selected = true;
         ms.appendChild(opt);
       });
-      for (let y = now.getFullYear(); y >= 2023; y--) {
-        const opt = document.createElement('option');
+      for (var y = now.getFullYear(); y >= 2023; y--) {
+    var opt = document.createElement('option');
         opt.value = y;
         opt.textContent = y;
         if (y === now.getFullYear()) opt.selected = true;
@@ -186,31 +182,31 @@
     }
 
     function loadMonth() {
-      const month = parseInt(document.getElementById('month-select').value);
-      const year  = parseInt(document.getElementById('year-select').value);
-      const labourId = APP.user.refId;
-      const monthStr = `${year}-${String(month).padStart(2,'0')}`;
+    var month = parseInt(document.getElementById('month-select').value);
+    var year  = parseInt(document.getElementById('year-select').value);
+    var labourId = APP.user.refId;
+    var monthStr = `${year}-${String(month).padStart(2,'0')}`;
       document.getElementById('calendar-title').textContent = `${MONTHS[month-1]} ${year}`;
 
       // Get attendance for this month
-      const monthAttendance = MockDB.getAttendance().filter(a => a.labourId === labourId && a.date.startsWith(monthStr));
-      const attMap = {};
+    var monthAttendance = MockDB.getAttendance().filter(a => a.labourId === labourId && a.date.startsWith(monthStr));
+    var attMap = {};
       monthAttendance.forEach(a => { attMap[a.date] = a; });
 
       // Build calendar
-      const daysInMonth  = new Date(year, month, 0).getDate();
-      const firstDayOfWeek = new Date(year, month - 1, 1).getDay();
-      const today        = new Date().toISOString().split('T')[0];
-      const dailyWage    = worker ? worker.dailyWage : 700;
+    var daysInMonth  = new Date(year, month, 0).getDate();
+    var firstDayOfWeek = new Date(year, month - 1, 1).getDay();
+    var today        = new Date().toISOString().split('T')[0];
+    var dailyWage    = worker ? worker.dailyWage : 700;
 
       // Summary
-      let present = 0, halfDay = 0, absent = 0, totalDays = daysInMonth;
+    var present = 0, halfDay = 0, absent = 0, totalDays = daysInMonth;
       monthAttendance.forEach(a => {
         if (a.status === 'present' || a.status === 'overtime') present++;
         else if (a.status === 'halfDay') halfDay++;
         else if (a.status === 'absent') absent++;
       });
-      const monthWage = (present * dailyWage) + (halfDay * dailyWage * 0.5);
+    var monthWage = (present * dailyWage) + (halfDay * dailyWage * 0.5);
       document.getElementById('sum-present').textContent     = present;
       document.getElementById('sum-halfday').textContent     = halfDay;
       document.getElementById('sum-absent').textContent      = absent;
@@ -218,16 +214,16 @@
       document.getElementById('sum-monthly-wage').textContent= Utils.formatCurrency(monthWage);
 
       // Calendar grid
-      let calHTML = '';
-      for (let i = 0; i < firstDayOfWeek; i++) {
+    var calHTML = '';
+      for (var i = 0; i < firstDayOfWeek; i++) {
         calHTML += `<div class="calendar-day" style="background:none;border:none;"></div>`;
       }
-      for (let d = 1; d <= daysInMonth; d++) {
-        const dateStr = `${year}-${String(month).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-        const att     = attMap[dateStr];
-        const isToday = dateStr === today;
-        let cls = 'cal-norecord';
-        let emoji = '';
+      for (var d = 1; d <= daysInMonth; d++) {
+    var dateStr = `${year}-${String(month).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    var att     = attMap[dateStr];
+    var isToday = dateStr === today;
+    var cls = 'cal-norecord';
+    var emoji = '';
         if (att) {
           if (att.status === 'present' || att.status === 'overtime') { cls = 'cal-present'; emoji = '✓'; }
           else if (att.status === 'halfDay') { cls = 'cal-halfday'; emoji = '½'; }
@@ -241,13 +237,13 @@
       document.getElementById('calendar-body').innerHTML = calHTML;
 
       // Table view
-      const rows = [];
-      for (let d = 1; d <= daysInMonth; d++) {
-        const dateStr = `${year}-${String(month).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-        const dateObj = new Date(dateStr);
-        const att     = attMap[dateStr];
+    var rows = [];
+      for (var d = 1; d <= daysInMonth; d++) {
+    var dateStr = `${year}-${String(month).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    var dateObj = new Date(dateStr);
+    var att     = attMap[dateStr];
         if (!att && dateStr > today) continue; // skip future days without record
-        const wage = att
+    var wage = att
           ? (att.status === 'present' || att.status === 'overtime') ? dailyWage
           : att.status === 'halfDay' ? dailyWage * 0.5
           : 0
@@ -262,6 +258,7 @@
       }
       document.getElementById('attendance-tbody').innerHTML = rows.join('') || '<tr><td colspan="5" class="text-center text-muted">No records found</td></tr>';
     }
-  </script>
+}());
+</script>
 </body>
 </html>

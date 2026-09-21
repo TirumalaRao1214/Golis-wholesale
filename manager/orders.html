@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Order Processing — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>Order Processing — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -138,43 +136,40 @@
         <button class="btn btn-primary" onclick="saveStatusUpdate()">Update</button>
       </div>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
-    let _orders = [];
+(function () {
+'use strict';
+    var _orders = [];
 
     function checkStock(orderId) {
-      const order  = MockDB.getOrderById(orderId);
+    var order  = MockDB.getOrderById(orderId);
       if (!order) return;
-      const vendor = MockDB.getVendorById(order.vendorId);
-      const items  = MockDB.getOrderItems(orderId);
+    var vendor = MockDB.getVendorById(order.vendorId);
+    var items  = MockDB.getOrderItems(orderId);
 
       document.getElementById('sc-order-id').textContent = orderId;
       document.getElementById('sc-vendor-info').innerHTML =
         `<strong>${vendor ? vendor.businessName : ''}</strong> — ${vendor ? vendor.city : ''} | Order Date: ${Utils.formatDate(order.orderDate)} | Total: ${Utils.formatCurrency(order.total)}`;
-
-      let allAvailable = true;
-      let anyAvailable = false;
-      let totalOrdered = 0, totalAvailable = 0;
-
-      const rows = items.map(item => {
-        const veg = MockDB.getVegetableById(item.vegId);
-        const inv = MockDB.getInventoryByVegetable(item.vegId, item.grade);
-        const avail = inv ? (inv.closing || 0) : 0;
-        const canFulfill = avail >= item.qty;
-        const partial = avail > 0 && avail < item.qty;
+    var allAvailable = true;
+    var anyAvailable = false;
+    var totalOrdered = 0, totalAvailable = 0;
+    var rows = items.map(item => {
+    var veg = MockDB.getVegetableById(item.vegId);
+    var inv = MockDB.getInventoryByVegetable(item.vegId, item.grade);
+    var avail = inv ? (inv.closing || 0) : 0;
+    var canFulfill = avail >= item.qty;
+    var partial = avail > 0 && avail < item.qty;
         totalOrdered   += item.qty;
         totalAvailable += Math.min(avail, item.qty);
         if (!canFulfill) allAvailable = false;
         if (avail > 0)   anyAvailable = true;
-        const icon = canFulfill ? '✅' : partial ? '⚠️' : '❌';
-        const rowClass = canFulfill ? 'color:var(--color-success)' : partial ? 'color:var(--color-warning)' : 'color:var(--color-danger)';
+    var icon = canFulfill ? '✅' : partial ? '⚠️' : '❌';
+    var rowClass = canFulfill ? 'color:var(--color-success)' : partial ? 'color:var(--color-warning)' : 'color:var(--color-danger)';
         return `<tr>
           <td>${veg ? veg.nameEn : item.vegId}</td>
           <td><span class="badge badge--success">Grade ${item.grade}</span></td>
@@ -188,8 +183,7 @@
         </tr>`;
       });
       document.getElementById('sc-items-tbody').innerHTML = rows.join('');
-
-      const shortage = totalOrdered - totalAvailable;
+    var shortage = totalOrdered - totalAvailable;
       document.getElementById('sc-summary').innerHTML = `
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;text-align:center;">
           <div><div style="font-size:0.75rem;color:var(--color-text-secondary);">Requested</div><div style="font-size:1.125rem;font-weight:700;">${totalOrdered.toLocaleString('en-IN')} kg</div></div>
@@ -198,7 +192,7 @@
         </div>`;
 
       // Action buttons based on fulfillment
-      let actions = `<button class="btn btn-ghost" onclick="Utils.closeModal('modal-stock-check')">Cancel</button>
+    var actions = `<button class="btn btn-ghost" onclick="Utils.closeModal('modal-stock-check')">Cancel</button>
         <button class="btn btn-danger" onclick="confirmOrder('${orderId}','cancelled')">Reject Order</button>`;
       if (allAvailable) {
         actions += `<button class="btn btn-primary" onclick="confirmOrder('${orderId}','confirmed')">✅ Accept Full Order</button>`;
@@ -217,15 +211,15 @@
       MockDB.updateRecord('_orders', orderId, { status: newStatus });
       _orders = MockDB.getOrders();
       Utils.closeModal('modal-stock-check');
-      const labels = { confirmed: 'Order confirmed!', partiallyFulfilled: 'Order partially accepted.', cancelled: 'Order rejected.' };
-      const types  = { confirmed: 'success', partiallyFulfilled: 'warning', cancelled: 'error' };
+    var labels = { confirmed: 'Order confirmed!', partiallyFulfilled: 'Order partially accepted.', cancelled: 'Order rejected.' };
+    var types  = { confirmed: 'success', partiallyFulfilled: 'warning', cancelled: 'error' };
       Utils.showToast(labels[newStatus] || 'Status updated.', types[newStatus] || 'info');
       renderPendingQueue();
       renderOrdersTable();
     }
 
     function openStatusModal(orderId) {
-      const order = MockDB.getOrderById(orderId);
+    var order = MockDB.getOrderById(orderId);
       document.getElementById('us-order-id').value = orderId;
       document.getElementById('us-status').value   = order ? order.status : 'pending';
       document.getElementById('us-notes').value    = order ? (order.notes || '') : '';
@@ -233,9 +227,9 @@
     }
 
     function saveStatusUpdate() {
-      const id     = document.getElementById('us-order-id').value;
-      const status = document.getElementById('us-status').value;
-      const notes  = document.getElementById('us-notes').value;
+    var id     = document.getElementById('us-order-id').value;
+    var status = document.getElementById('us-status').value;
+    var notes  = document.getElementById('us-notes').value;
       MockDB.updateRecord('_orders', id, { status, notes });
       _orders = MockDB.getOrders();
       Utils.closeModal('modal-update-status');
@@ -245,7 +239,7 @@
     }
 
     function renderPendingQueue() {
-      const pending = _orders.filter(o => o.status === 'pending');
+    var pending = _orders.filter(o => o.status === 'pending');
       document.getElementById('pending-count').textContent = pending.length + ' pending';
       if (pending.length === 0) {
         document.getElementById('pending-queue').innerHTML = '<div class="empty-state"><p class="empty-state__text">✅ No pending orders.</p></div>';
@@ -254,8 +248,8 @@
       document.getElementById('pending-queue').innerHTML =
         `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem;">` +
         pending.map(o => {
-          const vendor = MockDB.getVendorById(o.vendorId);
-          const items  = MockDB.getOrderItems(o.id);
+    var vendor = MockDB.getVendorById(o.vendorId);
+    var items  = MockDB.getOrderItems(o.id);
           return `<div style="padding:1rem;border:1px solid var(--color-border);border-radius:8px;background:var(--color-surface);">
             <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.5rem;">
               <div>
@@ -266,7 +260,7 @@
             </div>
             <div style="font-size:0.8rem;color:var(--color-text-secondary);margin-bottom:0.5rem;">
               ${items.length > 0 ? items.slice(0,2).map(i => {
-                const v = MockDB.getVegetableById(i.vegId);
+    var v = MockDB.getVegetableById(i.vegId);
                 return `${v ? v.nameEn : ''} ${i.qty} kg`;
               }).join(', ') + (items.length > 2 ? ` +${items.length - 2} more` : '') : 'No items'}
             </div>
@@ -279,10 +273,10 @@
     }
 
     function renderOrdersTable() {
-      const filter = document.getElementById('filter-status').value;
-      const list = filter ? _orders.filter(o => o.status === filter) : _orders;
+    var filter = document.getElementById('filter-status').value;
+    var list = filter ? _orders.filter(o => o.status === filter) : _orders;
       document.getElementById('orders-tbody').innerHTML = list.map(o => {
-        const vendor = MockDB.getVendorById(o.vendorId);
+    var vendor = MockDB.getVendorById(o.vendorId);
         return `<tr>
           <td><code>${o.id}</code></td>
           <td>${Utils.formatDate(o.orderDate)}</td>
@@ -304,6 +298,7 @@
       renderPendingQueue();
       renderOrdersTable();
     });
-  </script>
+}());
+</script>
 </body>
 </html>

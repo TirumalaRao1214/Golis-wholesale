@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vegetable Master — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>Vegetable Master — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -112,21 +110,20 @@
         <button class="btn btn-primary" onclick="saveVegetable()" data-i18n="common.save"></button>
       </div>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
-    let _vegs = [];
-    let _prices = [];
+(function () {
+'use strict';
+    var _vegs = [];
+    var _prices = [];
 
     function renderVegTable() {
       document.getElementById('veg-tbody').innerHTML = _vegs.map(v => {
-        const change = v.currentSellPrice > v.prevSellPrice ? 'up' : v.currentSellPrice < v.prevSellPrice ? 'down' : 'neutral';
+    var change = v.currentSellPrice > v.prevSellPrice ? 'up' : v.currentSellPrice < v.prevSellPrice ? 'down' : 'neutral';
         return `
         <tr>
           <td><code>${v.id}</code></td>
@@ -147,7 +144,7 @@
 
     function renderPriceEditTable() {
       document.getElementById('price-edit-tbody').innerHTML = _vegs.map(v => {
-        const change = v.currentSellPrice > v.prevSellPrice ? 'up' : v.currentSellPrice < v.prevSellPrice ? 'down' : 'neutral';
+    var change = v.currentSellPrice > v.prevSellPrice ? 'up' : v.currentSellPrice < v.prevSellPrice ? 'down' : 'neutral';
         return `
         <tr>
           <td><strong>${v.emoji || ''} ${v.nameEn}</strong></td>
@@ -160,15 +157,15 @@
     }
 
     function updatePriceIndicator(vegId) {
-      const v = _vegs.find(x => x.id === vegId);
+    var v = _vegs.find(x => x.id === vegId);
       if (!v) return;
-      const newPrice = Number(document.getElementById(`price-${vegId}`).value);
-      const change = newPrice > v.prevSellPrice ? 'up' : newPrice < v.prevSellPrice ? 'down' : 'neutral';
+    var newPrice = Number(document.getElementById(`price-${vegId}`).value);
+    var change = newPrice > v.prevSellPrice ? 'up' : newPrice < v.prevSellPrice ? 'down' : 'neutral';
       document.getElementById(`price-icon-${vegId}`).innerHTML = Utils.priceIcon(change);
     }
 
     function togglePriceEdit() {
-      const panel = document.getElementById('price-edit-panel');
+    var panel = document.getElementById('price-edit-panel');
       if (panel.style.display === 'none') {
         panel.style.display = '';
         renderPriceEditTable();
@@ -179,9 +176,9 @@
 
     function savePrices() {
       _vegs.forEach(v => {
-        const input = document.getElementById(`price-${v.id}`);
+    var input = document.getElementById(`price-${v.id}`);
         if (input) {
-          const newPrice = Number(input.value);
+    var newPrice = Number(input.value);
           MockDB.updateRecord('_vegetables', v.id, { prevSellPrice: v.currentSellPrice, currentSellPrice: newPrice });
         }
       });
@@ -199,7 +196,7 @@
     }
 
     function editVegetable(id) {
-      const v = _vegs.find(x => x.id === id);
+    var v = _vegs.find(x => x.id === id);
       if (!v) return;
       document.getElementById('veg-modal-title').textContent = 'Edit Vegetable';
       document.getElementById('veg-edit-id').value = id;
@@ -213,10 +210,10 @@
     }
 
     function saveVegetable() {
-      const name = document.getElementById('vg-name').value.trim();
+    var name = document.getElementById('vg-name').value.trim();
       if (!name) { Utils.showToast('Vegetable name is required.', 'error'); return; }
-      const editId = document.getElementById('veg-edit-id').value;
-      const record = {
+    var editId = document.getElementById('veg-edit-id').value;
+    var record = {
         nameEn: name,
         nameTe: document.getElementById('vg-namete').value.trim(),
         currentBuyPrice: Number(document.getElementById('vg-buy').value) || 0,
@@ -242,6 +239,7 @@
       _vegs = MockDB.getVegetables();
       renderVegTable();
     });
-  </script>
+}());
+</script>
 </body>
 </html>

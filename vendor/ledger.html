@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Account Statement — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>Account Statement — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -92,34 +90,32 @@
         </div>
       </main>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
-    let allEntries = [];
+(function () {
+'use strict';
+    var allEntries = [];
 
     document.addEventListener('DOMContentLoaded', () => {
       APP.init('vendor');
-      const vendorId = APP.user.refId;
+    var vendorId = APP.user.refId;
 
       allEntries = MockDB.getLedgerEntries(vendorId);
       allEntries.sort((a, b) => a.date.localeCompare(b.date));
 
       // Compute running balance (vendor: credit = order value owed, debit = payment made by vendor)
-      let runningBalance = 0;
+    var runningBalance = 0;
       allEntries = allEntries.map(e => {
         // For vendors: credit increases their debt, debit reduces it
         runningBalance += (e.debit - e.credit);
         return { ...e, runningBalance };
       });
-
-      const totalCredit = allEntries.reduce((s, e) => s + e.debit, 0);   // order invoiced (what they owe)
-      const totalDebit  = allEntries.reduce((s, e) => s + e.credit, 0);  // payments received by golis
+    var totalCredit = allEntries.reduce((s, e) => s + e.debit, 0);   // order invoiced (what they owe)
+    var totalDebit  = allEntries.reduce((s, e) => s + e.credit, 0);  // payments received by golis
 
       document.getElementById('kpi-total-purchases').textContent = Utils.formatCurrency(totalCredit);
       document.getElementById('kpi-total-paid').textContent      = Utils.formatCurrency(totalDebit);
@@ -130,14 +126,14 @@
 
     function renderTable(data) {
       document.getElementById('entry-count').textContent = data.length + ' entries';
-      const tbody = document.getElementById('ledger-tbody');
+    var tbody = document.getElementById('ledger-tbody');
       if (!data.length) {
         tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No ledger entries found</td></tr>';
         return;
       }
       tbody.innerHTML = data.map(e => {
-        const isOrder   = e.debit > 0;
-        const rowStyle  = isOrder ? 'background:#fff5f5;' : 'background:#f0fdf4;';
+    var isOrder   = e.debit > 0;
+    var rowStyle  = isOrder ? 'background:#fff5f5;' : 'background:#f0fdf4;';
         return `<tr style="${rowStyle}">
           <td>${Utils.formatDate(e.date)}</td>
           <td>${e.description}</td>
@@ -149,9 +145,9 @@
     }
 
     function applyFilter() {
-      const from = document.getElementById('filter-from').value;
-      const to   = document.getElementById('filter-to').value;
-      let filtered = [...allEntries];
+    var from = document.getElementById('filter-from').value;
+    var to   = document.getElementById('filter-to').value;
+    var filtered = [...allEntries];
       if (from) filtered = filtered.filter(e => e.date >= from);
       if (to)   filtered = filtered.filter(e => e.date <= to);
       renderTable(filtered);
@@ -164,16 +160,17 @@
     }
 
     function exportCSV() {
-      const headers = ['Date','Description','Payment Made','Order Value','Balance'];
-      const rows = allEntries.map(e => [e.date, `"${e.description}"`, e.credit, e.debit, e.runningBalance]);
-      const csv  = [headers, ...rows].map(r => r.join(',')).join('\n');
-      const blob = new Blob([csv], { type:'text/csv' });
-      const a    = document.createElement('a');
+    var headers = ['Date','Description','Payment Made','Order Value','Balance'];
+    var rows = allEntries.map(e => [e.date, `"${e.description}"`, e.credit, e.debit, e.runningBalance]);
+    var csv  = [headers, ...rows].map(r => r.join(',')).join('\n');
+    var blob = new Blob([csv], { type:'text/csv' });
+    var a    = document.createElement('a');
       a.href     = URL.createObjectURL(blob);
       a.download = `golis_vendor_ledger_${APP.user.refId}.csv`;
       a.click();
       Utils.showToast('Statement exported to CSV', 'success');
     }
-  </script>
+}());
+</script>
 </body>
 </html>

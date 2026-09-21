@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Arrival Register — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>Arrival Register — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -197,29 +195,26 @@
         <button class="btn btn-primary" onclick="updateStatus()">Update Status</button>
       </div>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
-    let _arrivals = [];
+(function () {
+'use strict';
+    var _arrivals = [];
 
     function renderArrivals() {
-      const statusFilter = document.getElementById('filter-status').value;
-      const vegFilter    = document.getElementById('filter-veg').value;
-      const dateFilter   = document.getElementById('filter-date').value;
-
-      let list = [..._arrivals];
+    var statusFilter = document.getElementById('filter-status').value;
+    var vegFilter    = document.getElementById('filter-veg').value;
+    var dateFilter   = document.getElementById('filter-date').value;
+    var list = [..._arrivals];
       if (statusFilter) list = list.filter(a => a.status === statusFilter);
       if (vegFilter)    list = list.filter(a => a.vegetableId === vegFilter);
       if (dateFilter)   list = list.filter(a => a.arrivalDate === dateFilter);
-
-      const today = new Date().toISOString().split('T')[0];
-      const todayList = _arrivals.filter(a => a.arrivalDate === today);
+    var today = new Date().toISOString().split('T')[0];
+    var todayList = _arrivals.filter(a => a.arrivalDate === today);
       document.getElementById('sum-today').textContent   = todayList.length;
       document.getElementById('sum-pending').textContent = _arrivals.filter(a => ['arrived','waiting'].includes(a.status)).length;
       document.getElementById('sum-done').textContent    = _arrivals.filter(a => a.status === 'completed').length;
@@ -227,10 +222,10 @@
       document.getElementById('arrivals-tbody').innerHTML = list.length === 0
         ? '<tr><td colspan="8" class="empty-row">No arrivals found.</td></tr>'
         : list.map(a => {
-            const farmer = MockDB.getFarmerById(a.farmerId);
-            const veg    = MockDB.getVegetableById(a.vegetableId);
-            const statusBadge = Utils.statusBadge(a.status);
-            const canWeigh = ['arrived','waiting'].includes(a.status);
+    var farmer = MockDB.getFarmerById(a.farmerId);
+    var veg    = MockDB.getVegetableById(a.vegetableId);
+    var statusBadge = Utils.statusBadge(a.status);
+    var canWeigh = ['arrived','waiting'].includes(a.status);
             return `<tr>
               <td><code>${a.id}</code></td>
               <td>${Utils.formatDate(a.arrivalDate)}<br><span class="text-muted" style="font-size:0.75rem;">${a.arrivalTime || ''}</span></td>
@@ -248,10 +243,10 @@
     }
 
     function openStatusModal(id) {
-      const arrival = _arrivals.find(a => a.id === id);
+    var arrival = _arrivals.find(a => a.id === id);
       if (!arrival) return;
-      const farmer = MockDB.getFarmerById(arrival.farmerId);
-      const veg    = MockDB.getVegetableById(arrival.vegetableId);
+    var farmer = MockDB.getFarmerById(arrival.farmerId);
+    var veg    = MockDB.getVegetableById(arrival.vegetableId);
       document.getElementById('status-arrival-id').value = id;
       document.getElementById('status-arrival-info').innerHTML =
         `<strong>${id}</strong> — ${farmer ? farmer.name : ''} / ${veg ? veg.nameEn : ''} (${arrival.expectedQty} kg)`;
@@ -261,9 +256,9 @@
     }
 
     function updateStatus() {
-      const id = document.getElementById('status-arrival-id').value;
-      const newStatus = document.getElementById('status-new').value;
-      const notes = document.getElementById('status-notes').value;
+    var id = document.getElementById('status-arrival-id').value;
+    var newStatus = document.getElementById('status-new').value;
+    var notes = document.getElementById('status-notes').value;
       if (!id || !newStatus) return;
       MockDB.updateRecord('_arrivals', id, { status: newStatus, notes });
       _arrivals = MockDB.getArrivals();
@@ -273,16 +268,16 @@
     }
 
     function saveArrival() {
-      const farmerId = document.getElementById('a-farmer').value;
-      const vegId    = document.getElementById('a-veg').value;
-      const vehicle  = document.getElementById('a-vehicle').value.trim();
-      const qty      = Number(document.getElementById('a-qty').value);
+    var farmerId = document.getElementById('a-farmer').value;
+    var vegId    = document.getElementById('a-veg').value;
+    var vehicle  = document.getElementById('a-vehicle').value.trim();
+    var qty      = Number(document.getElementById('a-qty').value);
       if (!farmerId || !vegId || !vehicle || !qty) {
         Utils.showToast('Please fill all required fields.', 'error');
         return;
       }
-      const dt = document.getElementById('a-datetime').value || new Date().toISOString();
-      const record = {
+    var dt = document.getElementById('a-datetime').value || new Date().toISOString();
+    var record = {
         id: Utils.generateId('ARR'),
         farmerId, vegetableId: vegId,
         vehicleNo: vehicle.toUpperCase(),
@@ -328,6 +323,7 @@
 
       renderArrivals();
     });
-  </script>
+}());
+</script>
 </body>
 </html>

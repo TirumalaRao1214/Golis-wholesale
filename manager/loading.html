@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Loading Management — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>Loading Management — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -133,50 +131,48 @@
         <button class="btn btn-primary" onclick="saveLoading()">Save Loading Record</button>
       </div>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
-    let _loading = [];
-    let _labour  = [];
+(function () {
+'use strict';
+    var _loading = [];
+    var _labour  = [];
 
     function onOrderSelect() {
-      const orderId = document.getElementById('ld-order').value;
-      const preview = document.getElementById('ld-order-preview');
+    var orderId = document.getElementById('ld-order').value;
+    var preview = document.getElementById('ld-order-preview');
       if (!orderId) { preview.style.display = 'none'; return; }
-      const order  = MockDB.getOrderById(orderId);
-      const vendor = order ? MockDB.getVendorById(order.vendorId) : null;
-      const items  = MockDB.getOrderItems(orderId);
+    var order  = MockDB.getOrderById(orderId);
+    var vendor = order ? MockDB.getVendorById(order.vendorId) : null;
+    var items  = MockDB.getOrderItems(orderId);
       preview.innerHTML =
         `<strong>${orderId}</strong> — ${vendor ? vendor.businessName : ''} (${vendor ? vendor.city : ''})<br>
-        Items: ${items.map(i => { const v = MockDB.getVegetableById(i.vegId); return `${v ? v.nameEn : ''} ${i.qty} kg`; }).join(', ')}<br>
+        Items: ${items.map(i => { var v = MockDB.getVegetableById(i.vegId); return `${v ? v.nameEn : ''} ${i.qty} kg`; }).join(', ')}<br>
         Total: <strong>${Utils.formatCurrency(order ? order.total : 0)}</strong>`;
       preview.style.display = 'block';
     }
 
     function calcLabourCost() {
-      const start = document.getElementById('ld-start').value;
-      const end   = document.getElementById('ld-end').value;
-      const selectedWorkers = [...document.querySelectorAll('#worker-checkboxes input:checked')];
-      const selectedLabour  = selectedWorkers.map(cb => _labour.find(l => l.id === cb.value)).filter(Boolean);
+    var start = document.getElementById('ld-start').value;
+    var end   = document.getElementById('ld-end').value;
+    var selectedWorkers = [...document.querySelectorAll('#worker-checkboxes input:checked')];
+    var selectedLabour  = selectedWorkers.map(cb => _labour.find(l => l.id === cb.value)).filter(Boolean);
 
       if (!start || !end || selectedLabour.length === 0) {
         document.getElementById('ld-cost-display').textContent = '₹0';
         document.getElementById('ld-cost-formula').textContent = 'Select workers and time range to calculate.';
         return;
       }
-      const startMs = new Date(start).getTime();
-      const endMs   = new Date(end).getTime();
+    var startMs = new Date(start).getTime();
+    var endMs   = new Date(end).getTime();
       if (endMs <= startMs) { document.getElementById('ld-cost-formula').textContent = 'End time must be after start time.'; return; }
-
-      const hours = (endMs - startMs) / (1000 * 3600);
-      const hourlyRate = (worker) => worker.dailyWage / 8;
-      const totalCost  = selectedLabour.reduce((s, l) => s + (hourlyRate(l) * hours), 0);
+    var hours = (endMs - startMs) / (1000 * 3600);
+    var hourlyRate = (worker) => worker.dailyWage / 8;
+    var totalCost  = selectedLabour.reduce((s, l) => s + (hourlyRate(l) * hours), 0);
 
       document.getElementById('ld-cost-display').textContent = Utils.formatCurrency(Math.round(totalCost));
       document.getElementById('ld-cost-formula').textContent =
@@ -184,7 +180,7 @@
     }
 
     function renderReadyQueue() {
-      const orders = MockDB.getOrders().filter(o => o.status === 'stockAllocated');
+    var orders = MockDB.getOrders().filter(o => o.status === 'stockAllocated');
       document.getElementById('ready-count').textContent = orders.length + ' orders ready';
       if (orders.length === 0) {
         document.getElementById('ready-queue').innerHTML = '<div class="empty-state"><p class="empty-state__text">No orders ready for loading. Allocate stock first.</p></div>';
@@ -193,7 +189,7 @@
       document.getElementById('ready-queue').innerHTML =
         `<div style="display:flex;flex-wrap:wrap;gap:1rem;">` +
         orders.map(o => {
-          const vendor = MockDB.getVendorById(o.vendorId);
+    var vendor = MockDB.getVendorById(o.vendorId);
           return `<div style="padding:0.875rem 1rem;border:2px solid var(--color-success);border-radius:8px;min-width:250px;">
             <div style="font-weight:700;">${o.id}</div>
             <div style="font-size:0.8rem;color:var(--color-text-secondary);margin-bottom:0.5rem;">${vendor ? vendor.businessName : ''} — ${Utils.formatCurrency(o.total)}</div>
@@ -204,21 +200,21 @@
     }
 
     function renderLoadingTable() {
-      const orders = MockDB.getOrders();
+    var orders = MockDB.getOrders();
       document.getElementById('loading-tbody').innerHTML = _loading.length === 0
         ? '<tr><td colspan="9" class="empty-row">No loading records yet.</td></tr>'
         : _loading.map(l => {
-            const order  = orders.find(o => o.id === l.orderId);
-            const vendor = order ? MockDB.getVendorById(order.vendorId) : null;
-            const workers = (l.labourIds || []).map(id => {
-              const w = MockDB.getLabour().find(lb => lb.id === id);
+    var order  = orders.find(o => o.id === l.orderId);
+    var vendor = order ? MockDB.getVendorById(order.vendorId) : null;
+    var workers = (l.labourIds || []).map(id => {
+    var w = MockDB.getLabour().find(lb => lb.id === id);
               return w ? w.name : id;
             });
             // Duration
-            let duration = '—';
+    var duration = '—';
             if (l.startTime && l.endTime) {
-              const ms = new Date(l.endTime) - new Date(l.startTime);
-              const hrs = ms / 3600000;
+    var ms = new Date(l.endTime) - new Date(l.startTime);
+    var hrs = ms / 3600000;
               duration = hrs.toFixed(1) + ' hrs';
             }
             return `<tr>
@@ -236,24 +232,21 @@
     }
 
     function saveLoading() {
-      const orderId  = document.getElementById('ld-order').value;
-      const startVal = document.getElementById('ld-start').value;
+    var orderId  = document.getElementById('ld-order').value;
+    var startVal = document.getElementById('ld-start').value;
       if (!orderId || !startVal) { Utils.showToast('Order and Start Time are required.', 'error'); return; }
-
-      const selectedWorkers = [...document.querySelectorAll('#worker-checkboxes input:checked')].map(cb => cb.value);
+    var selectedWorkers = [...document.querySelectorAll('#worker-checkboxes input:checked')].map(cb => cb.value);
       if (selectedWorkers.length === 0) { Utils.showToast('Assign at least one worker.', 'error'); return; }
-
-      const endVal = document.getElementById('ld-end').value;
-      let labourCost = 0;
+    var endVal = document.getElementById('ld-end').value;
+    var labourCost = 0;
       if (endVal) {
-        const hours = (new Date(endVal) - new Date(startVal)) / 3600000;
+    var hours = (new Date(endVal) - new Date(startVal)) / 3600000;
         selectedWorkers.forEach(id => {
-          const w = _labour.find(l => l.id === id);
+    var w = _labour.find(l => l.id === id);
           if (w) labourCost += (w.dailyWage / 8) * hours;
         });
       }
-
-      const record = {
+    var record = {
         id: Utils.generateId('LDG'),
         orderId,
         labourIds: selectedWorkers,
@@ -285,14 +278,14 @@
       MockDB.getOrders()
         .filter(o => ['stockAllocated','confirmed'].includes(o.status))
         .forEach(o => {
-          const vendor = MockDB.getVendorById(o.vendorId);
+    var vendor = MockDB.getVendorById(o.vendorId);
           document.getElementById('ld-order').add(new Option(`${o.id} — ${vendor ? vendor.businessName : ''} (${Utils.statusBadge ? o.status : o.status})`, o.id));
         });
 
       // Build worker checkboxes
-      const cbContainer = document.getElementById('worker-checkboxes');
+    var cbContainer = document.getElementById('worker-checkboxes');
       _labour.forEach(l => {
-        const div = document.createElement('div');
+    var div = document.createElement('div');
         div.innerHTML = `<label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-size:0.875rem;">
           <input type="checkbox" value="${l.id}" onchange="calcLabourCost()">
           <span>${l.name}</span>
@@ -307,6 +300,7 @@
       renderReadyQueue();
       renderLoadingTable();
     });
-  </script>
+}());
+</script>
 </body>
 </html>

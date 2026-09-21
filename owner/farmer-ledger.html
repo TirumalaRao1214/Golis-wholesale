@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Farmer Ledger — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>Farmer Ledger — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -90,32 +88,30 @@
         </div>
       </main>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
-    let _currentFarmerId = null;
+(function () {
+'use strict';
+    var _currentFarmerId = null;
 
     function loadFarmerLedger() {
-      const farmerId = document.getElementById('ledger-farmer-sel').value;
+    var farmerId = document.getElementById('ledger-farmer-sel').value;
       if (!farmerId) {
         document.getElementById('farmer-ledger-summary').style.display = 'none';
         document.getElementById('farmer-ledger-empty').style.display = '';
         return;
       }
       _currentFarmerId = farmerId;
-      const farmer = MockDB.getFarmerById(farmerId);
-      const entries = MockDB.getLedgerEntries(farmerId).sort((a, b) => a.date.localeCompare(b.date));
-      const payments = MockDB.getPayments().filter(p => p.partyId === farmerId && p.partyType === 'farmer');
-
-      const totalSupply = entries.filter(e => e.credit > 0).reduce((s, e) => s + e.credit, 0);
-      const totalPaid = payments.reduce((s, p) => s + p.amount, 0);
-      const balance = totalSupply - totalPaid;
+    var farmer = MockDB.getFarmerById(farmerId);
+    var entries = MockDB.getLedgerEntries(farmerId).sort((a, b) => a.date.localeCompare(b.date));
+    var payments = MockDB.getPayments().filter(p => p.partyId === farmerId && p.partyType === 'farmer');
+    var totalSupply = entries.filter(e => e.credit > 0).reduce((s, e) => s + e.credit, 0);
+    var totalPaid = payments.reduce((s, p) => s + p.amount, 0);
+    var balance = totalSupply - totalPaid;
 
       document.getElementById('fl-farmer-name').textContent = (farmer ? farmer.name : farmerId) + ' — Ledger';
       document.getElementById('fl-total-supply').textContent = Utils.formatCurrency(totalSupply);
@@ -143,26 +139,27 @@
 
     function exportLedger() {
       if (!_currentFarmerId) { Utils.showToast('Please select a farmer first.', 'warning'); return; }
-      const entries = MockDB.getLedgerEntries(_currentFarmerId);
-      const data = entries.map(e => ({ Date: e.date, Description: e.description, Debit: e.debit, Credit: e.credit, Balance: e.balance }));
-      const farmer = MockDB.getFarmerById(_currentFarmerId);
+    var entries = MockDB.getLedgerEntries(_currentFarmerId);
+    var data = entries.map(e => ({ Date: e.date, Description: e.description, Debit: e.debit, Credit: e.credit, Balance: e.balance }));
+    var farmer = MockDB.getFarmerById(_currentFarmerId);
       Utils.exportCSV(data, `ledger-${farmer ? farmer.name.replace(/\s/g,'-') : _currentFarmerId}.csv`);
     }
 
     document.addEventListener('DOMContentLoaded', () => {
       APP.init('owner');
-      const farmers = MockDB.getFarmers();
-      const sel = document.getElementById('ledger-farmer-sel');
+    var farmers = MockDB.getFarmers();
+    var sel = document.getElementById('ledger-farmer-sel');
       farmers.forEach(f => sel.add(new Option(f.name + ' (' + f.id + ')', f.id)));
 
       // Check URL param
-      const params = new URLSearchParams(window.location.search);
-      const id = params.get('id');
+    var params = new URLSearchParams(window.location.search);
+    var id = params.get('id');
       if (id) {
         sel.value = id;
         loadFarmerLedger();
       }
     });
-  </script>
+}());
+</script>
 </body>
 </html>

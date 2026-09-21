@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reports — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>Reports — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -79,17 +77,16 @@
         </div>
       </main>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
-    let _activeReport = null;
-    let _reportData = [];
+(function () {
+'use strict';
+    var _activeReport = null;
+    var _reportData = [];
 
     function generateReport(type) {
       _activeReport = type;
@@ -102,21 +99,20 @@
     function rerunReport() { if (_activeReport) renderReport(_activeReport); }
 
     function renderReport(type) {
-      const from = document.getElementById('report-from').value;
-      const to = document.getElementById('report-to').value;
-      const body = document.getElementById('report-body');
-
-      const purchases = MockDB.getPurchases().filter(p => (!from || p.date >= from) && (!to || p.date <= to));
-      const orders = MockDB.getOrders().filter(o => (!from || o.orderDate >= from) && (!to || o.orderDate <= to));
-      const expenses = MockDB.getExpenses().filter(e => (!from || e.date >= from) && (!to || e.date <= to));
+    var from = document.getElementById('report-from').value;
+    var to = document.getElementById('report-to').value;
+    var body = document.getElementById('report-body');
+    var purchases = MockDB.getPurchases().filter(p => (!from || p.date >= from) && (!to || p.date <= to));
+    var orders = MockDB.getOrders().filter(o => (!from || o.orderDate >= from) && (!to || o.orderDate <= to));
+    var expenses = MockDB.getExpenses().filter(e => (!from || e.date >= from) && (!to || e.date <= to));
 
       if (type === 'pl') {
         document.getElementById('report-title').textContent = 'Profit & Loss Statement';
-        const totalSales = orders.reduce((s, o) => s + o.total, 0);
-        const totalPurchases = purchases.reduce((s, p) => s + p.total, 0);
-        const totalExpenses = expenses.reduce((s, e) => s + e.amount, 0);
-        const grossProfit = totalSales - totalPurchases;
-        const netProfit = grossProfit - totalExpenses;
+    var totalSales = orders.reduce((s, o) => s + o.total, 0);
+    var totalPurchases = purchases.reduce((s, p) => s + p.total, 0);
+    var totalExpenses = expenses.reduce((s, e) => s + e.amount, 0);
+    var grossProfit = totalSales - totalPurchases;
+    var netProfit = grossProfit - totalExpenses;
         _reportData = [
           { Item: 'Total Sales', Amount: totalSales },
           { Item: 'Total Purchases', Amount: -totalPurchases },
@@ -137,9 +133,9 @@
 
       } else if (type === 'farmer-purchase') {
         document.getElementById('report-title').textContent = 'Farmer-wise Purchase Report';
-        const farmers = MockDB.getFarmers();
+    var farmers = MockDB.getFarmers();
         _reportData = farmers.map(f => {
-          const fp = purchases.filter(p => p.farmerId === f.id);
+    var fp = purchases.filter(p => p.farmerId === f.id);
           return { Farmer: f.name, District: f.district, Orders: fp.length, 'Total Qty (kg)': fp.reduce((s,p)=>s+p.qty,0), 'Total Value': fp.reduce((s,p)=>s+p.total,0) };
         }).filter(r => r.Orders > 0);
         body.innerHTML = `<table class="data-table"><thead><tr><th>Farmer</th><th>District</th><th>Records</th><th>Total Qty</th><th>Total Value</th></tr></thead><tbody>
@@ -148,9 +144,9 @@
 
       } else if (type === 'vendor-sales') {
         document.getElementById('report-title').textContent = 'Vendor-wise Sales Report';
-        const vendors = MockDB.getVendors();
+    var vendors = MockDB.getVendors();
         _reportData = vendors.map(v => {
-          const vo = orders.filter(o => o.vendorId === v.id);
+    var vo = orders.filter(o => o.vendorId === v.id);
           return { Vendor: v.businessName, State: v.state, Orders: vo.length, 'Total Value': vo.reduce((s,o)=>s+o.total,0) };
         }).filter(r => r.Orders > 0);
         body.innerHTML = `<table class="data-table"><thead><tr><th>Vendor</th><th>State</th><th>Orders</th><th>Total Value</th></tr></thead><tbody>
@@ -159,11 +155,11 @@
 
       } else if (type === 'veg-analysis') {
         document.getElementById('report-title').textContent = 'Vegetable-wise Analysis';
-        const vegs = MockDB.getVegetables();
+    var vegs = MockDB.getVegetables();
         _reportData = vegs.map(v => {
-          const vp = purchases.filter(p => p.vegetableId === v.id);
-          const inv = MockDB.getInventoryByVegetable(v.id, null);
-          const totalInv = Array.isArray(inv) ? inv.reduce((s, i) => s + (i.opening + i.purchased - i.sold - i.damaged - i.wastage), 0) : 0;
+    var vp = purchases.filter(p => p.vegetableId === v.id);
+    var inv = MockDB.getInventoryByVegetable(v.id, null);
+    var totalInv = Array.isArray(inv) ? inv.reduce((s, i) => s + (i.opening + i.purchased - i.sold - i.damaged - i.wastage), 0) : 0;
           return { Vegetable: v.nameEn, 'Purchased Qty': vp.reduce((s,p)=>s+p.qty,0), 'Purchase Value': vp.reduce((s,p)=>s+p.total,0), 'Current Stock': totalInv, 'Buy Price': v.currentBuyPrice, 'Sell Price': v.currentSellPrice };
         });
         body.innerHTML = `<table class="data-table"><thead><tr><th>Vegetable</th><th>Purchased Qty</th><th>Purchase Value</th><th>Current Stock</th><th>Buy Price</th><th>Sell Price</th></tr></thead><tbody>
@@ -172,13 +168,13 @@
 
       } else if (type === 'daily-summary') {
         document.getElementById('report-title').textContent = 'Daily Closing Summary';
-        const today = from || new Date().toISOString().split('T')[0];
-        const tp = MockDB.getPurchases().filter(p => p.date === today);
-        const to2 = MockDB.getOrders().filter(o => o.orderDate === today);
-        const te = MockDB.getExpenses().filter(e => e.date === today);
-        const sales = to2.reduce((s,o)=>s+o.total,0);
-        const purV = tp.reduce((s,p)=>s+p.total,0);
-        const expV = te.reduce((s,e)=>s+e.amount,0);
+    var today = from || new Date().toISOString().split('T')[0];
+    var tp = MockDB.getPurchases().filter(p => p.date === today);
+    var to2 = MockDB.getOrders().filter(o => o.orderDate === today);
+    var te = MockDB.getExpenses().filter(e => e.date === today);
+    var sales = to2.reduce((s,o)=>s+o.total,0);
+    var purV = tp.reduce((s,p)=>s+p.total,0);
+    var expV = te.reduce((s,e)=>s+e.amount,0);
         _reportData = [{ Date: today, Purchases: purV, Sales: sales, Expenses: expV, Profit: sales - purV - expV }];
         body.innerHTML = `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;">
           <div style="padding:1rem;background:var(--color-primary-pale);border-radius:8px;"><strong>Purchases</strong><div style="font-size:1.3rem;font-weight:700;color:var(--color-warning);">${Utils.formatCurrency(purV)}</div></div>
@@ -189,13 +185,13 @@
 
       } else if (type === 'labour-cost') {
         document.getElementById('report-title').textContent = 'Labour Cost Report';
-        const labour = MockDB.getLabour();
-        const attendance = MockDB.getAttendance();
+    var labour = MockDB.getLabour();
+    var attendance = MockDB.getAttendance();
         _reportData = labour.map(w => {
-          const wa = attendance.filter(a => a.labourId === w.id && (!from || a.date >= from) && (!to || a.date <= to));
-          const presentDays = wa.filter(a => ['present','overtime'].includes(a.status)).length;
-          const halfDays = wa.filter(a => a.status === 'halfDay').length;
-          const cost = presentDays * w.dailyWage + halfDays * w.dailyWage * 0.5;
+    var wa = attendance.filter(a => a.labourId === w.id && (!from || a.date >= from) && (!to || a.date <= to));
+    var presentDays = wa.filter(a => ['present','overtime'].includes(a.status)).length;
+    var halfDays = wa.filter(a => a.status === 'halfDay').length;
+    var cost = presentDays * w.dailyWage + halfDays * w.dailyWage * 0.5;
           return { Worker: w.name, 'Work Type': w.workType, 'Daily Wage': w.dailyWage, 'Days Present': presentDays, 'Half Days': halfDays, 'Total Cost': cost };
         });
         body.innerHTML = `<table class="data-table"><thead><tr><th>Worker</th><th>Work Type</th><th>Daily Wage</th><th>Days Present</th><th>Half Days</th><th>Total Cost</th></tr></thead><tbody>
@@ -204,12 +200,12 @@
 
       } else if (type === 'inventory-val') {
         document.getElementById('report-title').textContent = 'Inventory Valuation';
-        const inventory = MockDB.getInventory();
-        const vegs = MockDB.getVegetables();
+    var inventory = MockDB.getInventory();
+    var vegs = MockDB.getVegetables();
         _reportData = inventory.map(inv => {
-          const veg = vegs.find(v => v.id === inv.vegId);
-          const closing = inv.opening + inv.purchased - inv.sold - inv.damaged - inv.wastage;
-          const value = closing * (veg ? veg.currentSellPrice : 0);
+    var veg = vegs.find(v => v.id === inv.vegId);
+    var closing = inv.opening + inv.purchased - inv.sold - inv.damaged - inv.wastage;
+    var value = closing * (veg ? veg.currentSellPrice : 0);
           return { Vegetable: veg ? veg.nameEn : inv.vegId, Grade: inv.grade, 'Closing (kg)': closing, 'Sell Price': veg ? veg.currentSellPrice : 0, 'Value (₹)': value };
         });
         body.innerHTML = `<table class="data-table"><thead><tr><th>Vegetable</th><th>Grade</th><th>Closing Stock</th><th>Sell Price</th><th>Value</th></tr></thead><tbody>
@@ -226,16 +222,17 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       APP.init('owner');
-      const today = new Date().toISOString().split('T')[0];
-      const monthStart = today.substring(0, 8) + '01';
+    var today = new Date().toISOString().split('T')[0];
+    var monthStart = today.substring(0, 8) + '01';
       document.getElementById('report-from').value = monthStart;
       document.getElementById('report-to').value = today;
 
       // Add CSS for report cards inline since we need it
-      const style = document.createElement('style');
+    var style = document.createElement('style');
       style.textContent = `.report-selector{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;}.report-card{background:var(--color-surface);border:1.5px solid var(--color-border);border-radius:12px;padding:1.25rem;cursor:pointer;transition:all 0.2s;text-align:center;}.report-card:hover{border-color:var(--color-primary);box-shadow:0 4px 12px rgba(45,106,79,0.12);transform:translateY(-2px);}.report-card--active{border-color:var(--color-primary);background:var(--color-primary-pale);}.report-card__icon{font-size:2rem;margin-bottom:0.5rem;}.report-card__title{font-weight:600;font-size:0.9rem;color:var(--color-text-primary);margin-bottom:0.25rem;}.report-card__desc{font-size:0.75rem;color:var(--color-text-secondary);}`;
       document.head.appendChild(style);
     });
-  </script>
+}());
+</script>
 </body>
 </html>

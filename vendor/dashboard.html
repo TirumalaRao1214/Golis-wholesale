@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vendor Dashboard — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>Vendor Dashboard — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -135,22 +133,21 @@
 
       </main>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
+(function () {
+'use strict';
     document.addEventListener('DOMContentLoaded', () => {
       APP.init('vendor');
-      const user     = APP.user;
-      const vendor   = MockDB.getVendorById(user.refId);
-      const stats    = MockDB.getVendorStats(user.refId);
-      const orders   = MockDB.getOrders().filter(o => o.vendorId === user.refId);
-      const vegs     = MockDB.getVegetables();
+    var user     = APP.user;
+    var vendor   = MockDB.getVendorById(user.refId);
+    var stats    = MockDB.getVendorStats(user.refId);
+    var orders   = MockDB.getOrders().filter(o => o.vendorId === user.refId);
+    var vegs     = MockDB.getVegetables();
 
       document.getElementById('welcome-heading').textContent = `Welcome, ${vendor ? vendor.businessName : user.name}`;
       document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-IN', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
@@ -164,15 +161,15 @@
       document.getElementById('outstanding-label').textContent     = `${Utils.formatCurrency(stats.outstanding || 85200)} payable`;
 
       // Cart count
-      const cart = JSON.parse(localStorage.getItem('golis_cart') || '[]');
+    var cart = JSON.parse(localStorage.getItem('golis_cart') || '[]');
       document.getElementById('cart-label').textContent = `${cart.length} item${cart.length !== 1 ? 's' : ''}`;
 
       // Price Highlights (top 5)
-      const changeIcon = { up:'↑', down:'↓', neutral:'→' };
-      const highlights = document.getElementById('price-highlights');
+    var changeIcon = { up:'↑', down:'↓', neutral:'→' };
+    var highlights = document.getElementById('price-highlights');
       highlights.innerHTML = vegs.slice(0, 5).map(v => {
-        const ch = v.currentSellPrice > v.prevSellPrice ? 'up' : v.currentSellPrice < v.prevSellPrice ? 'down' : 'neutral';
-        const color = { up:'var(--color-success)', down:'var(--color-danger)', neutral:'var(--color-text-secondary)' }[ch];
+    var ch = v.currentSellPrice > v.prevSellPrice ? 'up' : v.currentSellPrice < v.prevSellPrice ? 'down' : 'neutral';
+    var color = { up:'var(--color-success)', down:'var(--color-danger)', neutral:'var(--color-text-secondary)' }[ch];
         return `<div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 1rem;border-bottom:1px solid var(--color-border);">
           <span style="font-weight:500;">${v.emoji} ${v.nameEn}</span>
           <div style="text-align:right;">
@@ -183,18 +180,18 @@
       }).join('');
 
       // Recent Orders (last 3)
-      const statusMap = {
+    var statusMap = {
         pending:'badge--warning', confirmed:'badge--info', preparing:'badge--info',
         stockAllocated:'badge--info', loading:'badge--info', dispatched:'badge--primary',
         inTransit:'badge--primary', delivered:'badge--success', partiallyFulfilled:'badge--warning',
       };
-      const statusLabels = {
+    var statusLabels = {
         pending:'Pending', confirmed:'Confirmed', preparing:'Preparing',
         stockAllocated:'Stock Ready', loading:'Loading', dispatched:'Dispatched',
         inTransit:'In Transit', delivered:'Delivered', partiallyFulfilled:'Partial',
       };
-      const recent3 = [...orders].sort((a,b) => b.orderDate.localeCompare(a.orderDate)).slice(0, 3);
-      const tbody = document.getElementById('recent-orders-tbody');
+    var recent3 = [...orders].sort((a,b) => b.orderDate.localeCompare(a.orderDate)).slice(0, 3);
+    var tbody = document.getElementById('recent-orders-tbody');
       if (!recent3.length) {
         tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">No orders yet</td></tr>';
       } else {
@@ -206,6 +203,7 @@
         </tr>`).join('');
       }
     });
-  </script>
+}());
+</script>
 </body>
 </html>

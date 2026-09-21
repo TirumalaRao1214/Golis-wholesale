@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Order Management — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>Order Management — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -154,27 +152,24 @@
         <button class="btn btn-primary" onclick="applyStatusUpdate()">Update</button>
       </div>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
-    let _orders = [];
-    let _currentOrderId = null;
-
-    const STATUS_FLOW = ['pending','confirmed','preparing','stockAllocated','loading','dispatched','inTransit','delivered'];
+(function () {
+'use strict';
+    var _orders = [];
+    var _currentOrderId = null;
+    var STATUS_FLOW = ['pending','confirmed','preparing','stockAllocated','loading','dispatched','inTransit','delivered'];
 
     function renderOrderTable() {
-      const statusFilter = document.getElementById('ord-filter-status').value;
-      const vendorFilter = document.getElementById('ord-filter-vendor').value;
-      const from = document.getElementById('ord-filter-from').value;
-      const to = document.getElementById('ord-filter-to').value;
-
-      const data = _orders.filter(o => {
+    var statusFilter = document.getElementById('ord-filter-status').value;
+    var vendorFilter = document.getElementById('ord-filter-vendor').value;
+    var from = document.getElementById('ord-filter-from').value;
+    var to = document.getElementById('ord-filter-to').value;
+    var data = _orders.filter(o => {
         if (statusFilter && o.status !== statusFilter) return false;
         if (vendorFilter && o.vendorId !== vendorFilter) return false;
         if (from && o.orderDate < from) return false;
@@ -183,9 +178,9 @@
       });
 
       document.getElementById('orders-tbody').innerHTML = data.map(o => {
-        const vendor = MockDB.getVendorById(o.vendorId);
-        const items = MockDB.getOrderItems(o.id);
-        const totalQty = items.reduce((s, i) => s + i.qty, 0);
+    var vendor = MockDB.getVendorById(o.vendorId);
+    var items = MockDB.getOrderItems(o.id);
+    var totalQty = items.reduce((s, i) => s + i.qty, 0);
         return `<tr>
           <td><strong>${o.id}</strong></td>
           <td>${vendor ? vendor.businessName : o.vendorId}<br><small class="text-muted">${vendor ? vendor.city : ''}</small></td>
@@ -224,16 +219,15 @@
 
     function viewOrder(id) {
       _currentOrderId = id;
-      const order = _orders.find(o => o.id === id);
+    var order = _orders.find(o => o.id === id);
       if (!order) return;
-      const vendor = MockDB.getVendorById(order.vendorId);
-      const items = MockDB.getOrderItems(id);
+    var vendor = MockDB.getVendorById(order.vendorId);
+    var items = MockDB.getOrderItems(id);
       document.getElementById('order-detail-title').textContent = `Order ${id}`;
-
-      const timeline = STATUS_FLOW.map((s, i) => {
-        const idx = STATUS_FLOW.indexOf(order.status);
-        const done = i < idx;
-        const current = s === order.status;
+    var timeline = STATUS_FLOW.map((s, i) => {
+    var idx = STATUS_FLOW.indexOf(order.status);
+    var done = i < idx;
+    var current = s === order.status;
         return `<div class="timeline-step ${done ? 'done' : current ? 'current' : ''}">
           <div class="timeline-step__dot"></div>
           <div class="timeline-step__label">${s.replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase())}</div>
@@ -253,7 +247,7 @@
         <table class="data-table" style="margin-bottom:1.5rem;">
           <thead><tr><th>Vegetable</th><th>Grade</th><th>Qty</th><th>Rate</th><th>Amount</th></tr></thead>
           <tbody>${items.map(i => {
-            const veg = MockDB.getVegetableById(i.vegId);
+    var veg = MockDB.getVegetableById(i.vegId);
             return `<tr><td>${veg ? veg.nameEn : i.vegId}</td><td>${i.grade}</td><td>${i.qty.toLocaleString('en-IN')} kg</td><td>₹${i.rate}/kg</td><td>${Utils.formatCurrency(i.amount)}</td></tr>`;
           }).join('')}</tbody>
           <tfoot><tr><th colspan="4">Total</th><th>${Utils.formatCurrency(order.total)}</th></tr></tfoot>
@@ -267,7 +261,7 @@
     }
 
     function openStatusUpdate(id) {
-      const order = _orders.find(o => o.id === id);
+    var order = _orders.find(o => o.id === id);
       if (!order) return;
       _currentOrderId = id;
       document.getElementById('su-order-id').value = id;
@@ -281,8 +275,8 @@
     }
 
     function applyStatusUpdate() {
-      const id = _currentOrderId;
-      const newStatus = document.getElementById('su-new-status').value;
+    var id = _currentOrderId;
+    var newStatus = document.getElementById('su-new-status').value;
       MockDB.updateRecord('_orders', id, { status: newStatus });
       _orders = MockDB.getOrders();
       Utils.closeModal('modal-status-update');
@@ -293,11 +287,12 @@
     document.addEventListener('DOMContentLoaded', () => {
       APP.init('owner');
       _orders = MockDB.getOrders();
-      const vendors = MockDB.getVendors();
-      const sel = document.getElementById('ord-filter-vendor');
+    var vendors = MockDB.getVendors();
+    var sel = document.getElementById('ord-filter-vendor');
       vendors.forEach(v => sel.add(new Option(v.businessName, v.id)));
       renderOrderTable();
     });
-  </script>
+}());
+</script>
 </body>
 </html>

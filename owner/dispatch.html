@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dispatch Management — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>Dispatch Management — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -141,24 +139,23 @@
         <button class="btn btn-ghost" onclick="Utils.closeModal('modal-dispatch-detail')" data-i18n="common.close"></button>
       </div>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
-    let _dispatches = [];
-    const DISPATCH_TIMELINE = ['pending','confirmed','preparing','loading','dispatched','inTransit','delivered'];
+(function () {
+'use strict';
+    var _dispatches = [];
+    var DISPATCH_TIMELINE = ['pending','confirmed','preparing','loading','dispatched','inTransit','delivered'];
 
     function loadDispatchOrderInfo() {
-      const orderId = document.getElementById('dp-order').value;
-      const info = document.getElementById('dp-order-info');
+    var orderId = document.getElementById('dp-order').value;
+    var info = document.getElementById('dp-order-info');
       if (!orderId) { info.style.display = 'none'; return; }
-      const order = MockDB.getOrderById(orderId);
-      const vendor = order ? MockDB.getVendorById(order.vendorId) : null;
+    var order = MockDB.getOrderById(orderId);
+    var vendor = order ? MockDB.getVendorById(order.vendorId) : null;
       document.getElementById('dp-order-info-text').innerHTML =
         `<strong>${orderId}</strong> — ${vendor ? vendor.businessName + ', ' + vendor.city : ''} — ${Utils.formatCurrency(order ? order.total : 0)}`;
       if (vendor) document.getElementById('dp-to').value = vendor.city;
@@ -166,20 +163,20 @@
     }
 
     function loadVehicleDriver() {
-      const vehicleId = document.getElementById('dp-vehicle').value;
-      const vehicle = MockDB.getVehicles().find(v => v.id === vehicleId);
+    var vehicleId = document.getElementById('dp-vehicle').value;
+    var vehicle = MockDB.getVehicles().find(v => v.id === vehicleId);
       if (vehicle) document.getElementById('dp-driver').value = vehicle.driverName;
     }
 
     function renderDispatchTable() {
-      const today = new Date().toISOString().split('T')[0];
+    var today = new Date().toISOString().split('T')[0];
       document.getElementById('disp-today').textContent = _dispatches.filter(d => d.dispatchDate === today).length;
       document.getElementById('disp-transit').textContent = _dispatches.filter(d => ['inTransit','dispatched'].includes(d.status)).length;
       document.getElementById('disp-delivered').textContent = _dispatches.filter(d => d.status === 'delivered' && d.actualArrival === today).length;
 
       document.getElementById('dispatch-tbody').innerHTML = _dispatches.map(d => {
-        const order = MockDB.getOrderById(d.orderId);
-        const vendor = order ? MockDB.getVendorById(order.vendorId) : null;
+    var order = MockDB.getOrderById(d.orderId);
+    var vendor = order ? MockDB.getVendorById(order.vendorId) : null;
         return `<tr>
           <td><code>${d.id}</code></td>
           <td><strong>${d.orderId}</strong></td>
@@ -196,16 +193,15 @@
     }
 
     function viewDispatch(id) {
-      const d = _dispatches.find(x => x.id === id);
+    var d = _dispatches.find(x => x.id === id);
       if (!d) return;
-      const order = MockDB.getOrderById(d.orderId);
-      const vendor = order ? MockDB.getVendorById(order.vendorId) : null;
+    var order = MockDB.getOrderById(d.orderId);
+    var vendor = order ? MockDB.getVendorById(order.vendorId) : null;
       document.getElementById('dispatch-detail-title').textContent = `Dispatch ${id}`;
-
-      const currentIdx = DISPATCH_TIMELINE.indexOf(d.status);
-      const timeline = DISPATCH_TIMELINE.map((s, i) => {
-        const done = i < currentIdx;
-        const current = i === currentIdx;
+    var currentIdx = DISPATCH_TIMELINE.indexOf(d.status);
+    var timeline = DISPATCH_TIMELINE.map((s, i) => {
+    var done = i < currentIdx;
+    var current = i === currentIdx;
         return `<div class="timeline-step ${done ? 'done' : current ? 'current' : ''}">
           <div class="timeline-step__dot"></div>
           <div class="timeline-step__label">${s.charAt(0).toUpperCase() + s.slice(1).replace(/([A-Z])/g, ' $1')}</div>
@@ -231,11 +227,11 @@
     }
 
     function saveDispatch() {
-      const orderId = document.getElementById('dp-order').value;
-      const vehicleId = document.getElementById('dp-vehicle').value;
+    var orderId = document.getElementById('dp-order').value;
+    var vehicleId = document.getElementById('dp-vehicle').value;
       if (!orderId || !vehicleId) { Utils.showToast('Please select order and vehicle.', 'error'); return; }
-      const vehicle = MockDB.getVehicles().find(v => v.id === vehicleId);
-      const record = {
+    var vehicle = MockDB.getVehicles().find(v => v.id === vehicleId);
+    var record = {
         id: Utils.generateId('DSP'),
         orderId,
         vehicleId,
@@ -259,21 +255,20 @@
     document.addEventListener('DOMContentLoaded', () => {
       APP.init('owner');
       _dispatches = MockDB.getDispatches();
-
-      const orders = MockDB.getOrders().filter(o => ['stockAllocated','loading','confirmed'].includes(o.status));
-      const orderSel = document.getElementById('dp-order');
+    var orders = MockDB.getOrders().filter(o => ['stockAllocated','loading','confirmed'].includes(o.status));
+    var orderSel = document.getElementById('dp-order');
       orders.forEach(o => {
-        const v = MockDB.getVendorById(o.vendorId);
+    var v = MockDB.getVendorById(o.vendorId);
         orderSel.add(new Option(`${o.id} — ${v ? v.businessName : ''} (${o.status})`, o.id));
       });
-
-      const vehicles = MockDB.getVehicles().filter(v => v.status === 'available');
-      const vehSel = document.getElementById('dp-vehicle');
+    var vehicles = MockDB.getVehicles().filter(v => v.status === 'available');
+    var vehSel = document.getElementById('dp-vehicle');
       vehicles.forEach(v => vehSel.add(new Option(`${v.vehicleNo} (${v.type}) — ${v.driverName}`, v.id)));
 
       document.getElementById('dp-date').value = new Date().toISOString().split('T')[0];
       renderDispatchTable();
     });
-  </script>
+}());
+</script>
 </body>
 </html>

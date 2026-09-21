@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Returns — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>Returns — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -238,17 +236,16 @@
         <button class="btn btn-primary" onclick="saveFarmerReturn()">Save Rejection</button>
       </div>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
-    let _returns  = [];
-    let _curTab   = 'vendor';
+(function () {
+'use strict';
+    var _returns  = [];
+    var _curTab   = 'vendor';
 
     function switchTab(tab) {
       _curTab = tab;
@@ -268,42 +265,42 @@
     }
 
     function onVrOrderSelect() {
-      const orderId = document.getElementById('vr-order').value;
-      const info    = document.getElementById('vr-vendor-info');
+    var orderId = document.getElementById('vr-order').value;
+    var info    = document.getElementById('vr-vendor-info');
       if (!orderId) { info.style.display = 'none'; return; }
-      const order  = MockDB.getOrderById(orderId);
-      const vendor = order ? MockDB.getVendorById(order.vendorId) : null;
+    var order  = MockDB.getOrderById(orderId);
+    var vendor = order ? MockDB.getVendorById(order.vendorId) : null;
       info.innerHTML = `<strong>${vendor ? vendor.businessName : ''}</strong> | ${vendor ? vendor.city : ''} | Order Total: ${Utils.formatCurrency(order ? order.total : 0)}`;
       info.style.display = '';
     }
 
     function calcReturnAdjustment(type) {
       if (type === 'vendor') {
-        const returned = Number(document.getElementById('vr-returned').value) || 0;
-        const rate     = Number(document.getElementById('vr-rate').value) || 0;
-        const adj      = returned * rate;
+    var returned = Number(document.getElementById('vr-returned').value) || 0;
+    var rate     = Number(document.getElementById('vr-rate').value) || 0;
+    var adj      = returned * rate;
         document.getElementById('vr-adj-amount').textContent = Utils.formatCurrency(adj);
         document.getElementById('vr-adj-formula').textContent = `${returned} kg × ₹${rate}/kg = ${Utils.formatCurrency(adj)} deducted from vendor balance`;
       } else {
-        const rejected = Number(document.getElementById('fr-rejected').value) || 0;
-        const rate     = Number(document.getElementById('fr-rate').value) || 0;
-        const adj      = rejected * rate;
+    var rejected = Number(document.getElementById('fr-rejected').value) || 0;
+    var rate     = Number(document.getElementById('fr-rate').value) || 0;
+    var adj      = rejected * rate;
         document.getElementById('fr-adj-amount').textContent = Utils.formatCurrency(adj);
         document.getElementById('fr-adj-formula').textContent = `${rejected} kg × ₹${rate}/kg = ${Utils.formatCurrency(adj)} deducted from farmer payment`;
       }
     }
 
     function saveVendorReturn() {
-      const orderId   = document.getElementById('vr-order').value;
-      const vegId     = document.getElementById('vr-veg').value;
-      const delivered = Number(document.getElementById('vr-delivered').value) || 0;
-      const returned  = Number(document.getElementById('vr-returned').value)  || 0;
-      const rate      = Number(document.getElementById('vr-rate').value)      || 0;
+    var orderId   = document.getElementById('vr-order').value;
+    var vegId     = document.getElementById('vr-veg').value;
+    var delivered = Number(document.getElementById('vr-delivered').value) || 0;
+    var returned  = Number(document.getElementById('vr-returned').value)  || 0;
+    var rate      = Number(document.getElementById('vr-rate').value)      || 0;
       if (!orderId || !vegId || !delivered || !returned) {
         Utils.showToast('Please fill all required fields.', 'error'); return;
       }
-      const order = MockDB.getOrderById(orderId);
-      const record = {
+    var order = MockDB.getOrderById(orderId);
+    var record = {
         id: Utils.generateId('RET'),
         type: 'vendor',
         partyId: order ? order.vendorId : '',
@@ -326,15 +323,15 @@
     }
 
     function saveFarmerReturn() {
-      const farmerId = document.getElementById('fr-farmer').value;
-      const vegId    = document.getElementById('fr-veg').value;
-      const received = Number(document.getElementById('fr-received').value)  || 0;
-      const rejected = Number(document.getElementById('fr-rejected').value)  || 0;
-      const rate     = Number(document.getElementById('fr-rate').value)      || 0;
+    var farmerId = document.getElementById('fr-farmer').value;
+    var vegId    = document.getElementById('fr-veg').value;
+    var received = Number(document.getElementById('fr-received').value)  || 0;
+    var rejected = Number(document.getElementById('fr-rejected').value)  || 0;
+    var rate     = Number(document.getElementById('fr-rate').value)      || 0;
       if (!farmerId || !vegId || !received || !rejected) {
         Utils.showToast('Please fill all required fields.', 'error'); return;
       }
-      const record = {
+    var record = {
         id: Utils.generateId('RET'),
         type: 'farmer',
         partyId: farmerId,
@@ -358,12 +355,12 @@
 
     function renderTables() {
       // Vendor Returns
-      const vendorReturns = _returns.filter(r => r.type === 'vendor');
+    var vendorReturns = _returns.filter(r => r.type === 'vendor');
       document.getElementById('vendor-returns-tbody').innerHTML = vendorReturns.length === 0
         ? '<tr><td colspan="10" class="empty-row">No vendor returns recorded yet.</td></tr>'
         : vendorReturns.map(r => {
-            const vendor = MockDB.getVendorById(r.partyId);
-            const veg    = MockDB.getVegetableById(r.vegId);
+    var vendor = MockDB.getVendorById(r.partyId);
+    var veg    = MockDB.getVegetableById(r.vegId);
             return `<tr>
               <td><code>${r.id}</code></td>
               <td>${Utils.formatDate(r.date)}</td>
@@ -379,12 +376,12 @@
           }).join('');
 
       // Farmer Rejections
-      const farmerReturns = _returns.filter(r => r.type === 'farmer');
+    var farmerReturns = _returns.filter(r => r.type === 'farmer');
       document.getElementById('farmer-returns-tbody').innerHTML = farmerReturns.length === 0
         ? '<tr><td colspan="9" class="empty-row">No farmer rejections recorded yet.</td></tr>'
         : farmerReturns.map(r => {
-            const farmer = MockDB.getFarmerById(r.partyId);
-            const veg    = MockDB.getVegetableById(r.vegId);
+    var farmer = MockDB.getFarmerById(r.partyId);
+    var veg    = MockDB.getVegetableById(r.vegId);
             return `<tr>
               <td><code>${r.id}</code></td>
               <td>${Utils.formatDate(r.date)}</td>
@@ -407,7 +404,7 @@
       MockDB.getOrders()
         .filter(o => ['delivered','dispatched','inTransit'].includes(o.status))
         .forEach(o => {
-          const vendor = MockDB.getVendorById(o.vendorId);
+    var vendor = MockDB.getVendorById(o.vendorId);
           document.getElementById('vr-order').add(new Option(`${o.id} — ${vendor ? vendor.businessName : ''}`, o.id));
         });
 
@@ -423,12 +420,13 @@
       });
 
       // Set default dates
-      const today = new Date().toISOString().split('T')[0];
+    var today = new Date().toISOString().split('T')[0];
       document.getElementById('vr-date').value  = today;
       document.getElementById('fr-date').value  = today;
 
       renderTables();
     });
-  </script>
+}());
+</script>
 </body>
 </html>

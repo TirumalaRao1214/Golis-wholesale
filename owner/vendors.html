@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vendor Management — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>Vendor Management — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -148,22 +146,21 @@
         <button class="btn btn-ghost" onclick="Utils.closeModal('modal-vendor-view')" data-i18n="common.close"></button>
       </div>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
-    let _vendors = [];
+(function () {
+'use strict';
+    var _vendors = [];
 
     function renderVendorTable() {
-      const q = (document.getElementById('vendor-search').value || '').toLowerCase();
-      const state = document.getElementById('vendor-state-filter').value;
-      const data = _vendors.filter(v => {
-        const match = !q || [v.businessName, v.city, v.gst, v.contactPerson].some(x => x && x.toLowerCase().includes(q));
+    var q = (document.getElementById('vendor-search').value || '').toLowerCase();
+    var state = document.getElementById('vendor-state-filter').value;
+    var data = _vendors.filter(v => {
+    var match = !q || [v.businessName, v.city, v.gst, v.contactPerson].some(x => x && x.toLowerCase().includes(q));
         return match && (!state || v.state === state);
       });
       document.getElementById('vendors-tbody').innerHTML = data.map(v => `
@@ -193,7 +190,7 @@
     }
 
     function editVendor(id) {
-      const v = _vendors.find(x => x.id === id);
+    var v = _vendors.find(x => x.id === id);
       if (!v) return;
       document.getElementById('vendor-modal-title').textContent = 'Edit Vendor';
       document.getElementById('vendor-edit-id').value = id;
@@ -209,10 +206,10 @@
     }
 
     function saveVendor() {
-      const business = document.getElementById('v-business').value.trim();
+    var business = document.getElementById('v-business').value.trim();
       if (!business) { Utils.showToast('Business name is required.', 'error'); return; }
-      const editId = document.getElementById('vendor-edit-id').value;
-      const record = {
+    var editId = document.getElementById('vendor-edit-id').value;
+    var record = {
         businessName: business,
         contactPerson: document.getElementById('v-contact').value.trim(),
         mobile: document.getElementById('v-mobile').value.trim(),
@@ -237,10 +234,10 @@
     }
 
     function viewVendor(id) {
-      const v = _vendors.find(x => x.id === id);
+    var v = _vendors.find(x => x.id === id);
       if (!v) return;
-      const orders = MockDB.getOrders().filter(o => o.vendorId === id);
-      const payments = MockDB.getPayments().filter(p => p.partyId === id && p.partyType === 'vendor');
+    var orders = MockDB.getOrders().filter(o => o.vendorId === id);
+    var payments = MockDB.getPayments().filter(p => p.partyId === id && p.partyType === 'vendor');
       document.getElementById('view-vendor-name').textContent = v.businessName;
       document.getElementById('view-vendor-body').innerHTML = `
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
@@ -272,6 +269,7 @@
       _vendors = MockDB.getVendors();
       renderVendorTable();
     });
-  </script>
+}());
+</script>
 </body>
 </html>

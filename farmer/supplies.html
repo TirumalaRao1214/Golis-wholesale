@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Supplies — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>My Supplies — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -178,27 +176,25 @@
         </form>
       </div>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
-    let allSupplies = [];
-    let vegetables  = [];
+(function () {
+'use strict';
+    var allSupplies = [];
+    var vegetables  = [];
 
     document.addEventListener('DOMContentLoaded', () => {
       APP.init('farmer');
-
-      const user = APP.user;
+    var user = APP.user;
       vegetables = MockDB.getVegetables();
 
       // Populate vegetable dropdowns
-      const vegSelectFilter = document.getElementById('filter-vegetable');
-      const vegSelectForm   = document.getElementById('supply-vegetable');
+    var vegSelectFilter = document.getElementById('filter-vegetable');
+    var vegSelectForm   = document.getElementById('supply-vegetable');
       vegetables.forEach(v => {
         vegSelectFilter.innerHTML += `<option value="${v.id}">${v.nameEn} (${v.nameTe})</option>`;
         vegSelectForm.innerHTML   += `<option value="${v.id}">${v.nameEn} (${v.nameTe})</option>`;
@@ -212,10 +208,10 @@
       allSupplies.sort((a, b) => b.date.localeCompare(a.date));
 
       // Compute summary
-      const now        = new Date();
-      const monthStart = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-      const monthSups  = allSupplies.filter(p => p.date.startsWith(monthStart));
-      const pendingCount = allSupplies.filter(p => p.status === 'pending').length;
+    var now        = new Date();
+    var monthStart = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    var monthSups  = allSupplies.filter(p => p.date.startsWith(monthStart));
+    var pendingCount = allSupplies.filter(p => p.status === 'pending').length;
 
       document.getElementById('kpi-total-supplies').textContent = allSupplies.length;
       document.getElementById('kpi-month-qty').textContent      = Utils.formatWeight(monthSups.reduce((s,p) => s+p.qty, 0));
@@ -226,27 +222,27 @@
     });
 
     function statusBadge(status) {
-      const map = {
+    var map = {
         pending:  'badge--warning',
         completed:'badge--success',
       };
-      const labels = {
+    var labels = {
         pending:  'Pending',
         completed:'Completed',
       };
-      const cls = map[status] || '';
+    var cls = map[status] || '';
       return `<span class="badge ${cls}">${labels[status] || status}</span>`;
     }
 
     function renderTable(data) {
       document.getElementById('supply-count').textContent = data.length + ' records';
-      const tbody = document.getElementById('supplies-tbody');
+    var tbody = document.getElementById('supplies-tbody');
       if (!data.length) {
         tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted empty-state-text">No supplies found for the selected filters</td></tr>';
         return;
       }
       tbody.innerHTML = data.map(p => {
-        const veg = vegetables.find(v => v.id === p.vegetableId);
+    var veg = vegetables.find(v => v.id === p.vegetableId);
         return `<tr>
           <td>${Utils.formatDate(p.date)}</td>
           <td>${veg ? `${veg.emoji} ${veg.nameEn} <span class="text-muted" style="font-size:0.8em;">(${veg.nameTe})</span>` : p.vegetableId}</td>
@@ -261,12 +257,11 @@
     }
 
     function applyFilters() {
-      const veg    = document.getElementById('filter-vegetable').value;
-      const grade  = document.getElementById('filter-grade').value;
-      const status = document.getElementById('filter-status').value;
-      const from   = document.getElementById('filter-date-from').value;
-
-      let filtered = [...allSupplies];
+    var veg    = document.getElementById('filter-vegetable').value;
+    var grade  = document.getElementById('filter-grade').value;
+    var status = document.getElementById('filter-status').value;
+    var from   = document.getElementById('filter-date-from').value;
+    var filtered = [...allSupplies];
       if (veg)    filtered = filtered.filter(p => p.vegetableId === veg);
       if (grade)  filtered = filtered.filter(p => p.grade === grade);
       if (status) filtered = filtered.filter(p => p.status === status);
@@ -277,21 +272,20 @@
 
     function submitSupply(e) {
       e.preventDefault();
-      const user      = APP.user;
-      const vegId     = document.getElementById('supply-vegetable').value;
-      const grade     = document.getElementById('supply-grade').value;
-      const qty       = parseInt(document.getElementById('supply-qty').value);
-      const rate      = parseFloat(document.getElementById('supply-rate').value) || 0;
-      const date      = document.getElementById('supply-date').value;
-      const vehicleNo = document.getElementById('supply-vehicle').value.trim();
-      const notes     = document.getElementById('supply-notes').value.trim();
+    var user      = APP.user;
+    var vegId     = document.getElementById('supply-vegetable').value;
+    var grade     = document.getElementById('supply-grade').value;
+    var qty       = parseInt(document.getElementById('supply-qty').value);
+    var rate      = parseFloat(document.getElementById('supply-rate').value) || 0;
+    var date      = document.getElementById('supply-date').value;
+    var vehicleNo = document.getElementById('supply-vehicle').value.trim();
+    var notes     = document.getElementById('supply-notes').value.trim();
 
       if (!vegId || !grade || !qty || !date) {
         Utils.showToast('Please fill all required fields', 'error');
         return;
       }
-
-      const record = {
+    var record = {
         id:          Utils.generateId('PUR'),
         farmerId:    user.refId,
         vegetableId: vegId,
@@ -318,6 +312,7 @@
       allSupplies.sort((a, b) => b.date.localeCompare(a.date));
       renderTable(allSupplies);
     }
-  </script>
+}());
+</script>
 </body>
 </html>

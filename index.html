@@ -1,14 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <title>GOLIS Wholesale — B2B Vegetable Trading Platform</title>
-  <meta name="description" content="GOLIS Wholesale — Connecting farmers directly with wholesale buyers through a smarter vegetable trading platform. Guntur, Andhra Pradesh.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <link rel="stylesheet" href="css/theme.css">
+  <meta name="description" content="GOLIS Wholesale — Connecting farmers directly with wholesale buyers through a smarter vegetable trading platform. Guntur, Andhra Pradesh.">  <link rel="stylesheet" href="css/theme.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/public.css">
@@ -768,6 +765,8 @@
   <script src="js/utils.js"></script>
   <script src="js/app.js"></script>
   <script>
+(function () {
+'use strict';
   /* ============================================================
      index.html — Public Landing Page Script
   ============================================================ */
@@ -779,22 +778,21 @@
 
   /* ── Price Cards ─────────────────────────────────── */
   function renderPriceCards() {
-    const board = document.getElementById('price-board');
+    var board = document.getElementById('price-board');
     if (!board) return;
-
-    const prices = MockDB.getPrices();           // all 15
-    const vegs   = MockDB.getVegetables();
+    var prices = MockDB.getPrices();           // all 15
+    var vegs   = MockDB.getVegetables();
     // Show first 8
-    const toShow = prices.slice(0, 8);
+    var toShow = prices.slice(0, 8);
 
     board.innerHTML = toShow.map(p => {
-      const veg = vegs.find(v => v.id === p.vegId) || {};
-      const prev = veg.prevSellPrice || p.sellPrice;
-      const pct  = prev > 0 ? (((p.sellPrice - prev) / prev) * 100).toFixed(1) : '0.0';
-      const changeClass = p.change === 'up' ? 'up' : p.change === 'down' ? 'down' : 'neutral';
-      const changeIcon  = p.change === 'up' ? '↑' : p.change === 'down' ? '↓' : '→';
-      const stockClass  = veg.available < 500 ? 'out' : veg.available < 1000 ? 'low' : '';
-      const stockLabel  = veg.available < 500 ? 'Low' : veg.available < 1000 ? 'Limited' : 'Available';
+    var veg = vegs.find(v => v.id === p.vegId) || {};
+    var prev = veg.prevSellPrice || p.sellPrice;
+    var pct  = prev > 0 ? (((p.sellPrice - prev) / prev) * 100).toFixed(1) : '0.0';
+    var changeClass = p.change === 'up' ? 'up' : p.change === 'down' ? 'down' : 'neutral';
+    var changeIcon  = p.change === 'up' ? '↑' : p.change === 'down' ? '↓' : '→';
+    var stockClass  = veg.available < 500 ? 'out' : veg.available < 1000 ? 'low' : '';
+    var stockLabel  = veg.available < 500 ? 'Low' : veg.available < 1000 ? 'Limited' : 'Available';
 
       return `
         <article class="price-card" role="listitem" aria-label="${veg.nameEn} wholesale price">
@@ -814,13 +812,12 @@
 
   /* ── Vegetable Grid ──────────────────────────────── */
   function renderVegetableCards() {
-    const grid = document.getElementById('vegetable-grid');
+    var grid = document.getElementById('vegetable-grid');
     if (!grid) return;
-
-    const vegs = MockDB.getVegetables();   // all 15
+    var vegs = MockDB.getVegetables();   // all 15
 
     grid.innerHTML = vegs.map(veg => {
-      const gradeStr = (veg.grades || ['A']).map(g => `Grade ${g}`).join(', ');
+    var gradeStr = (veg.grades || ['A']).map(g => `Grade ${g}`).join(', ');
       return `
         <article class="vegetable-card" role="listitem" aria-label="${veg.nameEn} — ${veg.nameTe}">
           <div class="vegetable-card__emoji" aria-hidden="true">${veg.emoji || '🥬'}</div>
@@ -837,13 +834,13 @@
 
   /* ── Login Dropdown ──────────────────────────────── */
   function initLoginDropdown() {
-    const trigger = document.querySelector('.login-dropdown__trigger');
-    const menu    = document.querySelector('.login-dropdown__menu');
+    var trigger = document.querySelector('.login-dropdown__trigger');
+    var menu    = document.querySelector('.login-dropdown__menu');
     if (!trigger || !menu) return;
 
     trigger.addEventListener('click', (e) => {
       e.stopPropagation();
-      const open = menu.classList.toggle('is-open');
+    var open = menu.classList.toggle('is-open');
       trigger.setAttribute('aria-expanded', String(open));
     });
 
@@ -857,12 +854,12 @@
 
   /* ── Mobile Nav ──────────────────────────────────── */
   function initMobileNav() {
-    const btn   = document.getElementById('hamburger-btn');
-    const nav   = document.getElementById('mobile-nav');
+    var btn   = document.getElementById('hamburger-btn');
+    var nav   = document.getElementById('mobile-nav');
     if (!btn || !nav) return;
 
     btn.addEventListener('click', () => {
-      const open = nav.classList.toggle('is-open');
+    var open = nav.classList.toggle('is-open');
       btn.setAttribute('aria-expanded', String(open));
       nav.setAttribute('aria-hidden', String(!open));
       btn.setAttribute('aria-label', open ? 'Close navigation menu' : 'Open navigation menu');
@@ -880,7 +877,7 @@
 
   /* ── Sticky Nav Highlight ─────────────────────────── */
   function initStickyNav() {
-    const nav = document.querySelector('.public-nav');
+    var nav = document.querySelector('.public-nav');
     if (!nav) return;
     window.addEventListener('scroll', () => {
       nav.classList.toggle('is-scrolled', window.scrollY > 40);
@@ -891,8 +888,8 @@
   function initSmoothScroll() {
     document.querySelectorAll('a[href^="#"]').forEach(a => {
       a.addEventListener('click', e => {
-        const id = a.getAttribute('href').slice(1);
-        const el = document.getElementById(id);
+    var id = a.getAttribute('href').slice(1);
+    var el = document.getElementById(id);
         if (el) {
           e.preventDefault();
           el.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -903,15 +900,14 @@
 
   /* ── Active Nav Highlight on Scroll ─────────────── */
   function initScrollSpy() {
-    const sections = document.querySelectorAll('section[id], div[id="prices"]');
-    const links    = document.querySelectorAll('.public-nav__link[href^="#"]');
+    var sections = document.querySelectorAll('section[id], div[id="prices"]');
+    var links    = document.querySelectorAll('.public-nav__link[href^="#"]');
     if (!links.length) return;
-
-    const observer = new IntersectionObserver((entries) => {
+    var observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           links.forEach(l => l.classList.remove('active'));
-          const active = document.querySelector(`.public-nav__link[href="#${entry.target.id}"]`);
+    var active = document.querySelector(`.public-nav__link[href="#${entry.target.id}"]`);
           if (active) active.classList.add('active');
         }
       });
@@ -924,11 +920,11 @@
   function initLangSwitcher() {
     document.querySelectorAll('[data-lang-btn]').forEach(btn => {
       btn.addEventListener('click', () => {
-        const lang = btn.dataset.langBtn;
+    var lang = btn.dataset.langBtn;
         I18N.setLanguage(lang);
         // Update all lang buttons
         document.querySelectorAll('[data-lang-btn]').forEach(b => {
-          const active = b.dataset.langBtn === lang;
+    var active = b.dataset.langBtn === lang;
           b.classList.toggle('lang-btn--active', active);
           b.setAttribute('aria-pressed', String(active));
         });
@@ -941,16 +937,15 @@
 
   /* ── Contact Form ─────────────────────────────────── */
   function initContactForm() {
-    const form = document.getElementById('contact-form');
+    var form = document.getElementById('contact-form');
     if (!form) return;
 
     form.addEventListener('submit', e => {
       e.preventDefault();
-
-      const name    = form.querySelector('#contact-name').value.trim();
-      const mobile  = form.querySelector('#contact-mobile').value.trim();
-      const role    = form.querySelector('#contact-role').value;
-      const message = form.querySelector('#contact-message').value.trim();
+    var name    = form.querySelector('#contact-name').value.trim();
+    var mobile  = form.querySelector('#contact-mobile').value.trim();
+    var role    = form.querySelector('#contact-role').value;
+    var message = form.querySelector('#contact-message').value.trim();
 
       // Basic validation
       if (!name) { showFormError('contact-name', "Name is required"); return; }
@@ -973,7 +968,7 @@
     // Clear error on input
     form.querySelectorAll('.form-control').forEach(input => {
       input.addEventListener('input', () => {
-        const err = input.parentNode.querySelector('.form-error');
+    var err = input.parentNode.querySelector('.form-error');
         if (err) err.remove();
         input.classList.remove('is-invalid');
       });
@@ -981,10 +976,10 @@
   }
 
   function showFormError(fieldId, message) {
-    const field = document.getElementById(fieldId);
+    var field = document.getElementById(fieldId);
     if (!field) return;
     field.classList.add('is-invalid');
-    let err = field.parentNode.querySelector('.form-error');
+    var err = field.parentNode.querySelector('.form-error');
     if (!err) {
       err = document.createElement('span');
       err.className = 'form-error';
@@ -1001,8 +996,8 @@
       return;
     }
     // Fallback
-    const container = document.getElementById('toast-container') || document.body;
-    const toast = document.createElement('div');
+    var container = document.getElementById('toast-container') || document.body;
+    var toast = document.createElement('div');
     toast.className = `toast toast--${type}`;
     toast.setAttribute('role', 'alert');
     toast.textContent = message;
@@ -1035,13 +1030,14 @@
     initContactForm();
 
     // Sync lang button active state with persisted lang
-    const currentLang = I18N.currentLang || 'en';
+    var currentLang = I18N.currentLang || 'en';
     document.querySelectorAll('[data-lang-btn]').forEach(btn => {
-      const active = btn.dataset.langBtn === currentLang;
+    var active = btn.dataset.langBtn === currentLang;
       btn.classList.toggle('lang-btn--active', active);
       btn.setAttribute('aria-pressed', String(active));
     });
   });
-  </script>
+}());
+</script>
 </body>
 </html>

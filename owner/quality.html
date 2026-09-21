@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quality Inspection — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>Quality Inspection — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -126,55 +124,52 @@
         <button class="btn btn-primary" onclick="saveQuality()">Save Quality Check</button>
       </div>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
-    let _quality = [];
+(function () {
+'use strict';
+    var _quality = [];
 
     function onWeighmentSelect() {
-      const weighmentId = document.getElementById('q-weighment').value;
+    var weighmentId = document.getElementById('q-weighment').value;
       if (!weighmentId) { document.getElementById('q-received').value = ''; return; }
-      const w = MockDB.getWeighments().find(x => x.id === weighmentId);
+    var w = MockDB.getWeighments().find(x => x.id === weighmentId);
       if (w) document.getElementById('q-received').value = w.netWt || 0;
       calcQualityTotal();
     }
 
     function calcQualityTotal() {
-      const received = Number(document.getElementById('q-received').value) || 0;
-      const a = Number(document.getElementById('q-a').value) || 0;
-      const b = Number(document.getElementById('q-b').value) || 0;
-      const c = Number(document.getElementById('q-c').value) || 0;
-      const dmg = Number(document.getElementById('q-damaged').value) || 0;
-      const rej = Number(document.getElementById('q-rejected').value) || 0;
-      const allocated = a + b + c + dmg + rej;
-      const remaining = received - allocated;
-      const pct = received > 0 ? Math.min(100, (allocated / received) * 100) : 0;
+    var received = Number(document.getElementById('q-received').value) || 0;
+    var a = Number(document.getElementById('q-a').value) || 0;
+    var b = Number(document.getElementById('q-b').value) || 0;
+    var c = Number(document.getElementById('q-c').value) || 0;
+    var dmg = Number(document.getElementById('q-damaged').value) || 0;
+    var rej = Number(document.getElementById('q-rejected').value) || 0;
+    var allocated = a + b + c + dmg + rej;
+    var remaining = received - allocated;
+    var pct = received > 0 ? Math.min(100, (allocated / received) * 100) : 0;
 
       document.getElementById('q-validation-text').textContent =
         `Allocated: ${allocated.toLocaleString('en-IN')} kg of ${received.toLocaleString('en-IN')} kg received (${Math.max(0, remaining).toLocaleString('en-IN')} kg remaining)`;
-
-      const bar = document.getElementById('q-progress-bar');
+    var bar = document.getElementById('q-progress-bar');
       bar.style.width = pct + '%';
       bar.style.background = remaining === 0 ? 'var(--color-success)' : remaining < 0 ? 'var(--color-danger)' : 'var(--color-warning)';
-
-      const icon = document.getElementById('q-validation-icon');
+    var icon = document.getElementById('q-validation-icon');
       if (remaining === 0) { icon.textContent = '✅'; document.getElementById('q-validation-bar').style.borderColor = 'var(--color-success)'; }
       else if (remaining < 0) { icon.textContent = '❌ Over-allocated'; document.getElementById('q-validation-bar').style.borderColor = 'var(--color-danger)'; }
       else { icon.textContent = `⚠ ${remaining} kg unallocated`; document.getElementById('q-validation-bar').style.borderColor = 'var(--color-warning)'; }
     }
 
     function renderQualityTable() {
-      const weighments = MockDB.getWeighments();
+    var weighments = MockDB.getWeighments();
       document.getElementById('quality-tbody').innerHTML = _quality.map(q => {
-        const wgt = weighments.find(w => w.id === q.weighmentId);
-        const veg = MockDB.getVegetableById(q.vegId);
-        const ok = q.total > 0 && (q.gradeA + q.gradeB + q.gradeC + q.damaged + q.rejected === q.total);
+    var wgt = weighments.find(w => w.id === q.weighmentId);
+    var veg = MockDB.getVegetableById(q.vegId);
+    var ok = q.total > 0 && (q.gradeA + q.gradeB + q.gradeC + q.damaged + q.rejected === q.total);
         return `<tr>
           <td><code>${q.id}</code></td>
           <td>${q.date ? Utils.formatDate(q.date) : '—'}</td>
@@ -191,16 +186,16 @@
     }
 
     function saveQuality() {
-      const weighmentId = document.getElementById('q-weighment').value;
+    var weighmentId = document.getElementById('q-weighment').value;
       if (!weighmentId) { Utils.showToast('Please link a weighment record.', 'error'); return; }
-      const received = Number(document.getElementById('q-received').value) || 0;
-      const a = Number(document.getElementById('q-a').value) || 0;
-      const b = Number(document.getElementById('q-b').value) || 0;
-      const c = Number(document.getElementById('q-c').value) || 0;
-      const dmg = Number(document.getElementById('q-damaged').value) || 0;
-      const rej = Number(document.getElementById('q-rejected').value) || 0;
-      const wgt = MockDB.getWeighments().find(w => w.id === weighmentId);
-      const record = {
+    var received = Number(document.getElementById('q-received').value) || 0;
+    var a = Number(document.getElementById('q-a').value) || 0;
+    var b = Number(document.getElementById('q-b').value) || 0;
+    var c = Number(document.getElementById('q-c').value) || 0;
+    var dmg = Number(document.getElementById('q-damaged').value) || 0;
+    var rej = Number(document.getElementById('q-rejected').value) || 0;
+    var wgt = MockDB.getWeighments().find(w => w.id === weighmentId);
+    var record = {
         id: Utils.generateId('QC'),
         weighmentId,
         vegId: wgt ? (MockDB.getArrivals().find(a => a.id === wgt.arrivalId) || {}).vegetableId : null,
@@ -221,8 +216,8 @@
     document.addEventListener('DOMContentLoaded', () => {
       APP.init('owner');
       _quality = MockDB.getQualityChecks();
-      const weighments = MockDB.getWeighments();
-      const sel = document.getElementById('q-weighment');
+    var weighments = MockDB.getWeighments();
+    var sel = document.getElementById('q-weighment');
       weighments.forEach(w => {
         if (w.netWt > 0) sel.add(new Option(`${w.id} — Net: ${w.netWt} kg (${w.date || 'pending'})`, w.id));
       });
@@ -230,6 +225,7 @@
       document.getElementById('q-by').value = APP.user ? APP.user.name : '';
       renderQualityTable();
     });
-  </script>
+}());
+</script>
 </body>
 </html>

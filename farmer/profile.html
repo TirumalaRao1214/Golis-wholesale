@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Profile — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>My Profile — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -120,24 +118,23 @@
 
       </main>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
-    let currentFarmer = null;
+(function () {
+'use strict';
+    var currentFarmer = null;
 
     document.addEventListener('DOMContentLoaded', () => {
       APP.init('farmer');
-      const user     = APP.user;
+    var user     = APP.user;
       currentFarmer  = MockDB.getFarmerById(user.refId);
-      const stats    = MockDB.getFarmerStats(user.refId);
-      const payments = MockDB.getPayments().filter(p => p.partyId === user.refId && p.partyType === 'farmer');
-      const received = payments.reduce((s, p) => s + p.amount, 0);
+    var stats    = MockDB.getFarmerStats(user.refId);
+    var payments = MockDB.getPayments().filter(p => p.partyId === user.refId && p.partyType === 'farmer');
+    var received = payments.reduce((s, p) => s + p.amount, 0);
 
       if (currentFarmer) {
         document.getElementById('field-name').value     = currentFarmer.name     || '';
@@ -160,14 +157,14 @@
     });
 
     function toggleEdit() {
-      const fields = document.querySelectorAll('#profile-form input');
+    var fields = document.querySelectorAll('#profile-form input');
       fields.forEach(f => f.disabled = false);
       document.getElementById('save-actions').style.display = 'block';
       document.getElementById('btn-edit').style.display = 'none';
     }
 
     function cancelEdit() {
-      const fields = document.querySelectorAll('#profile-form input');
+    var fields = document.querySelectorAll('#profile-form input');
       fields.forEach(f => f.disabled = true);
       document.getElementById('save-actions').style.display = 'none';
       document.getElementById('btn-edit').style.display = 'inline-flex';
@@ -183,7 +180,7 @@
 
     function saveProfile(e) {
       e.preventDefault();
-      const updates = {
+    var updates = {
         name:     document.getElementById('field-name').value.trim(),
         mobile:   document.getElementById('field-mobile').value.trim(),
         village:  document.getElementById('field-village').value.trim(),
@@ -195,13 +192,13 @@
       currentFarmer = { ...currentFarmer, ...updates };
       document.getElementById('profile-name-display').textContent    = currentFarmer.name;
       document.getElementById('profile-village-display').textContent = `${currentFarmer.village}, ${currentFarmer.district}`;
-
-      const fields = document.querySelectorAll('#profile-form input');
+    var fields = document.querySelectorAll('#profile-form input');
       fields.forEach(f => f.disabled = true);
       document.getElementById('save-actions').style.display = 'none';
       document.getElementById('btn-edit').style.display = 'inline-flex';
       Utils.showToast('Profile updated successfully! ✅', 'success');
     }
-  </script>
+}());
+</script>
 </body>
 </html>

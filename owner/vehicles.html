@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vehicle Registry — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>Vehicle Registry — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -106,23 +104,21 @@
         <button class="btn btn-primary" onclick="saveVehicle()" data-i18n="common.save"></button>
       </div>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
-    let _vehicles = [];
-
-    const VEHICLE_STATUS_COLORS = { available: 'badge--success', inUse: 'badge--info', maintenance: 'badge--danger', dispatched: 'badge--warning', loading: 'badge--info' };
+(function () {
+'use strict';
+    var _vehicles = [];
+    var VEHICLE_STATUS_COLORS = { available: 'badge--success', inUse: 'badge--info', maintenance: 'badge--danger', dispatched: 'badge--warning', loading: 'badge--info' };
 
     function renderVehiclesTable() {
       document.getElementById('vehicles-tbody').innerHTML = _vehicles.map(v => {
-        const colorClass = VEHICLE_STATUS_COLORS[v.status] || 'badge--muted';
-        const statusLabel = { available: 'Available', inUse: 'In Use', maintenance: 'Maintenance', dispatched: 'Dispatched', loading: 'Loading' }[v.status] || v.status;
+    var colorClass = VEHICLE_STATUS_COLORS[v.status] || 'badge--muted';
+    var statusLabel = { available: 'Available', inUse: 'In Use', maintenance: 'Maintenance', dispatched: 'Dispatched', loading: 'Loading' }[v.status] || v.status;
         return `<tr>
           <td><strong>${v.vehicleNo}</strong></td>
           <td>${v.type}</td>
@@ -146,7 +142,7 @@
     }
 
     function editVehicle(id) {
-      const v = _vehicles.find(x => x.id === id);
+    var v = _vehicles.find(x => x.id === id);
       if (!v) return;
       document.getElementById('vehicle-modal-title').textContent = 'Edit Vehicle';
       document.getElementById('vehicle-edit-id').value = id;
@@ -161,10 +157,10 @@
     }
 
     function saveVehicle() {
-      const vehicleNo = document.getElementById('vh-no').value.trim().toUpperCase();
+    var vehicleNo = document.getElementById('vh-no').value.trim().toUpperCase();
       if (!vehicleNo) { Utils.showToast('Vehicle number is required.', 'error'); return; }
-      const editId = document.getElementById('vehicle-edit-id').value;
-      const record = {
+    var editId = document.getElementById('vehicle-edit-id').value;
+    var record = {
         vehicleNo,
         type: document.getElementById('vh-type').value,
         driverName: document.getElementById('vh-driver').value.trim(),
@@ -190,6 +186,7 @@
       _vehicles = MockDB.getVehicles();
       renderVehiclesTable();
     });
-  </script>
+}());
+</script>
 </body>
 </html>

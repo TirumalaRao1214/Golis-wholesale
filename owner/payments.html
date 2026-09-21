@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Payment Records — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>Payment Records — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -151,16 +149,15 @@
         <button class="btn btn-primary" onclick="savePayment()" data-i18n="common.save"></button>
       </div>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
-    let _activeTab = 'farmer-payments';
+(function () {
+'use strict';
+    var _activeTab = 'farmer-payments';
 
     function switchTab(tab) {
       _activeTab = tab;
@@ -171,17 +168,17 @@
     }
 
     function renderFarmerPayments() {
-      const farmers = MockDB.getFarmers();
-      const payments = MockDB.getPayments();
-      const monthStr = new Date().toISOString().substring(0, 7);
-      let totalPayable = 0, paidMonth = 0, overdue = 0;
+    var farmers = MockDB.getFarmers();
+    var payments = MockDB.getPayments();
+    var monthStr = new Date().toISOString().substring(0, 7);
+    var totalPayable = 0, paidMonth = 0, overdue = 0;
 
       document.getElementById('farmer-payment-tbody').innerHTML = farmers.map(f => {
-        const fPays = payments.filter(p => p.partyId === f.id && p.partyType === 'farmer');
-        const totalPaid = fPays.reduce((s, p) => s + p.amount, 0);
-        const balance = f.totalSupplyValue - totalPaid;
-        const lastPay = fPays.sort((a, b) => b.date.localeCompare(a.date))[0];
-        const status = balance <= 0 ? 'paid' : balance > f.totalSupplyValue * 0.5 ? 'overdue' : 'partial';
+    var fPays = payments.filter(p => p.partyId === f.id && p.partyType === 'farmer');
+    var totalPaid = fPays.reduce((s, p) => s + p.amount, 0);
+    var balance = f.totalSupplyValue - totalPaid;
+    var lastPay = fPays.sort((a, b) => b.date.localeCompare(a.date))[0];
+    var status = balance <= 0 ? 'paid' : balance > f.totalSupplyValue * 0.5 ? 'overdue' : 'partial';
         totalPayable += Math.max(0, balance);
         paidMonth += fPays.filter(p => p.date.startsWith(monthStr)).reduce((s, p) => s + p.amount, 0);
         if (status === 'overdue') overdue += balance;
@@ -200,19 +197,19 @@
     }
 
     function renderVendorPayments() {
-      const vendors = MockDB.getVendors();
-      const payments = MockDB.getPayments();
-      const monthStr = new Date().toISOString().substring(0, 7);
-      let totalReceivable = 0, receivedMonth = 0, overdue = 0;
+    var vendors = MockDB.getVendors();
+    var payments = MockDB.getPayments();
+    var monthStr = new Date().toISOString().substring(0, 7);
+    var totalReceivable = 0, receivedMonth = 0, overdue = 0;
 
       document.getElementById('vendor-payment-tbody').innerHTML = vendors.map(v => {
-        const orders = MockDB.getOrders().filter(o => o.vendorId === v.id);
-        const totalValue = orders.reduce((s, o) => s + o.total, 0);
-        const vPays = payments.filter(p => p.partyId === v.id && p.partyType === 'vendor');
-        const totalReceived = vPays.reduce((s, p) => s + p.amount, 0);
-        const balance = totalValue - totalReceived;
-        const lastPay = vPays.sort((a, b) => b.date.localeCompare(a.date))[0];
-        const status = balance <= 0 ? 'paid' : balance > totalValue * 0.7 ? 'overdue' : 'partial';
+    var orders = MockDB.getOrders().filter(o => o.vendorId === v.id);
+    var totalValue = orders.reduce((s, o) => s + o.total, 0);
+    var vPays = payments.filter(p => p.partyId === v.id && p.partyType === 'vendor');
+    var totalReceived = vPays.reduce((s, p) => s + p.amount, 0);
+    var balance = totalValue - totalReceived;
+    var lastPay = vPays.sort((a, b) => b.date.localeCompare(a.date))[0];
+    var status = balance <= 0 ? 'paid' : balance > totalValue * 0.7 ? 'overdue' : 'partial';
         totalReceivable += Math.max(0, balance);
         receivedMonth += vPays.filter(p => p.date.startsWith(monthStr)).reduce((s, p) => s + p.amount, 0);
         if (status === 'overdue') overdue += balance;
@@ -233,7 +230,7 @@
     function openPaymentModal(partyType) {
       document.getElementById('pay-party-type').value = partyType;
       document.getElementById('payment-modal-title').textContent = partyType === 'farmer' ? 'Record Farmer Payment' : 'Record Vendor Receipt';
-      const sel = document.getElementById('pay-party');
+    var sel = document.getElementById('pay-party');
       sel.innerHTML = '<option value="">Select ' + (partyType === 'farmer' ? 'Farmer' : 'Vendor') + '</option>';
       if (partyType === 'farmer') {
         MockDB.getFarmers().forEach(f => sel.add(new Option(f.name, f.id)));
@@ -245,12 +242,12 @@
     }
 
     function savePayment() {
-      const partyId = document.getElementById('pay-party').value;
-      const amount = Number(document.getElementById('pay-amount').value);
-      const partyType = document.getElementById('pay-party-type').value;
+    var partyId = document.getElementById('pay-party').value;
+    var amount = Number(document.getElementById('pay-amount').value);
+    var partyType = document.getElementById('pay-party-type').value;
       if (!partyId || !amount) { Utils.showToast('Party and amount are required.', 'error'); return; }
-      const party = partyType === 'farmer' ? MockDB.getFarmerById(partyId) : MockDB.getVendorById(partyId);
-      const record = {
+    var party = partyType === 'farmer' ? MockDB.getFarmerById(partyId) : MockDB.getVendorById(partyId);
+    var record = {
         id: Utils.generateId('PAY'),
         partyId,
         partyType,
@@ -273,6 +270,7 @@
       renderFarmerPayments();
       renderVendorPayments();
     });
-  </script>
+}());
+</script>
 </body>
 </html>

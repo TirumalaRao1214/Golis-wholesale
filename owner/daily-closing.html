@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Daily Closing — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>Daily Closing — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -94,34 +92,31 @@
         </div>
       </main>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
-    const CLOSING_KEY = 'golis_daily_closing_done';
+(function () {
+'use strict';
+    var CLOSING_KEY = 'golis_daily_closing_done';
 
     function loadDailyClosing() {
-      const today = new Date().toISOString().split('T')[0];
+    var today = new Date().toISOString().split('T')[0];
       document.getElementById('closing-date-label').textContent = new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-
-      const purchases = MockDB.getPurchases().filter(p => p.date === today);
-      const orders = MockDB.getOrders().filter(o => o.orderDate === today);
-      const expenses = MockDB.getExpenses().filter(e => e.date === today);
-      const payments = MockDB.getPayments().filter(p => p.date === today);
-      const labour = MockDB.getLabour();
-      const attendance = MockDB.getAttendance(today);
-      const inventory = MockDB.getInventory();
-      const vegs = MockDB.getVegetables();
-
-      const totalPurchases = purchases.reduce((s, p) => s + p.total, 0);
-      const totalSales = orders.reduce((s, o) => s + o.total, 0);
-      const totalExpenses = expenses.reduce((s, e) => s + e.amount, 0);
-      const netProfit = totalSales - totalPurchases - totalExpenses;
+    var purchases = MockDB.getPurchases().filter(p => p.date === today);
+    var orders = MockDB.getOrders().filter(o => o.orderDate === today);
+    var expenses = MockDB.getExpenses().filter(e => e.date === today);
+    var payments = MockDB.getPayments().filter(p => p.date === today);
+    var labour = MockDB.getLabour();
+    var attendance = MockDB.getAttendance(today);
+    var inventory = MockDB.getInventory();
+    var vegs = MockDB.getVegetables();
+    var totalPurchases = purchases.reduce((s, p) => s + p.total, 0);
+    var totalSales = orders.reduce((s, o) => s + o.total, 0);
+    var totalExpenses = expenses.reduce((s, e) => s + e.amount, 0);
+    var netProfit = totalSales - totalPurchases - totalExpenses;
 
       // Hero profit
       document.getElementById('dc-hero-profit').textContent = Utils.formatCurrency(netProfit);
@@ -143,23 +138,23 @@
       `;
 
       // Section 3: Expenses
-      const byCategory = {};
+    var byCategory = {};
       expenses.forEach(e => byCategory[e.category] = (byCategory[e.category] || 0) + e.amount);
       document.getElementById('dc-expenses').innerHTML =
         Object.entries(byCategory).map(([k, v]) => `<div class="summary-item"><span>${k}</span><strong>${Utils.formatCurrency(v)}</strong></div>`).join('') +
         `<div class="summary-item" style="border-top:1px solid var(--color-border);margin-top:0.5rem;padding-top:0.5rem;"><span>Total</span><strong class="text-danger">${Utils.formatCurrency(totalExpenses)}</strong></div>`;
 
       // Section 4: Inventory closing
-      const topVegs = inventory.slice(0, 5);
+    var topVegs = inventory.slice(0, 5);
       document.getElementById('dc-inventory').innerHTML = topVegs.map(inv => {
-        const veg = vegs.find(v => v.id === inv.vegId);
-        const closing = inv.opening + inv.purchased - inv.sold - inv.damaged - inv.wastage;
+    var veg = vegs.find(v => v.id === inv.vegId);
+    var closing = inv.opening + inv.purchased - inv.sold - inv.damaged - inv.wastage;
         return `<div class="summary-item"><span>${veg ? veg.nameEn : inv.vegId} (${inv.grade})</span><strong>${closing.toLocaleString('en-IN')} kg</strong></div>`;
       }).join('') + `<div class="summary-item text-muted"><small>+${inventory.length - 5} more items</small></div>`;
 
       // Section 5: Payments
-      const farmerPayments = payments.filter(p => p.partyType === 'farmer').reduce((s,p)=>s+p.amount,0);
-      const vendorPayments = payments.filter(p => p.partyType === 'vendor').reduce((s,p)=>s+p.amount,0);
+    var farmerPayments = payments.filter(p => p.partyType === 'farmer').reduce((s,p)=>s+p.amount,0);
+    var vendorPayments = payments.filter(p => p.partyType === 'vendor').reduce((s,p)=>s+p.amount,0);
       document.getElementById('dc-payments').innerHTML = `
         <div class="summary-item"><span>Farmer Payouts</span><strong class="text-warning">${Utils.formatCurrency(farmerPayments)}</strong></div>
         <div class="summary-item"><span>Vendor Receipts</span><strong class="text-success">${Utils.formatCurrency(vendorPayments)}</strong></div>
@@ -167,9 +162,9 @@
       `;
 
       // Section 6: Labour
-      const present = attendance.filter(a => ['present','overtime'].includes(a.status)).length;
-      const labourCost = attendance.filter(a => ['present','overtime'].includes(a.status)).reduce((s, a) => {
-        const w = labour.find(l => l.id === a.labourId);
+    var present = attendance.filter(a => ['present','overtime'].includes(a.status)).length;
+    var labourCost = attendance.filter(a => ['present','overtime'].includes(a.status)).reduce((s, a) => {
+    var w = labour.find(l => l.id === a.labourId);
         return s + (w ? w.dailyWage : 0);
       }, 0);
       document.getElementById('dc-labour').innerHTML = `
@@ -179,7 +174,7 @@
       `;
 
       // Check if already closed
-      const closedDates = JSON.parse(localStorage.getItem(CLOSING_KEY) || '[]');
+    var closedDates = JSON.parse(localStorage.getItem(CLOSING_KEY) || '[]');
       if (closedDates.includes(today)) {
         document.getElementById('day-closed-banner').style.display = '';
         document.getElementById('close-day-btn').disabled = true;
@@ -190,8 +185,8 @@
 
     function closeDay() {
       Utils.confirm('Are you sure you want to close today? This will save all daily records.', () => {
-        const today = new Date().toISOString().split('T')[0];
-        const closedDates = JSON.parse(localStorage.getItem(CLOSING_KEY) || '[]');
+    var today = new Date().toISOString().split('T')[0];
+    var closedDates = JSON.parse(localStorage.getItem(CLOSING_KEY) || '[]');
         if (!closedDates.includes(today)) closedDates.push(today);
         localStorage.setItem(CLOSING_KEY, JSON.stringify(closedDates));
 
@@ -207,6 +202,7 @@
       APP.init('owner');
       loadDailyClosing();
     });
-  </script>
+}());
+</script>
 </body>
 </html>

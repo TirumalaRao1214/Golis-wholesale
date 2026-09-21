@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Labour Attendance — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>Labour Attendance — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -69,29 +67,28 @@
         </div>
       </main>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
-    const OT_RATE_PER_HOUR = 100; // ₹100 per overtime hour
-    let _labour     = [];
-    let _attendance = {};  // map labourId → { status, overtimeHours }
-    let _isSaved    = false;
-    let _editing    = true;
+(function () {
+'use strict';
+    var OT_RATE_PER_HOUR = 100; // ₹100 per overtime hour
+    var _labour     = [];
+    var _attendance = {};  // map labourId → { status, overtimeHours }
+    var _isSaved    = false;
+    var _editing    = true;
 
     function loadAttendance() {
-      const date = document.getElementById('att-date').value;
+    var date = document.getElementById('att-date').value;
       if (!date) return;
-      const dt = new Date(date);
+    var dt = new Date(date);
       document.getElementById('date-display').textContent = 'Date: ' + dt.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
 
       // Load existing attendance for this date
-      const existing = MockDB.getAttendance(date);
+    var existing = MockDB.getAttendance(date);
       _attendance = {};
       existing.forEach(a => {
         _attendance[a.labourId] = { status: a.status, overtimeHours: a.overtimeHours || 0, id: a.id };
@@ -116,11 +113,11 @@
     }
 
     function onStatusChange(labourId, select) {
-      const val = select.value;
+    var val = select.value;
       if (!_attendance[labourId]) _attendance[labourId] = { status: val, overtimeHours: 0 };
       else _attendance[labourId].status = val;
       // Show/hide OT input
-      const otDiv = document.getElementById(`ot-${labourId}`);
+    var otDiv = document.getElementById(`ot-${labourId}`);
       if (otDiv) otDiv.style.display = val === 'overtime' ? 'flex' : 'none';
       updateSummary();
     }
@@ -132,23 +129,23 @@
     }
 
     function renderCards() {
-      const grid = document.getElementById('attendance-grid');
+    var grid = document.getElementById('attendance-grid');
       grid.innerHTML = _labour.map(l => {
-        const att = _attendance[l.id] || { status: 'present', overtimeHours: 0 };
-        const statusColors = {
+    var att = _attendance[l.id] || { status: 'present', overtimeHours: 0 };
+    var statusColors = {
           present:  'var(--color-success)',
           halfDay:  'var(--color-warning)',
           absent:   'var(--color-danger)',
           overtime: 'var(--color-info)',
         };
-        const statusWage = {
+    var statusWage = {
           present:  l.dailyWage,
           halfDay:  Math.round(l.dailyWage * 0.5),
           absent:   0,
           overtime: l.dailyWage + (att.overtimeHours * OT_RATE_PER_HOUR),
         };
-        const workTypeBadge = { Loading: 'badge--info', Unloading: 'badge--warning', Sorting: 'badge--success', Packing: 'badge--primary', Cleaning: 'badge--ghost' };
-        const disabled = !_editing ? 'disabled' : '';
+    var workTypeBadge = { Loading: 'badge--info', Unloading: 'badge--warning', Sorting: 'badge--success', Packing: 'badge--primary', Cleaning: 'badge--ghost' };
+    var disabled = !_editing ? 'disabled' : '';
         return `<div style="padding:1rem;border:1px solid var(--color-border);border-radius:10px;background:var(--color-surface);border-left:4px solid ${statusColors[att.status] || 'var(--color-border)'};">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.75rem;">
             <div>
@@ -183,9 +180,9 @@
     }
 
     function updateSummary() {
-      let present = 0, halfday = 0, absent = 0, overtime = 0, totalWage = 0;
+    var present = 0, halfday = 0, absent = 0, overtime = 0, totalWage = 0;
       _labour.forEach(l => {
-        const att = _attendance[l.id] || { status: 'present', overtimeHours: 0 };
+    var att = _attendance[l.id] || { status: 'present', overtimeHours: 0 };
         if (att.status === 'present')  { present++;  totalWage += l.dailyWage; }
         if (att.status === 'halfDay')  { halfday++;  totalWage += Math.round(l.dailyWage * 0.5); }
         if (att.status === 'absent')   { absent++; }
@@ -199,13 +196,13 @@
     }
 
     function saveAttendance() {
-      const date = document.getElementById('att-date').value;
+    var date = document.getElementById('att-date').value;
       if (!date) { Utils.showToast('Please select a date.', 'error'); return; }
-      let saved = 0;
+    var saved = 0;
       _labour.forEach(l => {
-        const att = _attendance[l.id] || { status: 'present', overtimeHours: 0 };
-        const existing = MockDB.getAttendance(date).find(a => a.labourId === l.id);
-        const record = {
+    var att = _attendance[l.id] || { status: 'present', overtimeHours: 0 };
+    var existing = MockDB.getAttendance(date).find(a => a.labourId === l.id);
+    var record = {
           labourId: l.id,
           date,
           status: att.status,
@@ -232,10 +229,11 @@
       APP.init('manager');
       _labour = MockDB.getLabour();
       // Default to today
-      const today = new Date().toISOString().split('T')[0];
+    var today = new Date().toISOString().split('T')[0];
       document.getElementById('att-date').value = today;
       loadAttendance();
     });
-  </script>
+}());
+</script>
 </body>
 </html>

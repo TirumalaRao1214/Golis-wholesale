@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Farmer Dashboard — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>Farmer Dashboard — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -152,21 +150,19 @@
 
       </main>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
+(function () {
+'use strict';
     document.addEventListener('DOMContentLoaded', () => {
       APP.init('farmer');
-
-      const user    = APP.user;
-      const farmer  = MockDB.getFarmerById(user.refId);
-      const stats   = MockDB.getFarmerStats(user.refId);
+    var user    = APP.user;
+    var farmer  = MockDB.getFarmerById(user.refId);
+    var stats   = MockDB.getFarmerStats(user.refId);
 
       // Greet
       document.getElementById('welcome-heading').textContent = `Welcome, ${user.name}`;
@@ -180,21 +176,19 @@
       document.getElementById('payment-pending-display').textContent = Utils.formatCurrency(stats.pendingPayment || 18200);
 
       // Recent Supplies (last 5 for this farmer)
-      const purchases  = MockDB.getPurchases().filter(p => p.farmerId === user.refId);
-      const vegetables = MockDB.getVegetables();
-      const recent5    = [...purchases].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 5);
-
-      const statusMap = {
+    var purchases  = MockDB.getPurchases().filter(p => p.farmerId === user.refId);
+    var vegetables = MockDB.getVegetables();
+    var recent5    = [...purchases].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 5);
+    var statusMap = {
         pending:   '<span class="badge badge--warning">Pending</span>',
         completed: '<span class="badge badge--success">Completed</span>',
       };
-
-      const tbody = document.getElementById('recent-supplies-body');
+    var tbody = document.getElementById('recent-supplies-body');
       if (!recent5.length) {
         tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No supplies found</td></tr>';
       } else {
         tbody.innerHTML = recent5.map(p => {
-          const veg = vegetables.find(v => v.id === p.vegetableId);
+    var veg = vegetables.find(v => v.id === p.vegetableId);
           return `<tr>
             <td>${Utils.formatDate(p.date)}</td>
             <td>${veg ? `${veg.emoji} ${veg.nameEn}` : p.vegetableId}</td>
@@ -206,15 +200,16 @@
       }
 
       // Today's Top-5 Price Preview
-      const priceList = document.getElementById('price-preview-list');
-      const top5 = vegetables.slice(0, 5);
-      const changeIcon = { up:'<span style="color:var(--color-success)">↑</span>', down:'<span style="color:var(--color-danger)">↓</span>', neutral:'<span style="color:var(--color-text-secondary)">→</span>' };
+    var priceList = document.getElementById('price-preview-list');
+    var top5 = vegetables.slice(0, 5);
+    var changeIcon = { up:'<span style="color:var(--color-success)">↑</span>', down:'<span style="color:var(--color-danger)">↓</span>', neutral:'<span style="color:var(--color-text-secondary)">→</span>' };
       priceList.innerHTML = top5.map(v => `
         <div style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem 1rem;border-bottom:1px solid var(--color-border);">
           <span style="font-weight:500;">${v.emoji} ${v.nameEn}</span>
           <span>${changeIcon[v.prevSellPrice < v.currentSellPrice ? 'up' : v.prevSellPrice > v.currentSellPrice ? 'down' : 'neutral']} <strong>${Utils.formatCurrency(v.currentBuyPrice)}/kg</strong></span>
         </div>`).join('');
     });
-  </script>
+}());
+</script>
 </body>
 </html>

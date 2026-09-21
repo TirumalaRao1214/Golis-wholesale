@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Farmer Management — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>Farmer Management — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -123,30 +121,29 @@
         <button class="btn btn-ghost" onclick="Utils.closeModal('modal-farmer-view')" data-i18n="common.close"></button>
       </div>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
-    let _farmers = [];
-    let _currentPage = 1;
-    const PAGE_SIZE = 10;
+(function () {
+'use strict';
+    var _farmers = [];
+    var _currentPage = 1;
+    var PAGE_SIZE = 10;
 
     function renderFarmerTable() {
-      const q = (document.getElementById('farmer-search').value || '').toLowerCase();
-      const dist = document.getElementById('farmer-district-filter').value;
-      let data = _farmers.filter(f => {
-        const match = !q || [f.name, f.mobile, f.village, f.district].some(v => v && v.toLowerCase().includes(q));
-        const distMatch = !dist || f.district === dist;
+    var q = (document.getElementById('farmer-search').value || '').toLowerCase();
+    var dist = document.getElementById('farmer-district-filter').value;
+    var data = _farmers.filter(f => {
+    var match = !q || [f.name, f.mobile, f.village, f.district].some(v => v && v.toLowerCase().includes(q));
+    var distMatch = !dist || f.district === dist;
         return match && distMatch;
       });
-      const tbody = document.getElementById('farmers-tbody');
-      const start = (_currentPage - 1) * PAGE_SIZE;
-      const page = data.slice(start, start + PAGE_SIZE);
+    var tbody = document.getElementById('farmers-tbody');
+    var start = (_currentPage - 1) * PAGE_SIZE;
+    var page = data.slice(start, start + PAGE_SIZE);
       tbody.innerHTML = page.map((f, i) => `
         <tr>
           <td>${start + i + 1}</td>
@@ -166,8 +163,8 @@
         </tr>
       `).join('');
       // Pagination
-      const totalPages = Math.ceil(data.length / PAGE_SIZE);
-      const pag = document.getElementById('farmers-pagination');
+    var totalPages = Math.ceil(data.length / PAGE_SIZE);
+    var pag = document.getElementById('farmers-pagination');
       pag.innerHTML = `<div class="pagination"><span class="pagination__info">Showing ${start+1}–${Math.min(start+PAGE_SIZE, data.length)} of ${data.length}</span><div class="pagination__controls">${_currentPage > 1 ? `<button class="btn btn-sm btn-ghost" onclick="goPage(${_currentPage-1})">← Prev</button>` : ''} Page ${_currentPage}/${totalPages} ${_currentPage < totalPages ? `<button class="btn btn-sm btn-ghost" onclick="goPage(${_currentPage+1})">Next →</button>` : ''}</div></div>`;
     }
 
@@ -181,7 +178,7 @@
     }
 
     function editFarmer(id) {
-      const f = _farmers.find(x => x.id === id);
+    var f = _farmers.find(x => x.id === id);
       if (!f) return;
       document.getElementById('farmer-modal-title').textContent = 'Edit Farmer';
       document.getElementById('farmer-edit-id').value = id;
@@ -195,10 +192,10 @@
     }
 
     function saveFarmer() {
-      const name = document.getElementById('f-name').value.trim();
+    var name = document.getElementById('f-name').value.trim();
       if (!name) { Utils.showToast('Farmer name is required.', 'error'); return; }
-      const editId = document.getElementById('farmer-edit-id').value;
-      const record = {
+    var editId = document.getElementById('farmer-edit-id').value;
+    var record = {
         name,
         mobile: document.getElementById('f-mobile').value.trim(),
         village: document.getElementById('f-village').value.trim(),
@@ -221,10 +218,10 @@
     }
 
     function viewFarmer(id) {
-      const f = _farmers.find(x => x.id === id);
+    var f = _farmers.find(x => x.id === id);
       if (!f) return;
-      const purchases = MockDB.getPurchases().filter(p => p.farmerId === id);
-      const payments = MockDB.getPayments().filter(p => p.partyId === id && p.partyType === 'farmer');
+    var purchases = MockDB.getPurchases().filter(p => p.farmerId === id);
+    var payments = MockDB.getPayments().filter(p => p.partyId === id && p.partyType === 'farmer');
       document.getElementById('view-farmer-name').textContent = f.name;
       document.getElementById('view-farmer-body').innerHTML = `
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
@@ -241,7 +238,7 @@
         <table class="data-table" style="margin-bottom:1rem;">
           <thead><tr><th>ID</th><th>Date</th><th>Vegetable</th><th>Grade</th><th>Qty</th><th>Rate</th><th>Total</th></tr></thead>
           <tbody>${purchases.map(p => {
-            const veg = MockDB.getVegetableById(p.vegetableId);
+    var veg = MockDB.getVegetableById(p.vegetableId);
             return `<tr><td>${p.id}</td><td>${Utils.formatDate(p.date)}</td><td>${veg ? veg.nameEn : p.vegetableId}</td><td>${p.grade}</td><td>${p.qty} kg</td><td>₹${p.rate}/kg</td><td>${Utils.formatCurrency(p.total)}</td></tr>`;
           }).join('')}</tbody>
         </table>
@@ -259,6 +256,7 @@
       _farmers = MockDB.getFarmers();
       renderFarmerTable();
     });
-  </script>
+}());
+</script>
 </body>
 </html>

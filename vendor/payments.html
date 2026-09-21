@@ -1,12 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Payments — GOLIS Wholesale</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <title>Payments — GOLIS Wholesale</title>  <link rel="stylesheet" href="../css/theme.css">
   <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/layout.css">
 </head>
@@ -140,17 +138,16 @@
         </div>
       </div>
     </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="../js/i18n.js"></script>
+  </div>  <script src="../js/i18n.js"></script>
   <script src="../js/mock-data.js"></script>
   <script src="../js/utils.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/charts.js"></script>
   <script>
-    let currentPayOrderId = null;
-    let currentPayAmount  = 0;
+(function () {
+'use strict';
+    var currentPayOrderId = null;
+    var currentPayAmount  = 0;
 
     document.addEventListener('DOMContentLoaded', () => {
       APP.init('vendor');
@@ -158,17 +155,15 @@
     });
 
     function loadData() {
-      const user    = APP.user;
-      const orders  = MockDB.getOrders().filter(o => o.vendorId === user.refId);
-      const payments = MockDB.getPayments().filter(p => p.partyId === user.refId && p.partyType === 'vendor');
-
-      const totalOrdersValue = orders.reduce((s, o) => s + o.total, 0);
-      const totalPaid        = payments.reduce((s, p) => s + p.amount, 0);
-      const outstanding      = Math.max(0, totalOrdersValue - totalPaid);
-
-      const now        = new Date();
-      const monthStart = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-      const monthPaid  = payments.filter(p => p.date && p.date.startsWith(monthStart)).reduce((s,p) => s+p.amount, 0);
+    var user    = APP.user;
+    var orders  = MockDB.getOrders().filter(o => o.vendorId === user.refId);
+    var payments = MockDB.getPayments().filter(p => p.partyId === user.refId && p.partyType === 'vendor');
+    var totalOrdersValue = orders.reduce((s, o) => s + o.total, 0);
+    var totalPaid        = payments.reduce((s, p) => s + p.amount, 0);
+    var outstanding      = Math.max(0, totalOrdersValue - totalPaid);
+    var now        = new Date();
+    var monthStart = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    var monthPaid  = payments.filter(p => p.date && p.date.startsWith(monthStart)).reduce((s,p) => s+p.amount, 0);
 
       document.getElementById('kpi-orders-value').textContent = Utils.formatCurrency(totalOrdersValue);
       document.getElementById('kpi-paid').textContent         = Utils.formatCurrency(totalPaid);
@@ -176,24 +171,22 @@
       document.getElementById('kpi-month-paid').textContent   = Utils.formatCurrency(monthPaid);
 
       // Build invoices (non-delivered or delivered but not fully paid)
-      const invoiceOrders = orders.filter(o => ['pending','confirmed','preparing','stockAllocated','loading','dispatched','inTransit','delivered'].includes(o.status));
-      const invoicesTbody = document.getElementById('invoices-tbody');
+    var invoiceOrders = orders.filter(o => ['pending','confirmed','preparing','stockAllocated','loading','dispatched','inTransit','delivered'].includes(o.status));
+    var invoicesTbody = document.getElementById('invoices-tbody');
 
       if (!invoiceOrders.length) {
         invoicesTbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No outstanding invoices</td></tr>';
       } else {
         invoicesTbody.innerHTML = invoiceOrders.map(o => {
-          const orderPayments = payments.filter(p => p.notes && p.notes.includes(o.id));
-          const paid          = orderPayments.reduce((s, p) => s + p.amount, 0);
-          const balance       = Math.max(0, o.total - paid);
-
-          const dueDate = new Date(o.orderDate);
+    var orderPayments = payments.filter(p => p.notes && p.notes.includes(o.id));
+    var paid          = orderPayments.reduce((s, p) => s + p.amount, 0);
+    var balance       = Math.max(0, o.total - paid);
+    var dueDate = new Date(o.orderDate);
           dueDate.setDate(dueDate.getDate() + 7); // net 7
-
-          const isOverdue  = dueDate < new Date() && balance > 0;
-          const isDueSoon  = !isOverdue && (dueDate - new Date()) < 2 * 86400000 && balance > 0;
-          const statusCls  = isOverdue ? 'badge--danger' : isDueSoon ? 'badge--warning' : 'badge--success';
-          const statusLbl  = isOverdue ? 'Overdue' : isDueSoon ? 'Due Soon' : 'On Time';
+    var isOverdue  = dueDate < new Date() && balance > 0;
+    var isDueSoon  = !isOverdue && (dueDate - new Date()) < 2 * 86400000 && balance > 0;
+    var statusCls  = isOverdue ? 'badge--danger' : isDueSoon ? 'badge--warning' : 'badge--success';
+    var statusLbl  = isOverdue ? 'Overdue' : isDueSoon ? 'Due Soon' : 'On Time';
 
           return `<tr>
             <td style="font-weight:700;">${o.id}</td>
@@ -209,8 +202,8 @@
       }
 
       // Payment history
-      const histTbody = document.getElementById('history-tbody');
-      const sortedPay = [...payments].sort((a, b) => b.date.localeCompare(a.date));
+    var histTbody = document.getElementById('history-tbody');
+    var sortedPay = [...payments].sort((a, b) => b.date.localeCompare(a.date));
       if (!sortedPay.length) {
         histTbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No payment records found</td></tr>';
       } else {
@@ -235,9 +228,9 @@
 
     function confirmPayment() {
       if (!currentPayOrderId) return;
-      const method = document.getElementById('pay-method').value;
-      const txnId  = document.getElementById('pay-txn-id').value.trim() || `DEMO-${Date.now()}`;
-      const date   = new Date().toISOString().split('T')[0];
+    var method = document.getElementById('pay-method').value;
+    var txnId  = document.getElementById('pay-txn-id').value.trim() || `DEMO-${Date.now()}`;
+    var date   = new Date().toISOString().split('T')[0];
 
       MockDB.saveRecord('_payments', {
         id:        Utils.generateId('PAY'),
@@ -255,6 +248,7 @@
       Utils.showToast(`Payment of ${Utils.formatCurrency(currentPayAmount)} recorded successfully ✅`, 'success');
       loadData();
     }
-  </script>
+}());
+</script>
 </body>
 </html>
