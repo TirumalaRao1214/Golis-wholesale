@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Records — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content">
+        <div class="page-header">
+          <h1 class="page-title" data-i18n="page.payments"></h1>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs" id="payments-tabs">
+          <button class="tab-btn tab-btn--active" data-tab="farmer-payments" onclick="switchTab('farmer-payments')">Farmer Payments</button>
+          <button class="tab-btn" data-tab="vendor-payments" onclick="switchTab('vendor-payments')">Vendor Payments</button>
+        </div>
+
+        <!-- Farmer Payments Tab -->
+        <div class="tab-content" id="tab-farmer-payments">
+          <div class="stats-grid stats-grid--3" style="margin-bottom:1rem;margin-top:1rem;">
+            <div class="stat-card stat-card--warning">
+              <div class="stat-card__body">
+                <div class="stat-card__value" id="fp-total-payable">—</div>
+                <div class="stat-card__label">Total Payable</div>
+              </div>
+            </div>
+            <div class="stat-card stat-card--success">
+              <div class="stat-card__body">
+                <div class="stat-card__value" id="fp-paid-month">—</div>
+                <div class="stat-card__label">Paid This Month</div>
+              </div>
+            </div>
+            <div class="stat-card stat-card--danger">
+              <div class="stat-card__body">
+                <div class="stat-card__value" id="fp-overdue">—</div>
+                <div class="stat-card__label">Overdue</div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card__header">
+              <h3 class="card__title">Farmer Payment Summary</h3>
+              <button class="btn btn-primary btn-sm" onclick="openPaymentModal('farmer')">Record Payment</button>
+            </div>
+            <div class="card__body" style="padding:0;">
+              <table class="data-table">
+                <thead><tr><th>Farmer</th><th>Total Supply Value</th><th>Advance Paid</th><th>Balance Payable</th><th>Last Payment</th><th>Status</th></tr></thead>
+                <tbody id="farmer-payment-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vendor Payments Tab -->
+        <div class="tab-content" id="tab-vendor-payments" style="display:none;">
+          <div class="stats-grid stats-grid--3" style="margin-bottom:1rem;margin-top:1rem;">
+            <div class="stat-card stat-card--info">
+              <div class="stat-card__body">
+                <div class="stat-card__value" id="vp-total-receivable">—</div>
+                <div class="stat-card__label">Total Receivable</div>
+              </div>
+            </div>
+            <div class="stat-card stat-card--success">
+              <div class="stat-card__body">
+                <div class="stat-card__value" id="vp-received-month">—</div>
+                <div class="stat-card__label">Received This Month</div>
+              </div>
+            </div>
+            <div class="stat-card stat-card--danger">
+              <div class="stat-card__body">
+                <div class="stat-card__value" id="vp-overdue">—</div>
+                <div class="stat-card__label">Overdue</div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card__header">
+              <h3 class="card__title">Vendor Payment Summary</h3>
+              <button class="btn btn-primary btn-sm" onclick="openPaymentModal('vendor')">Record Receipt</button>
+            </div>
+            <div class="card__body" style="padding:0;">
+              <table class="data-table">
+                <thead><tr><th>Vendor</th><th>Total Order Value</th><th>Received</th><th>Balance Receivable</th><th>Last Payment</th><th>Status</th></tr></thead>
+                <tbody id="vendor-payment-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Record Payment Modal -->
+  <div class="modal-overlay" id="modal-payment">
+    <div class="modal">
+      <div class="modal__header">
+        <h3 class="modal__title" id="payment-modal-title">Record Payment</h3>
+        <button class="modal__close" onclick="Utils.closeModal('modal-payment')">&times;</button>
+      </div>
+      <div class="modal__body">
+        <input type="hidden" id="pay-party-type">
+        <div class="form-grid form-grid--2">
+          <div class="form-group form-group--full">
+            <label class="form-label" data-i18n="field.partyName"></label>
+            <select class="form-select" id="pay-party">
+              <option value="">Select Party</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="field.paidAmount"></label>
+            <input type="number" class="form-input" id="pay-amount" placeholder="Amount (₹)">
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="field.paymentMode2"></label>
+            <select class="form-select" id="pay-mode">
+              <option>Cash</option>
+              <option>UPI</option>
+              <option>Bank Transfer</option>
+              <option>Advance</option>
+              <option>Partial Payment</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="field.paymentDate"></label>
+            <input type="date" class="form-input" id="pay-date">
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="field.transactionId"></label>
+            <input type="text" class="form-input" id="pay-txn" placeholder="Transaction/Reference ID">
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="common.notes"></label>
+            <input type="text" class="form-input" id="pay-notes" placeholder="Payment notes">
+          </div>
+        </div>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn-ghost" onclick="Utils.closeModal('modal-payment')" data-i18n="common.cancel"></button>
+        <button class="btn btn-primary" onclick="savePayment()" data-i18n="common.save"></button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    let _activeTab = 'farmer-payments';
+
+    function switchTab(tab) {
+      _activeTab = tab;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-btn--active'));
+      document.querySelector(`[data-tab="${tab}"]`).classList.add('tab-btn--active');
+      document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+      document.getElementById('tab-' + tab).style.display = '';
+    }
+
+    function renderFarmerPayments() {
+      const farmers = MockDB.getFarmers();
+      const payments = MockDB.getPayments();
+      const monthStr = new Date().toISOString().substring(0, 7);
+      let totalPayable = 0, paidMonth = 0, overdue = 0;
+
+      document.getElementById('farmer-payment-tbody').innerHTML = farmers.map(f => {
+        const fPays = payments.filter(p => p.partyId === f.id && p.partyType === 'farmer');
+        const totalPaid = fPays.reduce((s, p) => s + p.amount, 0);
+        const balance = f.totalSupplyValue - totalPaid;
+        const lastPay = fPays.sort((a, b) => b.date.localeCompare(a.date))[0];
+        const status = balance <= 0 ? 'paid' : balance > f.totalSupplyValue * 0.5 ? 'overdue' : 'partial';
+        totalPayable += Math.max(0, balance);
+        paidMonth += fPays.filter(p => p.date.startsWith(monthStr)).reduce((s, p) => s + p.amount, 0);
+        if (status === 'overdue') overdue += balance;
+        return `<tr>
+          <td><strong>${f.name}</strong></td>
+          <td>${Utils.formatCurrency(f.totalSupplyValue)}</td>
+          <td>${Utils.formatCurrency(totalPaid)}</td>
+          <td class="${balance > 0 ? 'text-warning' : 'text-success'}">${Utils.formatCurrency(Math.max(0, balance))}</td>
+          <td>${lastPay ? Utils.formatDate(lastPay.date) : 'Never'}</td>
+          <td>${Utils.statusBadge(status)}</td>
+        </tr>`;
+      }).join('');
+      document.getElementById('fp-total-payable').textContent = Utils.formatCurrency(totalPayable);
+      document.getElementById('fp-paid-month').textContent = Utils.formatCurrency(paidMonth);
+      document.getElementById('fp-overdue').textContent = Utils.formatCurrency(overdue);
+    }
+
+    function renderVendorPayments() {
+      const vendors = MockDB.getVendors();
+      const payments = MockDB.getPayments();
+      const monthStr = new Date().toISOString().substring(0, 7);
+      let totalReceivable = 0, receivedMonth = 0, overdue = 0;
+
+      document.getElementById('vendor-payment-tbody').innerHTML = vendors.map(v => {
+        const orders = MockDB.getOrders().filter(o => o.vendorId === v.id);
+        const totalValue = orders.reduce((s, o) => s + o.total, 0);
+        const vPays = payments.filter(p => p.partyId === v.id && p.partyType === 'vendor');
+        const totalReceived = vPays.reduce((s, p) => s + p.amount, 0);
+        const balance = totalValue - totalReceived;
+        const lastPay = vPays.sort((a, b) => b.date.localeCompare(a.date))[0];
+        const status = balance <= 0 ? 'paid' : balance > totalValue * 0.7 ? 'overdue' : 'partial';
+        totalReceivable += Math.max(0, balance);
+        receivedMonth += vPays.filter(p => p.date.startsWith(monthStr)).reduce((s, p) => s + p.amount, 0);
+        if (status === 'overdue') overdue += balance;
+        return `<tr>
+          <td><strong>${v.businessName}</strong></td>
+          <td>${Utils.formatCurrency(totalValue)}</td>
+          <td>${Utils.formatCurrency(totalReceived)}</td>
+          <td class="${balance > 0 ? 'text-warning' : 'text-success'}">${Utils.formatCurrency(Math.max(0, balance))}</td>
+          <td>${lastPay ? Utils.formatDate(lastPay.date) : 'Never'}</td>
+          <td>${Utils.statusBadge(status)}</td>
+        </tr>`;
+      }).join('');
+      document.getElementById('vp-total-receivable').textContent = Utils.formatCurrency(totalReceivable);
+      document.getElementById('vp-received-month').textContent = Utils.formatCurrency(receivedMonth);
+      document.getElementById('vp-overdue').textContent = Utils.formatCurrency(overdue);
+    }
+
+    function openPaymentModal(partyType) {
+      document.getElementById('pay-party-type').value = partyType;
+      document.getElementById('payment-modal-title').textContent = partyType === 'farmer' ? 'Record Farmer Payment' : 'Record Vendor Receipt';
+      const sel = document.getElementById('pay-party');
+      sel.innerHTML = '<option value="">Select ' + (partyType === 'farmer' ? 'Farmer' : 'Vendor') + '</option>';
+      if (partyType === 'farmer') {
+        MockDB.getFarmers().forEach(f => sel.add(new Option(f.name, f.id)));
+      } else {
+        MockDB.getVendors().forEach(v => sel.add(new Option(v.businessName, v.id)));
+      }
+      document.getElementById('pay-date').value = new Date().toISOString().split('T')[0];
+      Utils.openModal('modal-payment');
+    }
+
+    function savePayment() {
+      const partyId = document.getElementById('pay-party').value;
+      const amount = Number(document.getElementById('pay-amount').value);
+      const partyType = document.getElementById('pay-party-type').value;
+      if (!partyId || !amount) { Utils.showToast('Party and amount are required.', 'error'); return; }
+      const party = partyType === 'farmer' ? MockDB.getFarmerById(partyId) : MockDB.getVendorById(partyId);
+      const record = {
+        id: Utils.generateId('PAY'),
+        partyId,
+        partyType,
+        partyName: partyType === 'farmer' ? (party ? party.name : partyId) : (party ? party.businessName : partyId),
+        amount,
+        mode: document.getElementById('pay-mode').value,
+        txnId: document.getElementById('pay-txn').value.trim() || Utils.generateId('TXN'),
+        date: document.getElementById('pay-date').value,
+        notes: document.getElementById('pay-notes').value.trim(),
+      };
+      MockDB.saveRecord('_payments', record);
+      Utils.closeModal('modal-payment');
+      Utils.showToast(t('toast.payment.recorded'), 'success');
+      renderFarmerPayments();
+      renderVendorPayments();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('owner');
+      renderFarmerPayments();
+      renderVendorPayments();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wholesale Prices — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <style>
+    .price-table-row { cursor:pointer; transition:background 0.15s; }
+    .price-table-row:hover { background:var(--color-primary-pale) !important; }
+    .qty-input { width:80px; text-align:center; border:1px solid var(--color-border); border-radius:var(--radius-sm); padding:0.25rem 0.5rem; font-size:0.9rem; }
+    .change-badge-up   { background:#dcfce7; color:#16a34a; padding:0.2rem 0.5rem; border-radius:999px; font-size:0.75rem; font-weight:600; }
+    .change-badge-down { background:#fee2e2; color:#dc2626; padding:0.2rem 0.5rem; border-radius:999px; font-size:0.75rem; font-weight:600; }
+    .change-badge-neutral { background:var(--color-bg); color:var(--color-text-secondary); padding:0.2rem 0.5rem; border-radius:999px; font-size:0.75rem; }
+    .cart-bar { position:fixed; bottom:0; left:var(--sidebar-width,260px); right:0; background:var(--color-primary); color:white; padding:0.75rem 1.5rem; display:flex; justify-content:space-between; align-items:center; z-index:100; transform:translateY(100%); transition:transform 0.3s; }
+    .cart-bar.visible { transform:translateY(0); }
+  </style>
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content" style="padding-bottom:5rem;">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Today's Wholesale Prices</h1>
+            <p class="text-muted" id="price-date" style="font-size:0.875rem;margin-top:0.25rem;"></p>
+          </div>
+          <div class="page-header-actions">
+            <a href="cart.html" class="btn btn-primary" id="btn-cart">🛒 Cart (0 items)</a>
+          </div>
+        </div>
+
+        <!-- Demo + disclaimer -->
+        <div style="display:flex;gap:1rem;margin-bottom:1.25rem;flex-wrap:wrap;">
+          <div style="background:#fef9c3;border:1px solid #fde68a;border-radius:var(--radius-md);padding:0.6rem 1rem;font-size:0.85rem;color:#78350f;">
+            <strong>DEMO / SAMPLE PRICES</strong> — These prices are for demonstration purposes only.
+          </div>
+          <div style="background:var(--color-primary-pale);border:1px solid var(--color-primary-light);border-radius:var(--radius-md);padding:0.6rem 1rem;font-size:0.85rem;color:var(--color-primary);">
+            💡 Minimum order: 100 kg per item. Add to cart in 50 kg steps.
+          </div>
+        </div>
+
+        <!-- Price Table -->
+        <div class="card">
+          <div class="card__body" style="padding:0;">
+            <table class="table" id="price-table">
+              <thead>
+                <tr>
+                  <th>Vegetable</th>
+                  <th>Grade</th>
+                  <th class="text-right">Buy Price (₹/kg)</th>
+                  <th class="text-right">MOQ</th>
+                  <th class="text-right">Available Stock</th>
+                  <th>Change</th>
+                  <th>Qty (kg)</th>
+                  <th>Add</th>
+                </tr>
+              </thead>
+              <tbody id="price-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Cart Bar (bottom sticky) -->
+  <div class="cart-bar" id="cart-bar">
+    <div style="font-size:0.95rem;font-weight:600;" id="cart-bar-text">🛒 Cart: 0 items</div>
+    <div style="display:flex;gap:1rem;align-items:center;">
+      <span style="font-size:1.1rem;font-weight:700;" id="cart-bar-total">₹0</span>
+      <a href="cart.html" style="background:white;color:var(--color-primary);border-radius:var(--radius-md);padding:0.4rem 1rem;font-weight:700;text-decoration:none;font-size:0.9rem;">View Cart →</a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    let cart = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('vendor');
+      cart = JSON.parse(localStorage.getItem('golis_cart') || '[]');
+
+      document.getElementById('price-date').textContent =
+        `Prices as of: ${new Date().toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'short', year:'numeric' })}, 6:00 AM (Demo Data)`;
+
+      const vegetables = MockDB.getVegetables();
+      const tbody      = document.getElementById('price-tbody');
+      const rows       = [];
+
+      vegetables.forEach(v => {
+        v.grades.forEach(g => {
+          const gradeMultiplier = { A: 1.0, B: 0.85, C: 0.70 }[g] || 1.0;
+          const buyPrice = Math.round(v.currentSellPrice * gradeMultiplier);
+          const prevPrice = Math.round(v.prevSellPrice   * gradeMultiplier);
+          const change = buyPrice > prevPrice ? 'up' : buyPrice < prevPrice ? 'down' : 'neutral';
+          const pct = prevPrice > 0 ? Math.abs(Math.round((buyPrice - prevPrice) / prevPrice * 100)) : 0;
+          const available = Math.round(v.available * gradeMultiplier);
+          const rowId = `row-${v.id}-${g}`;
+          rows.push({ rowId, v, g, buyPrice, change, pct, available });
+        });
+      });
+
+      tbody.innerHTML = rows.map(({ rowId, v, g, buyPrice, change, pct, available }) => {
+        const changeBadge = change === 'up'
+          ? `<span class="change-badge-up">↑ ${pct}%</span>`
+          : change === 'down'
+          ? `<span class="change-badge-down">↓ ${pct}%</span>`
+          : `<span class="change-badge-neutral">→ Stable</span>`;
+        const inCart = cart.find(c => c.vegetableId === v.id && c.grade === g);
+        const defQty = inCart ? inCart.qty : 500;
+        return `<tr class="price-table-row" id="${rowId}">
+          <td>
+            <div style="font-weight:600;">${v.emoji} ${v.nameEn}</div>
+            <div class="text-muted" style="font-size:0.8rem;font-family:'Noto Sans Telugu',sans-serif;">${v.nameTe}</div>
+          </td>
+          <td><span class="badge badge--info">Grade ${g}</span></td>
+          <td class="text-right" style="font-weight:700;font-size:1rem;">₹${buyPrice}</td>
+          <td class="text-right text-muted">100 kg</td>
+          <td class="text-right">${Utils.formatWeight(available)}</td>
+          <td>${changeBadge}</td>
+          <td><input type="number" class="qty-input" id="qty-${v.id}-${g}" value="${defQty}" min="100" step="50" style="width:90px;"></td>
+          <td>
+            <button class="btn btn-primary btn-sm" onclick="addToCart('${v.id}','${v.nameEn}','${v.nameTe}','${g}',${buyPrice},${available})">
+              Add
+            </button>
+          </td>
+        </tr>`;
+      }).join('');
+
+      updateCartBar();
+    });
+
+    function addToCart(vegId, nameEn, nameTe, grade, rate, available) {
+      const qtyInput = document.getElementById(`qty-${vegId}-${grade}`);
+      let qty = parseInt(qtyInput.value) || 500;
+
+      // Clamp to available stock
+      if (qty > available) {
+        Utils.showToast(`⚠ Only ${Utils.formatWeight(available)} available. Adjusting to maximum.`, 'warning', 4000);
+        qty = available;
+        qtyInput.value = qty;
+      }
+      if (qty < 100) { qty = 100; qtyInput.value = 100; }
+
+      const existIdx = cart.findIndex(c => c.vegetableId === vegId && c.grade === grade);
+      const item = { vegetableId: vegId, nameEn, nameTe, grade, qty, rate, total: qty * rate, available };
+      if (existIdx >= 0) {
+        cart[existIdx] = item;
+      } else {
+        cart.push(item);
+      }
+      localStorage.setItem('golis_cart', JSON.stringify(cart));
+      updateCartBar();
+      Utils.showToast(`${nameEn} Grade ${grade} — ${Utils.formatWeight(qty)} added to cart ✅`, 'success');
+    }
+
+    function updateCartBar() {
+      const cartTotal = cart.reduce((s, c) => s + c.total, 0);
+      const cartCount = cart.length;
+      document.getElementById('btn-cart').textContent = `🛒 Cart (${cartCount} items, ${Utils.formatCurrency(cartTotal)})`;
+      document.getElementById('cart-bar-text').textContent = `🛒 Cart: ${cartCount} item${cartCount !== 1 ? 's' : ''}`;
+      document.getElementById('cart-bar-total').textContent = Utils.formatCurrency(cartTotal);
+      const bar = document.getElementById('cart-bar');
+      if (cartCount > 0) bar.classList.add('visible');
+      else bar.classList.remove('visible');
+    }
+  </script>
+</body>
+</html>

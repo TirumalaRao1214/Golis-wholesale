@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Labour Management — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content">
+        <div class="page-header">
+          <h1 class="page-title" data-i18n="page.labour"></h1>
+          <div class="page-header-actions">
+            <button class="btn btn-primary" onclick="openAddLabour()">+ Add Labour</button>
+          </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="stats-grid stats-grid--4" style="margin-bottom:1rem;">
+          <div class="stat-card stat-card--info">
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="lab-total">—</div>
+              <div class="stat-card__label">Total Workers</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--success">
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="lab-present">—</div>
+              <div class="stat-card__label">Active Today</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--warning">
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="lab-monthly-wage">—</div>
+              <div class="stat-card__label">Total Monthly Wage</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--danger">
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="lab-pending">—</div>
+              <div class="stat-card__label">Pending Payment</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="card">
+          <div class="card__body" style="padding:0;">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Labour ID</th>
+                    <th data-i18n="col.name"></th>
+                    <th data-i18n="col.mobile"></th>
+                    <th data-i18n="col.workType"></th>
+                    <th data-i18n="col.dailyWage"></th>
+                    <th data-i18n="col.status"></th>
+                    <th data-i18n="common.actions"></th>
+                  </tr>
+                </thead>
+                <tbody id="labour-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Add/Edit Labour Modal -->
+  <div class="modal-overlay" id="modal-labour">
+    <div class="modal">
+      <div class="modal__header">
+        <h3 class="modal__title" id="labour-modal-title">Add Labour Worker</h3>
+        <button class="modal__close" onclick="Utils.closeModal('modal-labour')">&times;</button>
+      </div>
+      <div class="modal__body">
+        <form id="labour-form">
+          <input type="hidden" id="labour-edit-id">
+          <div class="form-grid form-grid--2">
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.labourName"></label>
+              <input type="text" class="form-input" id="l-name" placeholder="Full Name">
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.mobile"></label>
+              <input type="text" class="form-input" id="l-mobile" placeholder="Mobile Number">
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.workType"></label>
+              <select class="form-select" id="l-type">
+                <option>Loading</option>
+                <option>Unloading</option>
+                <option>Sorting</option>
+                <option>Packing</option>
+                <option>Cleaning</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.dailyWage"></label>
+              <input type="number" class="form-input" id="l-wage" placeholder="Daily wage (₹)">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Bank/UPI (Demo)</label>
+              <input type="text" class="form-input" id="l-upi" placeholder="UPI ID or Bank Account">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Status</label>
+              <select class="form-select" id="l-status">
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn-ghost" onclick="Utils.closeModal('modal-labour')" data-i18n="common.cancel"></button>
+        <button class="btn btn-primary" onclick="saveLabour()" data-i18n="common.save"></button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    let _labour = [];
+
+    const WORK_TYPE_COLORS = { Loading: 'badge--success', Unloading: 'badge--info', Sorting: 'badge--warning', Packing: 'badge--primary', Cleaning: 'badge--muted' };
+
+    function renderLabourTable() {
+      const today = new Date().toISOString().split('T')[0];
+      const attendance = MockDB.getAttendance(today);
+      document.getElementById('labour-tbody').innerHTML = _labour.map(w => {
+        const att = attendance.find(a => a.labourId === w.id);
+        const todayStatus = att ? att.status : 'absent';
+        const colorClass = WORK_TYPE_COLORS[w.workType] || 'badge--muted';
+        return `<tr>
+          <td><code>${w.id}</code></td>
+          <td><strong>${w.name}</strong></td>
+          <td>${w.mobile}</td>
+          <td><span class="badge ${colorClass}">${w.workType}</span></td>
+          <td>₹${w.dailyWage}/day</td>
+          <td>${Utils.statusBadge(w.status)}</td>
+          <td>
+            <button class="btn btn-sm btn-secondary" onclick="editLabour('${w.id}')">Edit</button>
+            <span class="badge badge--${todayStatus === 'present' || todayStatus === 'overtime' ? 'success' : todayStatus === 'halfDay' ? 'warning' : 'danger'}" style="margin-left:4px;">${todayStatus}</span>
+          </td>
+        </tr>`;
+      }).join('');
+
+      // Summary cards
+      const today2 = new Date().toISOString().split('T')[0];
+      const att2 = MockDB.getAttendance(today2);
+      const present = att2.filter(a => ['present','overtime'].includes(a.status)).length;
+      const monthlyWage = _labour.reduce((s, w) => s + w.dailyWage * 26, 0); // ~26 working days
+      document.getElementById('lab-total').textContent = _labour.length;
+      document.getElementById('lab-present').textContent = present;
+      document.getElementById('lab-monthly-wage').textContent = Utils.formatCurrency(monthlyWage);
+      document.getElementById('lab-pending').textContent = Utils.formatCurrency(monthlyWage * 0.3); // demo: 30% pending
+    }
+
+    function openAddLabour() {
+      document.getElementById('labour-modal-title').textContent = 'Add Labour Worker';
+      document.getElementById('labour-edit-id').value = '';
+      document.getElementById('labour-form').reset();
+      Utils.openModal('modal-labour');
+    }
+
+    function editLabour(id) {
+      const w = _labour.find(x => x.id === id);
+      if (!w) return;
+      document.getElementById('labour-modal-title').textContent = 'Edit Labour Worker';
+      document.getElementById('labour-edit-id').value = id;
+      document.getElementById('l-name').value = w.name;
+      document.getElementById('l-mobile').value = w.mobile;
+      document.getElementById('l-type').value = w.workType;
+      document.getElementById('l-wage').value = w.dailyWage;
+      document.getElementById('l-status').value = w.status;
+      Utils.openModal('modal-labour');
+    }
+
+    function saveLabour() {
+      const name = document.getElementById('l-name').value.trim();
+      if (!name) { Utils.showToast('Labour name is required.', 'error'); return; }
+      const editId = document.getElementById('labour-edit-id').value;
+      const record = {
+        name,
+        mobile: document.getElementById('l-mobile').value.trim(),
+        workType: document.getElementById('l-type').value,
+        dailyWage: Number(document.getElementById('l-wage').value) || 0,
+        status: document.getElementById('l-status').value,
+        joinDate: new Date().toISOString().split('T')[0],
+      };
+      if (editId) {
+        MockDB.updateRecord('_labour', editId, record);
+      } else {
+        record.id = Utils.generateId('L');
+        MockDB.saveRecord('_labour', record);
+      }
+      _labour = MockDB.getLabour();
+      Utils.closeModal('modal-labour');
+      Utils.showToast(t('toast.labour.saved'), 'success');
+      renderLabourTable();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('owner');
+      _labour = MockDB.getLabour();
+      renderLabourTable();
+    });
+  </script>
+</body>
+</html>

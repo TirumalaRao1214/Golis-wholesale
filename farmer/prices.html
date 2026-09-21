@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Today's Prices — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <style>
+    .price-board { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; }
+    @media(max-width:900px){ .price-board { grid-template-columns:repeat(2,1fr); } }
+    @media(max-width:600px){ .price-board { grid-template-columns:1fr; } }
+    .price-card { background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--radius-lg); padding:1.25rem; transition:box-shadow 0.2s; }
+    .price-card:hover { box-shadow:var(--shadow-md); }
+    .price-card__emoji { font-size:2rem; margin-bottom:0.5rem; }
+    .price-card__name-en { font-size:1rem; font-weight:600; color:var(--color-text-primary); }
+    .price-card__name-te { font-size:0.9rem; color:var(--color-text-secondary); font-family:'Noto Sans Telugu',sans-serif; margin-top:0.1rem; }
+    .price-card__grades { margin-top:0.75rem; border-top:1px solid var(--color-border); padding-top:0.75rem; }
+    .grade-row { display:flex; justify-content:space-between; align-items:center; padding:0.3rem 0; }
+    .grade-label { font-size:0.8rem; font-weight:600; background:var(--color-primary-pale); color:var(--color-primary); padding:0.15rem 0.5rem; border-radius:var(--radius-sm); }
+    .grade-buy { font-size:0.8rem; color:var(--color-text-secondary); }
+    .grade-sell { font-size:0.9rem; font-weight:700; color:var(--color-primary); }
+    .change-up   { color:var(--color-success); font-size:0.75rem; }
+    .change-down { color:var(--color-danger);  font-size:0.75rem; }
+    .change-neutral { color:var(--color-text-secondary); font-size:0.75rem; }
+  </style>
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Today's Wholesale Price Board</h1>
+            <p class="text-muted" style="font-size:0.875rem;margin-top:0.25rem;" id="price-timestamp"></p>
+          </div>
+        </div>
+
+        <!-- Disclaimer Banner -->
+        <div style="background:#fef3c7;border:1px solid #fde68a;border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1.5rem;display:flex;align-items:flex-start;gap:0.75rem;">
+          <div style="font-size:1.5rem;flex-shrink:0;">📊</div>
+          <div>
+            <strong style="color:#92400e;">Reference Prices Only</strong>
+            <p style="color:#78350f;font-size:0.875rem;margin:0.25rem 0 0;">These are indicative wholesale market prices. Actual purchase price depends on quality grade and market conditions at time of inspection. This is a <strong>DEMO application</strong> — prices shown are sample data.</p>
+          </div>
+        </div>
+
+        <!-- Price Grid -->
+        <div class="price-board" id="price-board">
+          <!-- Rendered by JS -->
+        </div>
+
+        <!-- Legend -->
+        <div class="card" style="margin-top:1.5rem;">
+          <div class="card__body">
+            <div style="display:flex;gap:2rem;flex-wrap:wrap;align-items:center;font-size:0.875rem;">
+              <span><strong>Grade A</strong> — Premium quality, highest price</span>
+              <span><strong>Grade B</strong> — Standard quality</span>
+              <span><strong>Grade C</strong> — Economy quality, lowest price</span>
+              <span class="change-up">↑ Price increased from yesterday</span>
+              <span class="change-down">↓ Price decreased from yesterday</span>
+              <span class="change-neutral">→ No change</span>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('farmer');
+
+      const vegetables = MockDB.getVegetables();
+      const now = new Date();
+      document.getElementById('price-timestamp').textContent =
+        `Prices as of: ${now.toLocaleDateString('en-IN', {weekday:'long', day:'numeric', month:'short', year:'numeric'})}, 6:00 AM (Demo Data)`;
+
+      // Grade price multipliers (relative to sell price)
+      const gradeMultiplier = { A: 1.0, B: 0.85, C: 0.70 };
+
+      const changeIcon = (ch) => {
+        if (ch === 'up')      return `<span class="change-up">↑ Up today</span>`;
+        if (ch === 'down')    return `<span class="change-down">↓ Down today</span>`;
+        return `<span class="change-neutral">→ Stable</span>`;
+      };
+
+      const board = document.getElementById('price-board');
+      board.innerHTML = vegetables.map(v => {
+        const gradeRows = v.grades.map(g => {
+          const buyRate  = Math.round(v.currentBuyPrice  * gradeMultiplier[g]);
+          const sellRate = Math.round(v.currentSellPrice * gradeMultiplier[g]);
+          return `<div class="grade-row">
+            <span class="grade-label">Grade ${g}</span>
+            <span class="grade-buy">Buy: ₹${buyRate}/kg</span>
+            <span class="grade-sell">₹${sellRate}/kg</span>
+          </div>`;
+        }).join('');
+
+        const pctChange = v.prevSellPrice !== 0
+          ? Math.round((v.currentSellPrice - v.prevSellPrice) / v.prevSellPrice * 100)
+          : 0;
+        const chLabel = v.currentSellPrice > v.prevSellPrice ? 'up' : v.currentSellPrice < v.prevSellPrice ? 'down' : 'neutral';
+
+        return `<div class="price-card">
+          <div class="price-card__emoji">${v.emoji}</div>
+          <div class="price-card__name-en">${v.nameEn}</div>
+          <div class="price-card__name-te">${v.nameTe}</div>
+          <div style="margin-top:0.4rem;font-size:0.8rem;">${changeIcon(chLabel)}${pctChange !== 0 ? ` (${pctChange > 0 ? '+' : ''}${pctChange}%)` : ''}</div>
+          <div class="price-card__grades">${gradeRows}</div>
+          <div style="margin-top:0.5rem;font-size:0.75rem;color:var(--color-text-secondary);">Available: ${Utils.formatWeight(v.available)}</div>
+        </div>`;
+      }).join('');
+    });
+  </script>
+</body>
+</html>

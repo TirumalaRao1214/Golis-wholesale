@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Labour Dashboard — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <style>
+    .assignment-card { background:var(--color-surface); border:2px solid var(--color-primary-light); border-radius:var(--radius-lg); padding:1.75rem; }
+    .assignment-row { display:flex; justify-content:space-between; align-items:center; padding:0.6rem 0; border-bottom:1px solid var(--color-border); }
+    .assignment-row:last-child { border-bottom:none; }
+    .assignment-label { font-weight:500; color:var(--color-text-secondary); font-size:0.875rem; }
+    .assignment-value { font-weight:700; color:var(--color-text-primary); }
+    .mark-attendance-btn { width:100%; padding:1rem; font-size:1.05rem; margin-top:1.25rem; }
+  </style>
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title" id="welcome-heading">My Dashboard</h1>
+            <p class="text-muted" id="today-date" style="font-size:0.875rem;margin-top:0.25rem;"></p>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 380px;gap:1.5rem;">
+          <!-- Left: Today's Assignment + Mark Attendance -->
+          <div style="display:flex;flex-direction:column;gap:1.25rem;">
+            <!-- Today's Assignment Card -->
+            <div class="assignment-card">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+                <h2 style="font-size:1.15rem;font-weight:700;">📋 Today's Work Assignment</h2>
+                <span class="badge badge--info" id="assignment-status-badge">Loading...</span>
+              </div>
+              <div id="assignment-details">
+                <!-- Filled by JS -->
+              </div>
+              <!-- Mark Attendance Button -->
+              <div id="attendance-section" style="margin-top:1.25rem;">
+                <div id="attendance-current" style="display:none;margin-bottom:0.75rem;">
+                  <div style="display:flex;align-items:center;gap:0.75rem;">
+                    <span id="current-attendance-badge"></span>
+                    <button class="btn btn-ghost btn-sm" onclick="Utils.openModal('modal-attendance')">Edit</button>
+                  </div>
+                </div>
+                <button class="btn btn-primary mark-attendance-btn" id="btn-mark-attendance" onclick="Utils.openModal('modal-attendance')">
+                  ✅ Mark Attendance for Today
+                </button>
+              </div>
+            </div>
+
+            <!-- Recent Payments -->
+            <div class="card">
+              <div class="card__header">
+                <h3 class="card__title">💰 Recent Payments</h3>
+                <a href="attendance.html" class="btn btn-ghost btn-sm">View All →</a>
+              </div>
+              <div class="card__body" style="padding:0;">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Period</th>
+                      <th class="text-right">Amount</th>
+                      <th>Method</th>
+                    </tr>
+                  </thead>
+                  <tbody id="recent-payments-tbody">
+                    <tr><td colspan="4" class="text-center text-muted">No payment records</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: KPI Cards -->
+          <div style="display:flex;flex-direction:column;gap:1rem;">
+            <div class="stat-card stat-card--success">
+              <div class="stat-card__icon">💵</div>
+              <div class="stat-card__body">
+                <div class="stat-card__value" id="kpi-today-wage">—</div>
+                <div class="stat-card__label">Today's Wage</div>
+                <div class="stat-card__trend" id="kpi-today-wage-note">Based on attendance</div>
+              </div>
+            </div>
+            <div class="stat-card stat-card--info">
+              <div class="stat-card__icon">📅</div>
+              <div class="stat-card__body">
+                <div class="stat-card__value" id="kpi-month-earnings">—</div>
+                <div class="stat-card__label">This Month Earnings</div>
+                <div class="stat-card__trend trend-up">Current month</div>
+              </div>
+            </div>
+            <div class="stat-card stat-card--warning">
+              <div class="stat-card__icon">⏳</div>
+              <div class="stat-card__body">
+                <div class="stat-card__value" id="kpi-pending">—</div>
+                <div class="stat-card__label">Pending Payment</div>
+                <div class="stat-card__trend trend-warning">Will be settled soon</div>
+              </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="card">
+              <div class="card__body">
+                <div style="display:flex;flex-direction:column;gap:0.5rem;">
+                  <a href="attendance.html" class="btn btn-secondary" style="text-align:center;">📅 My Attendance</a>
+                  <a href="work-history.html" class="btn btn-secondary" style="text-align:center;">📋 Work History</a>
+                  <a href="profile.html" class="btn btn-ghost" style="text-align:center;">👤 My Profile</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Mark Attendance Modal -->
+  <div class="modal-overlay" id="modal-attendance">
+    <div class="modal" style="max-width:380px;">
+      <div class="modal__header">
+        <h3 class="modal__title">Mark Attendance for Today</h3>
+        <button class="modal__close" data-modal-close>&times;</button>
+      </div>
+      <div class="modal__body">
+        <p class="text-muted" style="margin-bottom:1.25rem;" id="modal-attendance-date"></p>
+        <div style="display:flex;flex-direction:column;gap:0.75rem;">
+          <label style="display:flex;align-items:center;gap:0.75rem;padding:0.875rem;border:2px solid var(--color-border);border-radius:var(--radius-md);cursor:pointer;" id="att-opt-present">
+            <input type="radio" name="attendance" value="present" style="width:18px;height:18px;">
+            <div>
+              <div style="font-weight:600;">✅ Present</div>
+              <div class="text-muted" style="font-size:0.8rem;" id="att-wage-present">Full day wage</div>
+            </div>
+          </label>
+          <label style="display:flex;align-items:center;gap:0.75rem;padding:0.875rem;border:2px solid var(--color-border);border-radius:var(--radius-md);cursor:pointer;" id="att-opt-halfday">
+            <input type="radio" name="attendance" value="halfDay" style="width:18px;height:18px;">
+            <div>
+              <div style="font-weight:600;">🌗 Half Day</div>
+              <div class="text-muted" style="font-size:0.8rem;" id="att-wage-half">Half day wage</div>
+            </div>
+          </label>
+          <label style="display:flex;align-items:center;gap:0.75rem;padding:0.875rem;border:2px solid var(--color-border);border-radius:var(--radius-md);cursor:pointer;" id="att-opt-absent">
+            <input type="radio" name="attendance" value="absent" style="width:18px;height:18px;">
+            <div>
+              <div style="font-weight:600;">❌ Absent</div>
+              <div class="text-muted" style="font-size:0.8rem;">₹0 — No wage</div>
+            </div>
+          </label>
+        </div>
+        <div style="display:flex;gap:0.75rem;justify-content:flex-end;margin-top:1.25rem;">
+          <button class="btn btn-ghost" data-modal-close>Cancel</button>
+          <button class="btn btn-primary" onclick="confirmAttendance()">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    let worker      = null;
+    let todayRecord = null;
+    const today     = new Date().toISOString().split('T')[0];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('labour');
+      const user    = APP.user;
+      worker        = MockDB.getLabourById ? MockDB.getLabourById(user.refId) : MockDB._labour.find(l => l.id === user.refId);
+      const stats   = MockDB.getLabourStats(user.refId);
+
+      document.getElementById('welcome-heading').textContent = `Welcome, ${user.name}`;
+      document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-IN', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+      document.getElementById('modal-attendance-date').textContent = `Date: ${Utils.formatDate(today)}`;
+
+      if (worker) {
+        document.getElementById('att-wage-present').textContent = `₹${worker.dailyWage} — Full day`;
+        document.getElementById('att-wage-half').textContent    = `₹${worker.dailyWage * 0.5} — Half day`;
+      }
+
+      // Today's assignment (demo: assigned to loading if L001, else based on work type)
+      const loading  = MockDB.getLoadingRecords().filter(r => r.labourIds && r.labourIds.includes(user.refId) && r.date !== 'completed');
+      const assignment = loading.length ? loading[0] : null;
+
+      const assignDetails = document.getElementById('assignment-details');
+      const badge         = document.getElementById('assignment-status-badge');
+
+      if (worker) {
+        const demoAssignment = {
+          workType:   worker.workType,
+          location:   'Wholesale Market, Guntur',
+          time:       '6:00 AM – 10:00 AM',
+          supervisor: 'Suresh Babu (Manager)',
+          status:     'Assigned',
+        };
+        badge.textContent  = demoAssignment.status;
+        badge.className    = 'badge badge--info';
+        assignDetails.innerHTML = `
+          <div class="assignment-row"><span class="assignment-label">Work Type</span><span class="assignment-value">${demoAssignment.workType}</span></div>
+          <div class="assignment-row"><span class="assignment-label">Location</span><span class="assignment-value">${demoAssignment.location}</span></div>
+          <div class="assignment-row"><span class="assignment-label">Time</span><span class="assignment-value">${demoAssignment.time}</span></div>
+          <div class="assignment-row"><span class="assignment-label">Supervisor</span><span class="assignment-value">${demoAssignment.supervisor}</span></div>`;
+      } else {
+        badge.textContent  = 'No Assignment';
+        badge.className    = 'badge';
+        assignDetails.innerHTML = `<div style="text-align:center;padding:1.5rem;color:var(--color-text-secondary);">No assignment for today</div>`;
+      }
+
+      // Check today's attendance
+      const todayAtt = MockDB.getAttendance(today).find(a => a.labourId === user.refId);
+      todayRecord    = todayAtt;
+      updateAttendanceUI(todayAtt, worker ? worker.dailyWage : 700);
+
+      // KPI Cards
+      document.getElementById('kpi-month-earnings').textContent = Utils.formatCurrency(stats.thisMonthEarnings || 14000);
+      document.getElementById('kpi-pending').textContent        = Utils.formatCurrency(stats.pendingPayment    || 2800);
+
+      // Recent payments (demo: generate from attendance data)
+      document.getElementById('recent-payments-tbody').innerHTML = `
+        <tr><td>${Utils.formatDate('2026-09-21')}</td><td>16–21 Sep</td><td class="text-right" style="font-weight:700;color:var(--color-success);">₹4,200</td><td><span class="badge badge--info">Cash</span></td></tr>
+        <tr><td>${Utils.formatDate('2026-09-14')}</td><td>09–14 Sep</td><td class="text-right" style="font-weight:700;color:var(--color-success);">₹3,850</td><td><span class="badge badge--info">UPI</span></td></tr>
+        <tr><td>${Utils.formatDate('2026-09-07')}</td><td>02–07 Sep</td><td class="text-right" style="font-weight:700;color:var(--color-success);">₹4,200</td><td><span class="badge badge--info">Cash</span></td></tr>`;
+    });
+
+    function updateAttendanceUI(record, dailyWage) {
+      const btn    = document.getElementById('btn-mark-attendance');
+      const curDiv = document.getElementById('attendance-current');
+      const badge  = document.getElementById('current-attendance-badge');
+      const kpi    = document.getElementById('kpi-today-wage');
+      const kpiNote= document.getElementById('kpi-today-wage-note');
+
+      if (record && record.status !== undefined) {
+        const statusMap = {
+          present:  { cls:'badge--success', lbl:'Present', wage: dailyWage },
+          halfDay:  { cls:'badge--warning', lbl:'Half Day',wage: dailyWage * 0.5 },
+          absent:   { cls:'badge--danger',  lbl:'Absent',  wage: 0 },
+          overtime: { cls:'badge--info',    lbl:'Overtime',wage: dailyWage + (record.overtimeHours || 0) * (dailyWage / 8) },
+        };
+        const s = statusMap[record.status] || { cls:'', lbl:record.status, wage:0 };
+        badge.innerHTML = `<span class="badge ${s.cls}">${s.lbl}</span>`;
+        curDiv.style.display = 'flex';
+        btn.textContent      = '✏️ Edit Attendance';
+        kpi.textContent      = Utils.formatCurrency(s.wage);
+        kpiNote.textContent  = s.lbl + ' today';
+
+        // Pre-select radio
+        const radio = document.querySelector(`input[name="attendance"][value="${record.status}"]`);
+        if (radio) radio.checked = true;
+      } else {
+        curDiv.style.display = 'none';
+        btn.textContent      = '✅ Mark Attendance for Today';
+        kpi.textContent      = '₹0';
+        kpiNote.textContent  = 'Not marked yet';
+      }
+    }
+
+    function confirmAttendance() {
+      const selected = document.querySelector('input[name="attendance"]:checked');
+      if (!selected) {
+        Utils.showToast('Please select an attendance status', 'warning');
+        return;
+      }
+      const status   = selected.value;
+      const labourId = APP.user.refId;
+
+      if (todayRecord) {
+        // Update existing
+        MockDB.updateRecord('_attendance', todayRecord.id, { status });
+        todayRecord.status = status;
+      } else {
+        // Create new
+        const newRecord = {
+          id:            Utils.generateId('ATT'),
+          labourId,
+          date:          today,
+          status,
+          overtimeHours: 0,
+          notes:         'Self-marked',
+        };
+        MockDB.saveRecord('_attendance', newRecord);
+        todayRecord = newRecord;
+      }
+
+      Utils.closeModal('modal-attendance');
+      const dailyWage = worker ? worker.dailyWage : 700;
+      updateAttendanceUI(todayRecord, dailyWage);
+      Utils.showToast(`Attendance marked: ${status === 'present' ? 'Present' : status === 'halfDay' ? 'Half Day' : 'Absent'} ✅`, 'success');
+    }
+  </script>
+</body>
+</html>

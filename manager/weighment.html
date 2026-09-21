@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weighment Entry — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content">
+        <div class="page-header">
+          <h1 class="page-title" data-i18n="page.weighment"></h1>
+          <div class="page-header-actions">
+            <button class="btn btn-primary" onclick="Utils.openModal('modal-weighment')">+ New Weighment</button>
+          </div>
+        </div>
+
+        <!-- Pending Arrivals Alert -->
+        <div id="pending-alert" class="alert alert--warning" style="margin-bottom:1rem;display:none;">
+          <strong>⚖ Arrivals Ready for Weighment:</strong>
+          <span id="pending-alert-text"></span>
+        </div>
+
+        <!-- History Table -->
+        <div class="card">
+          <div class="card__header">
+            <h3 class="card__title">Weighment Records</h3>
+            <span class="badge badge--info" id="total-count"></span>
+          </div>
+          <div class="card__body" style="padding:0;">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Weighment ID</th>
+                    <th data-i18n="col.date"></th>
+                    <th>Arrival</th>
+                    <th>Farmer</th>
+                    <th>Vegetable</th>
+                    <th data-i18n="col.grossWt"></th>
+                    <th data-i18n="col.tareWt"></th>
+                    <th data-i18n="col.netWt"></th>
+                    <th data-i18n="col.status"></th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="weighments-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Weighment Modal -->
+  <div class="modal-overlay" id="modal-weighment">
+    <div class="modal modal--lg">
+      <div class="modal__header">
+        <h3 class="modal__title">New Weighment Entry</h3>
+        <button class="modal__close" onclick="Utils.closeModal('modal-weighment')">&times;</button>
+      </div>
+      <div class="modal__body">
+        <form id="weighment-form">
+          <div class="form-group">
+            <label class="form-label">Link to Arrival <span class="required">*</span></label>
+            <select class="form-select" id="w-arrival" onchange="onArrivalSelect()">
+              <option value="">Select Arrival (Arrived/Waiting status)</option>
+            </select>
+          </div>
+          <!-- Arrival Info Preview -->
+          <div id="arrival-preview" style="display:none;padding:0.75rem;background:var(--color-primary-pale);border-radius:8px;margin-bottom:1rem;font-size:0.875rem;">
+            <strong id="prev-farmer"></strong> — <span id="prev-veg"></span><br>
+            Expected: <strong id="prev-qty"></strong> kg | Vehicle: <code id="prev-vehicle"></code>
+          </div>
+
+          <div class="form-grid form-grid--2">
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.grossWeight"></label>
+              <input type="number" class="form-input" id="w-gross" placeholder="0" oninput="calcNetWeight()" min="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.tareWeight"></label>
+              <input type="number" class="form-input" id="w-tare" placeholder="0" oninput="calcNetWeight()" min="0">
+            </div>
+          </div>
+
+          <!-- Net weight live display -->
+          <div class="form-group">
+            <label class="form-label" data-i18n="field.netWeight"></label>
+            <div style="display:flex;align-items:center;gap:1rem;padding:1rem;background:var(--color-bg);border:2px solid var(--color-border);border-radius:8px;">
+              <div style="text-align:center;flex:1;">
+                <div style="font-size:0.75rem;color:var(--color-text-secondary);margin-bottom:0.25rem;">Gross</div>
+                <div id="disp-gross" style="font-size:1.25rem;font-weight:700;color:var(--color-text-primary);">0 kg</div>
+              </div>
+              <div style="font-size:1.5rem;color:var(--color-text-secondary);">−</div>
+              <div style="text-align:center;flex:1;">
+                <div style="font-size:0.75rem;color:var(--color-text-secondary);margin-bottom:0.25rem;">Tare</div>
+                <div id="disp-tare" style="font-size:1.25rem;font-weight:700;color:var(--color-text-primary);">0 kg</div>
+              </div>
+              <div style="font-size:1.5rem;color:var(--color-text-secondary);">=</div>
+              <div style="text-align:center;flex:1;padding:0.5rem;background:var(--color-primary-pale);border-radius:6px;">
+                <div style="font-size:0.75rem;color:var(--color-primary);margin-bottom:0.25rem;">Net Weight</div>
+                <div id="disp-net" style="font-size:1.5rem;font-weight:800;color:var(--color-primary);">0 kg</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-grid form-grid--2">
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.weighmentDate"></label>
+              <input type="date" class="form-input" id="w-date">
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.weighedBy"></label>
+              <input type="text" class="form-input" id="w-by" placeholder="Staff name">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="common.notes"></label>
+            <textarea class="form-textarea" id="w-notes" rows="2"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn-ghost" onclick="Utils.closeModal('modal-weighment')" data-i18n="common.cancel"></button>
+        <button class="btn btn-primary" onclick="saveWeighment()">Save &amp; Proceed to Quality Check</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    let _weighments = [];
+
+    function onArrivalSelect() {
+      const id = document.getElementById('w-arrival').value;
+      const preview = document.getElementById('arrival-preview');
+      if (!id) { preview.style.display = 'none'; return; }
+      const arr    = MockDB.getArrivals().find(a => a.id === id);
+      const farmer = arr ? MockDB.getFarmerById(arr.farmerId) : null;
+      const veg    = arr ? MockDB.getVegetableById(arr.vegetableId) : null;
+      document.getElementById('prev-farmer').textContent  = farmer ? farmer.name : '';
+      document.getElementById('prev-veg').textContent     = veg ? veg.nameEn : '';
+      document.getElementById('prev-qty').textContent     = arr ? arr.expectedQty.toLocaleString('en-IN') : '';
+      document.getElementById('prev-vehicle').textContent = arr ? arr.vehicleNo : '';
+      preview.style.display = 'block';
+    }
+
+    function calcNetWeight() {
+      const gross = Number(document.getElementById('w-gross').value) || 0;
+      const tare  = Number(document.getElementById('w-tare').value) || 0;
+      const net   = Math.max(0, gross - tare);
+      document.getElementById('disp-gross').textContent = gross.toLocaleString('en-IN') + ' kg';
+      document.getElementById('disp-tare').textContent  = tare.toLocaleString('en-IN') + ' kg';
+      document.getElementById('disp-net').textContent   = net.toLocaleString('en-IN') + ' kg';
+    }
+
+    function renderWeighments() {
+      document.getElementById('total-count').textContent = _weighments.length + ' records';
+      const arrivals = MockDB.getArrivals();
+      document.getElementById('weighments-tbody').innerHTML = _weighments.map(w => {
+        const arr    = arrivals.find(a => a.id === w.arrivalId);
+        const farmer = arr ? MockDB.getFarmerById(arr.farmerId) : null;
+        const veg    = arr ? MockDB.getVegetableById(arr.vegetableId) : null;
+        const done   = w.netWt > 0;
+        return `<tr>
+          <td><code>${w.id}</code></td>
+          <td>${w.date ? Utils.formatDate(w.date) : '<span class="badge badge--warning">Pending</span>'}</td>
+          <td><a href="arrivals.html" style="color:var(--color-info);">${w.arrivalId}</a></td>
+          <td>${farmer ? farmer.name : '—'}</td>
+          <td>${veg ? veg.nameEn : '—'}</td>
+          <td>${w.grossWt ? w.grossWt.toLocaleString('en-IN') + ' kg' : '—'}</td>
+          <td>${w.tareWt ? w.tareWt.toLocaleString('en-IN') + ' kg' : '—'}</td>
+          <td><strong>${done ? w.netWt.toLocaleString('en-IN') + ' kg' : '—'}</strong></td>
+          <td>${Utils.statusBadge(done ? 'completed' : 'pending')}</td>
+          <td>${done ? `<a href="quality.html" class="btn btn-sm btn-primary">→ Quality Check</a>` : '<span class="text-muted">Pending</span>'}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    function saveWeighment() {
+      const arrivalId = document.getElementById('w-arrival').value;
+      const gross     = Number(document.getElementById('w-gross').value) || 0;
+      const tare      = Number(document.getElementById('w-tare').value) || 0;
+      if (!arrivalId) { Utils.showToast('Please select an arrival.', 'error'); return; }
+      if (!gross)     { Utils.showToast('Gross weight is required.', 'error'); return; }
+      const net = Math.max(0, gross - tare);
+      const record = {
+        id: Utils.generateId('WGT'),
+        arrivalId,
+        grossWt: gross,
+        tareWt: tare,
+        netWt: net,
+        date: document.getElementById('w-date').value || new Date().toISOString().split('T')[0],
+        weighedBy: document.getElementById('w-by').value.trim(),
+        notes: document.getElementById('w-notes').value.trim(),
+      };
+      MockDB.saveRecord('_weighments', record);
+      // Auto-update arrival status to Quality Check
+      MockDB.updateRecord('_arrivals', arrivalId, { status: 'qualityCheck' });
+      _weighments = MockDB.getWeighments();
+      Utils.closeModal('modal-weighment');
+      Utils.showToast('Weighment saved! Arrival moved to Quality Check.', 'success');
+      renderWeighments();
+      populateArrivalsDropdown();
+    }
+
+    function populateArrivalsDropdown() {
+      const sel = document.getElementById('w-arrival');
+      sel.innerHTML = '<option value="">Select Arrival (Arrived/Waiting status)</option>';
+      const arrivals = MockDB.getArrivals().filter(a => ['arrived','waiting','weighing'].includes(a.status));
+      arrivals.forEach(a => {
+        const farmer = MockDB.getFarmerById(a.farmerId);
+        const veg    = MockDB.getVegetableById(a.vegetableId);
+        sel.add(new Option(`${a.id} — ${farmer ? farmer.name : ''} / ${veg ? veg.nameEn : ''} (${a.expectedQty} kg) [${a.status}]`, a.id));
+      });
+      // Show pending alert
+      if (arrivals.length > 0) {
+        document.getElementById('pending-alert').style.display = '';
+        document.getElementById('pending-alert-text').textContent = ` ${arrivals.length} arrival(s) awaiting weighment: ${arrivals.map(a => a.id).join(', ')}`;
+      } else {
+        document.getElementById('pending-alert').style.display = 'none';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('manager');
+      _weighments = MockDB.getWeighments();
+      populateArrivalsDropdown();
+      document.getElementById('w-date').value = new Date().toISOString().split('T')[0];
+      document.getElementById('w-by').value   = APP.user ? APP.user.name : '';
+      renderWeighments();
+    });
+  </script>
+</body>
+</html>

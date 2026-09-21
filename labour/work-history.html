@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Work History — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content">
+        <div class="page-header">
+          <h1 class="page-title">Work History</h1>
+        </div>
+
+        <!-- Filters -->
+        <div class="card">
+          <div class="card__body">
+            <div style="display:flex;gap:1rem;align-items:flex-end;flex-wrap:wrap;">
+              <div class="form-group" style="margin:0;">
+                <label class="form-label">Work Type</label>
+                <select class="form-select" id="filter-work-type">
+                  <option value="">All Types</option>
+                  <option value="Loading">Loading</option>
+                  <option value="Unloading">Unloading</option>
+                  <option value="Sorting">Sorting</option>
+                  <option value="Packing">Packing</option>
+                  <option value="Cleaning">Cleaning</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin:0;">
+                <label class="form-label">From Date</label>
+                <input type="date" class="form-input" id="filter-from">
+              </div>
+              <div class="form-group" style="margin:0;">
+                <label class="form-label">To Date</label>
+                <input type="date" class="form-input" id="filter-to">
+              </div>
+              <button class="btn btn-secondary" onclick="applyFilter()">Filter</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Monthly Summary Card -->
+        <div class="card" style="margin-top:1.25rem;">
+          <div class="card__body">
+            <div style="display:flex;gap:2rem;flex-wrap:wrap;align-items:center;">
+              <div>
+                <div class="text-muted" style="font-size:0.8rem;">Total Assignments</div>
+                <div style="font-size:1.5rem;font-weight:800;" id="summary-total">0</div>
+              </div>
+              <div>
+                <div class="text-muted" style="font-size:0.8rem;">Completed</div>
+                <div style="font-size:1.5rem;font-weight:800;color:var(--color-success);" id="summary-completed">0</div>
+              </div>
+              <div>
+                <div class="text-muted" style="font-size:0.8rem;">This Month Earnings</div>
+                <div style="font-size:1.5rem;font-weight:800;color:var(--color-primary);" id="summary-earnings">₹0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Work History Table -->
+        <div class="card" style="margin-top:1.25rem;">
+          <div class="card__header">
+            <h3 class="card__title">📋 Work Assignments</h3>
+            <span class="badge badge--info" id="record-count">0 records</span>
+          </div>
+          <div class="card__body" style="padding:0;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Work Type</th>
+                  <th>Location</th>
+                  <th>Time</th>
+                  <th>Supervisor</th>
+                  <th>Status</th>
+                  <th class="text-right">Wage</th>
+                </tr>
+              </thead>
+              <tbody id="work-history-tbody">
+                <tr><td colspan="7" class="text-center text-muted">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    let allAssignments = [];
+    let worker = null;
+
+    const WORK_TYPE_BADGES = {
+      Loading:   'badge--info',
+      Unloading: 'badge--success',
+      Sorting:   'badge--primary',
+      Packing:   'badge--warning',
+      Cleaning:  '',
+    };
+
+    const STATUS_BADGES = {
+      Assigned:    'badge--info',
+      'In Progress':'badge--warning',
+      Completed:   'badge--success',
+      Absent:      'badge--danger',
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('labour');
+      const user = APP.user;
+      worker     = MockDB._labour.find(l => l.id === user.refId);
+      const dailyWage = worker ? worker.dailyWage : 700;
+
+      // Build work history from loading records + attendance
+      const loadingRecords = MockDB.getLoadingRecords().filter(r => r.labourIds && r.labourIds.includes(user.refId));
+      const attendance     = MockDB.getAttendance().filter(a => a.labourId === user.refId);
+      const orders         = MockDB.getOrders();
+
+      // Build assignments from attendance (one per present day)
+      allAssignments = attendance.map(att => {
+        const loadRec = loadingRecords.find(lr => {
+          const lrDate = lr.startTime ? lr.startTime.split('T')[0] : '';
+          return lrDate === att.date;
+        });
+        const order = loadRec ? orders.find(o => o.id === loadRec.orderId) : null;
+        const workType = worker ? worker.workType : 'Loading';
+        const status   = att.status === 'absent' ? 'Absent'
+                       : loadRec && loadRec.status === 'completed' ? 'Completed'
+                       : loadRec && loadRec.status === 'inProgress' ? 'In Progress'
+                       : att.status === 'present' || att.status === 'overtime' ? 'Assigned'
+                       : 'Assigned';
+        const wage = att.status === 'present' || att.status === 'overtime' ? dailyWage
+                   : att.status === 'halfDay'   ? dailyWage * 0.5
+                   : 0;
+        const startTime = loadRec && loadRec.startTime ? new Date(loadRec.startTime).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' }) : '6:00 AM';
+        const endTime   = loadRec && loadRec.endTime   ? new Date(loadRec.endTime).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' })   : '10:00 AM';
+
+        return {
+          date:       att.date,
+          workType,
+          location:   'Wholesale Market, Guntur',
+          time:       `${startTime} – ${endTime}`,
+          supervisor: 'Suresh Babu',
+          status,
+          wage,
+          orderId:    order ? order.id : null,
+        };
+      }).sort((a, b) => b.date.localeCompare(a.date));
+
+      renderTable(allAssignments, dailyWage);
+    });
+
+    function renderTable(data, dailyWage) {
+      document.getElementById('record-count').textContent = data.length + ' records';
+      const completed = data.filter(d => d.status === 'Completed').length;
+      const now        = new Date();
+      const monthStart = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+      const monthEarnings = data.filter(d => d.date.startsWith(monthStart)).reduce((s, d) => s + d.wage, 0);
+
+      document.getElementById('summary-total').textContent     = data.length;
+      document.getElementById('summary-completed').textContent = completed;
+      document.getElementById('summary-earnings').textContent  = Utils.formatCurrency(monthEarnings);
+
+      const tbody = document.getElementById('work-history-tbody');
+      if (!data.length) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No work records found</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.map(a => `<tr>
+        <td>${Utils.formatDate(a.date)}</td>
+        <td><span class="badge ${WORK_TYPE_BADGES[a.workType] || ''}">${a.workType}</span></td>
+        <td>${a.location}</td>
+        <td style="font-size:0.85rem;">${a.time}</td>
+        <td>${a.supervisor}</td>
+        <td><span class="badge ${STATUS_BADGES[a.status] || ''}">${a.status}</span></td>
+        <td class="text-right" style="font-weight:${a.wage > 0 ? '700' : '400'};color:${a.wage > 0 ? 'var(--color-success)' : 'var(--color-text-secondary)'};">${a.wage > 0 ? Utils.formatCurrency(a.wage) : '—'}</td>
+      </tr>`).join('');
+    }
+
+    function applyFilter() {
+      const type = document.getElementById('filter-work-type').value;
+      const from = document.getElementById('filter-from').value;
+      const to   = document.getElementById('filter-to').value;
+      let filtered = [...allAssignments];
+      if (type) filtered = filtered.filter(a => a.workType === type);
+      if (from) filtered = filtered.filter(a => a.date >= from);
+      if (to)   filtered = filtered.filter(a => a.date <= to);
+      const dailyWage = worker ? worker.dailyWage : 700;
+      renderTable(filtered, dailyWage);
+    }
+  </script>
+</body>
+</html>

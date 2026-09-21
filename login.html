@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — GOLIS Wholesale</title>
+  <meta name="description" content="Login to GOLIS Wholesale — B2B vegetable trading management platform.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <style>
+    /* ─── Login Page Custom Styles ───────────────────────── */
+    body.login-body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(135deg, #0b1f14 0%, #153222 40%, #1b3d2b 100%);
+      color: var(--color-text-primary);
+      font-family: var(--font-primary);
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Pattern overlay on background */
+    .login-bg-pattern {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      opacity: 0.05;
+      background-image: radial-gradient(#52b788 1.5px, transparent 1.5px), radial-gradient(#52b788 1.5px, #153222 1.5px);
+      background-size: 30px 30px;
+      background-position: 0 0, 15px 15px;
+      z-index: 0;
+    }
+
+    /* Top bar for public return & lang switcher */
+    .login-header-bar {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .login-back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #d1fae5;
+      text-decoration: none;
+      font-size: var(--text-sm);
+      font-weight: var(--font-medium);
+      transition: color var(--transition-fast), transform var(--transition-fast);
+      background: rgba(255, 255, 255, 0.08);
+      padding: 0.4rem 0.9rem;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .login-back-link:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.16);
+      transform: translateX(-2px);
+      text-decoration: none;
+    }
+
+    .login-lang-switch {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: var(--radius-full);
+      padding: 2px 4px;
+    }
+    .login-lang-btn {
+      background: none;
+      border: none;
+      color: #a7f3d0;
+      font-size: var(--text-xs);
+      font-weight: var(--font-semibold);
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .login-lang-btn.active {
+      background: var(--color-primary-light);
+      color: #0b1f14;
+    }
+
+    /* Main Container */
+    .login-main {
+      position: relative;
+      z-index: 10;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem 1rem 2.5rem;
+    }
+
+    .login-card-container {
+      width: 100%;
+      max-width: 1040px;
+      background: var(--color-surface);
+      border-radius: var(--radius-xl);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      overflow: hidden;
+    }
+
+    /* Left Panel: Branded / Demo Credentials */
+    .login-left-panel {
+      background: #1b2f23;
+      color: #f1f5f9;
+      padding: 2.25rem 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      position: relative;
+    }
+
+    .login-brand-header {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .login-brand-logo {
+      width: 44px;
+      height: 44px;
+      background: var(--color-primary-light);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(82, 183, 136, 0.35);
+      flex-shrink: 0;
+    }
+    .login-brand-logo svg {
+      width: 26px;
+      height: 26px;
+      color: #0d2818;
+    }
+
+    .login-brand-title {
+      font-size: var(--text-xl);
+      font-weight: var(--font-extrabold);
+      letter-spacing: -0.02em;
+      color: #ffffff;
+      line-height: 1.1;
+    }
+    .login-brand-sub {
+      font-size: var(--text-xs);
+      color: #a7f3d0;
+      font-weight: var(--font-medium);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .demo-pill-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(244, 162, 97, 0.18);
+      border: 1px solid rgba(244, 162, 97, 0.45);
+      color: #fca311;
+      padding: 0.3rem 0.75rem;
+      border-radius: var(--radius-full);
+      font-size: var(--text-xs);
+      font-weight: var(--font-bold);
+      letter-spacing: 0.05em;
+      margin-bottom: 1.25rem;
+      width: fit-content;
+    }
+    .demo-pill-badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #fca311;
+      box-shadow: 0 0 8px #fca311;
+    }
+
+    .demo-creds-title {
+      font-size: var(--text-sm);
+      font-weight: var(--font-semibold);
+      color: #d1fae5;
+      margin-bottom: 0.25rem;
+    }
+    .demo-creds-hint {
+      font-size: var(--text-xs);
+      color: #94a3b8;
+      margin-bottom: 1rem;
+    }
+
+    /* Demo Credential Cards */
+    .demo-cards-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .demo-cred-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-lg);
+      padding: 0.65rem 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      user-select: none;
+      position: relative;
+    }
+    .demo-cred-card:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: var(--color-primary-light);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+    .demo-cred-card.active-role {
+      background: rgba(82, 183, 136, 0.18);
+      border-color: var(--color-primary-light);
+      box-shadow: 0 0 0 1px var(--color-primary-light);
+    }
+
+    .demo-cred-card-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .demo-cred-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.05rem;
+      flex-shrink: 0;
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .demo-cred-icon svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .demo-cred-info {
+      display: flex;
+      flex-direction: column;
+    }
+    .demo-cred-role {
+      font-size: var(--text-sm);
+      font-weight: var(--font-semibold);
+      color: #ffffff;
+      line-height: 1.2;
+    }
+    .demo-cred-email {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      font-family: var(--font-mono, monospace);
+    }
+
+    .demo-cred-btn {
+      font-size: 0.7rem;
+      font-weight: var(--font-semibold);
+      color: #a7f3d0;
+      background: rgba(82, 183, 136, 0.15);
+      border: 1px solid rgba(82, 183, 136, 0.3);
+      padding: 0.3rem 0.6rem;
+      border-radius: var(--radius-sm);
+      white-space: nowrap;
+      transition: all var(--transition-fast);
+      pointer-events: none; /* clicking the card handles action */
+    }
+    .demo-cred-card:hover .demo-cred-btn {
+      background: var(--color-primary-light);
+      color: #0b1f14;
+    }
+
+    .login-left-footer {
+      font-size: 0.72rem;
+      color: #64748b;
+      line-height: 1.4;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 0.85rem;
+    }
+
+    /* Right Panel: Login Form */
+    .login-right-panel {
+      padding: 2.75rem 2.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: #ffffff;
+    }
+
+    .login-form-header {
+      margin-bottom: 1.75rem;
+    }
+    .login-form-heading {
+      font-size: var(--text-2xl);
+      font-weight: var(--font-bold);
+      color: var(--color-text-primary);
+      margin-bottom: 0.35rem;
+      letter-spacing: -0.02em;
+    }
+    .login-form-subheading {
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+    }
+
+    .login-alert {
+      display: none;
+      background: var(--color-danger-bg);
+      border: 1px solid rgba(230, 57, 70, 0.25);
+      color: var(--color-danger-text);
+      font-size: var(--text-sm);
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-md);
+      margin-bottom: 1.25rem;
+      line-height: 1.4;
+    }
+
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.15rem;
+    }
+
+    .login-field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .login-label {
+      font-size: var(--text-xs);
+      font-weight: var(--font-semibold);
+      color: var(--color-text-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .login-input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .login-input-icon {
+      position: absolute;
+      left: 0.85rem;
+      color: var(--color-text-secondary);
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+    }
+    .login-input-icon svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .login-input {
+      width: 100%;
+      padding: 0.7rem 0.85rem 0.7rem 2.5rem;
+      font-size: var(--text-sm);
+      border: 1px solid var(--color-border-dark);
+      border-radius: var(--radius-md);
+      background: #ffffff;
+      color: var(--color-text-primary);
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+      font-family: inherit;
+    }
+    .login-input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px var(--color-primary-pale);
+    }
+
+    .password-toggle-btn {
+      position: absolute;
+      right: 0.75rem;
+      background: none;
+      border: none;
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      padding: 0.25rem;
+      display: flex;
+      align-items: center;
+      transition: color var(--transition-fast);
+    }
+    .password-toggle-btn:hover {
+      color: var(--color-text-primary);
+    }
+
+    .login-form-options {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: var(--text-xs);
+    }
+
+    .login-remember {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      cursor: pointer;
+      color: var(--color-text-secondary);
+      user-select: none;
+    }
+    .login-remember input {
+      accent-color: var(--color-primary);
+      cursor: pointer;
+    }
+
+    .login-submit-btn {
+      width: 100%;
+      padding: 0.8rem 1.25rem;
+      font-size: var(--text-base);
+      font-weight: var(--font-semibold);
+      background: var(--color-primary);
+      color: #ffffff;
+      border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: background-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    .login-submit-btn:hover {
+      background: #245c43;
+      box-shadow: 0 4px 12px rgba(45, 106, 79, 0.3);
+      transform: translateY(-1px);
+    }
+    .login-submit-btn:active {
+      transform: translateY(0);
+    }
+    .login-submit-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 860px) {
+      .login-card-container {
+        grid-template-columns: 1fr;
+        max-width: 520px;
+      }
+      .login-left-panel {
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 1.75rem 1.5rem;
+      }
+      .login-right-panel {
+        padding: 2rem 1.5rem;
+      }
+      .login-header-bar {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body class="login-body">
+  <div class="login-bg-pattern" aria-hidden="true"></div>
+
+  <!-- Header Bar -->
+  <header class="login-header-bar">
+    <a href="index.html" class="login-back-link">
+      <span data-i18n="auth.backToWebsite">← Back to Website</span>
+    </a>
+    
+    <div class="login-lang-switch" role="group" aria-label="Language switcher">
+      <button class="login-lang-btn" data-lang-btn="en" aria-label="Switch to English">EN</button>
+      <button class="login-lang-btn" data-lang-btn="te" aria-label="తెలుగుకు మారండి">తెలుగు</button>
+    </div>
+  </header>
+
+  <!-- Main Login Container -->
+  <main class="login-main">
+    <div class="login-card-container">
+      
+      <!-- Left Panel: Branding & Demo Credentials -->
+      <section class="login-left-panel" aria-label="Demo Credentials">
+        <div>
+          <!-- Logo & Branding -->
+          <div class="login-brand-header">
+            <div class="login-brand-logo" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
+                <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+              </svg>
+            </div>
+            <div>
+              <div class="login-brand-title" data-i18n="app.name">GOLIS Wholesale</div>
+              <div class="login-brand-sub" data-i18n="app.tagline">B2B Vegetable Trading</div>
+            </div>
+          </div>
+
+          <!-- Demo Application Badge -->
+          <div class="demo-pill-badge" data-i18n="auth.demoApp">DEMO APPLICATION</div>
+
+          <!-- Demo Credentials Heading & Hint -->
+          <div class="demo-creds-title" data-i18n="auth.demoCredentials">Demo Credentials</div>
+          <div class="demo-creds-hint" data-i18n="auth.clickToFill">Click any role below to auto-fill credentials</div>
+
+          <!-- Role Cards List -->
+          <div class="demo-cards-list" role="list">
+            
+            <!-- Owner -->
+            <div class="demo-cred-card" data-demo-role="owner" data-email="owner@golis.com" data-pwd="owner123" role="button" tabindex="0" aria-label="Use Owner credentials">
+              <div class="demo-cred-card-left">
+                <div class="demo-cred-icon" style="color:#fbbf24;" aria-hidden="true">
+                  <!-- Crown / Owner SVG -->
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14v2H5v-2z"/></svg>
+                </div>
+                <div class="demo-cred-info">
+                  <span class="demo-cred-role" data-i18n="role.owner">Owner</span>
+                  <span class="demo-cred-email">owner@golis.com</span>
+                </div>
+              </div>
+              <span class="demo-cred-btn" data-i18n="auth.useCredentials">Use these credentials</span>
+            </div>
+
+            <!-- Manager -->
+            <div class="demo-cred-card" data-demo-role="manager" data-email="manager@golis.com" data-pwd="manager123" role="button" tabindex="0" aria-label="Use Manager credentials">
+              <div class="demo-cred-card-left">
+                <div class="demo-cred-icon" style="color:#60a5fa;" aria-hidden="true">
+                  <!-- Clipboard / Manager SVG -->
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+                </div>
+                <div class="demo-cred-info">
+                  <span class="demo-cred-role" data-i18n="role.manager">Manager</span>
+                  <span class="demo-cred-email">manager@golis.com</span>
+                </div>
+              </div>
+              <span class="demo-cred-btn" data-i18n="auth.useCredentials">Use these credentials</span>
+            </div>
+
+            <!-- Farmer -->
+            <div class="demo-cred-card" data-demo-role="farmer" data-email="farmer@golis.com" data-pwd="farmer123" role="button" tabindex="0" aria-label="Use Farmer credentials">
+              <div class="demo-cred-card-left">
+                <div class="demo-cred-icon" style="color:#4ade80;" aria-hidden="true">
+                  <!-- Leaf / Farmer SVG -->
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/></svg>
+                </div>
+                <div class="demo-cred-info">
+                  <span class="demo-cred-role" data-i18n="role.farmer">Farmer</span>
+                  <span class="demo-cred-email">farmer@golis.com</span>
+                </div>
+              </div>
+              <span class="demo-cred-btn" data-i18n="auth.useCredentials">Use these credentials</span>
+            </div>
+
+            <!-- Vendor -->
+            <div class="demo-cred-card" data-demo-role="vendor" data-email="vendor@golis.com" data-pwd="vendor123" role="button" tabindex="0" aria-label="Use Vendor credentials">
+              <div class="demo-cred-card-left">
+                <div class="demo-cred-icon" style="color:#f472b6;" aria-hidden="true">
+                  <!-- Store / Shop SVG -->
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                </div>
+                <div class="demo-cred-info">
+                  <span class="demo-cred-role" data-i18n="role.vendor">Vendor</span>
+                  <span class="demo-cred-email">vendor@golis.com</span>
+                </div>
+              </div>
+              <span class="demo-cred-btn" data-i18n="auth.useCredentials">Use these credentials</span>
+            </div>
+
+            <!-- Labour -->
+            <div class="demo-cred-card" data-demo-role="labour" data-email="labour@golis.com" data-pwd="labour123" role="button" tabindex="0" aria-label="Use Labour credentials">
+              <div class="demo-cred-card-left">
+                <div class="demo-cred-icon" style="color:#fb923c;" aria-hidden="true">
+                  <!-- Tools / Labour SVG -->
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                </div>
+                <div class="demo-cred-info">
+                  <span class="demo-cred-role" data-i18n="role.labour">Labour</span>
+                  <span class="demo-cred-email">labour@golis.com</span>
+                </div>
+              </div>
+              <span class="demo-cred-btn" data-i18n="auth.useCredentials">Use these credentials</span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Disclaimer -->
+        <div class="login-left-footer" data-i18n="auth.demoDisclaimer">
+          This is a demo application. No real authentication or data storage. All data is simulated.
+        </div>
+      </section>
+
+      <!-- Right Panel: Login Form -->
+      <section class="login-right-panel" aria-label="Login Form">
+        <div class="login-form-header">
+          <h1 class="login-form-heading" data-i18n="auth.welcomeBack">Welcome Back</h1>
+          <p class="login-form-subheading" data-i18n="auth.loginTitle">Sign in to GOLIS Wholesale</p>
+        </div>
+
+        <!-- Error Message Alert -->
+        <div class="login-alert" id="login-error" role="alert" aria-live="assertive"></div>
+
+        <!-- Form -->
+        <form class="login-form" id="login-form" novalidate>
+          
+          <!-- Email -->
+          <div class="login-field-group">
+            <label class="login-label" for="email" data-i18n="auth.email">Email Address</label>
+            <div class="login-input-wrap">
+              <div class="login-input-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </div>
+              <input type="email" id="email" class="login-input" placeholder="name@golis.com" required data-validate="required|email" autocomplete="email">
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div class="login-field-group">
+            <label class="login-label" for="password" data-i18n="auth.password">Password</label>
+            <div class="login-input-wrap">
+              <div class="login-input-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              </div>
+              <input type="password" id="password" class="login-input" placeholder="••••••••" required data-validate="required" autocomplete="current-password" style="padding-right: 2.5rem;">
+              <button type="button" class="password-toggle-btn" id="toggle-password" aria-label="Show or hide password">
+                <svg id="eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Options: Remember Me -->
+          <div class="login-form-options">
+            <label class="login-remember">
+              <input type="checkbox" id="remember-me" checked>
+              <span data-i18n="auth.rememberMe">Remember me</span>
+            </label>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="login-submit-btn" id="login-btn">
+            <span id="login-btn-text" data-i18n="auth.loginBtn">Login</span>
+          </button>
+
+        </form>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Core Scripts -->
+  <script src="js/i18n.js"></script>
+  <script src="js/mock-data.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/app.js"></script>
+  
+  <!-- Inline Page Script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Initialize MockDB & i18n
+      MockDB.init();
+      I18N.currentLang = I18N.getLanguage();
+      I18N.applyTranslations();
+
+      // Update lang buttons state
+      updateLangButtons();
+
+      // 2. If already logged in, redirect to appropriate dashboard
+      const session = APP.getSession();
+      if (session && session.role) {
+        redirectToDashboard(session.role);
+        return;
+      }
+
+      // 3. Password visibility toggle
+      const pwdInput = document.getElementById('password');
+      const toggleBtn = document.getElementById('toggle-password');
+      if (toggleBtn && pwdInput) {
+        toggleBtn.addEventListener('click', () => {
+          const isPassword = pwdInput.type === 'password';
+          pwdInput.type = isPassword ? 'text' : 'password';
+          toggleBtn.innerHTML = isPassword 
+            ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'
+            : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+        });
+      }
+
+      // 4. Credential card click → auto-fill & highlight
+      const demoCards = document.querySelectorAll('[data-demo-role]');
+      function selectCard(role, email, pwd) {
+        document.getElementById('email').value = email;
+        document.getElementById('password').value = pwd;
+        document.getElementById('login-error').style.display = 'none';
+        demoCards.forEach(c => {
+          if (c.dataset.demoRole === role) {
+            c.classList.add('active-role');
+          } else {
+            c.classList.remove('active-role');
+          }
+        });
+      }
+
+      demoCards.forEach(card => {
+        card.addEventListener('click', () => {
+          selectCard(card.dataset.demoRole, card.dataset.email, card.dataset.pwd);
+        });
+        card.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            selectCard(card.dataset.demoRole, card.dataset.email, card.dataset.pwd);
+          }
+        });
+      });
+
+      // 5. Auto-fill from URL param ?role=farmer etc.
+      const urlRole = new URLSearchParams(window.location.search).get('role');
+      if (urlRole) {
+        const matchingCard = document.querySelector(`[data-demo-role="${urlRole.toLowerCase()}"]`);
+        if (matchingCard) {
+          selectCard(urlRole.toLowerCase(), matchingCard.dataset.email, matchingCard.dataset.pwd);
+        }
+      }
+
+      // 6. Form submit
+      const form = document.getElementById('login-form');
+      const errorEl = document.getElementById('login-error');
+      const btn = document.getElementById('login-btn');
+      const btnText = document.getElementById('login-btn-text');
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+
+        if (!email || !password) {
+          errorEl.textContent = t('auth.invalidCredentials') || 'Invalid email or password. Please try again.';
+          errorEl.style.display = 'block';
+          return;
+        }
+
+        // Show loading state
+        btn.disabled = true;
+        btnText.textContent = t('auth.loggingIn') || 'Logging in...';
+        errorEl.style.display = 'none';
+
+        // Simulate async (500ms delay)
+        setTimeout(() => {
+          const result = APP.login(email, password);
+          if (result && result.success) {
+            showToast(t('toast.login.success') || 'Login successful!', 'success');
+            setTimeout(() => redirectToDashboard(result.role || (result.user && result.user.role)), 500);
+          } else {
+            errorEl.textContent = t('auth.invalidCredentials') || 'Invalid email or password. Please try again.';
+            errorEl.style.display = 'block';
+            btn.disabled = false;
+            btnText.textContent = t('auth.loginBtn') || 'Login';
+          }
+        }, 500);
+      });
+
+      function redirectToDashboard(role) {
+        const routes = {
+          owner: 'owner/dashboard.html',
+          manager: 'manager/dashboard.html',
+          farmer: 'farmer/dashboard.html',
+          vendor: 'vendor/dashboard.html',
+          labour: 'labour/dashboard.html',
+        };
+        window.location.href = routes[role] || 'index.html';
+      }
+
+      // 7. Language Switcher
+      function updateLangButtons() {
+        document.querySelectorAll('[data-lang-btn]').forEach(btn => {
+          if (btn.dataset.langBtn === I18N.currentLang) {
+            btn.classList.add('active');
+          } else {
+            btn.classList.remove('active');
+          }
+        });
+      }
+
+      document.querySelectorAll('[data-lang-btn]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          I18N.setLanguage(btn.dataset.langBtn);
+          updateLangButtons();
+        });
+      });
+    });
+  </script>
+</body>
+</html>

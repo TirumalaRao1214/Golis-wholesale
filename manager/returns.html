@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Returns — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content">
+        <div class="page-header">
+          <h1 class="page-title">Returns &amp; Rejections</h1>
+          <div class="page-header-actions" id="tab-actions">
+            <button class="btn btn-primary" id="add-btn" onclick="openAddModal()">+ Add Return</button>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div style="display:flex;border-bottom:2px solid var(--color-border);margin-bottom:1.25rem;">
+          <button class="tab-btn active" id="tab-vendor" onclick="switchTab('vendor')"
+            style="padding:0.625rem 1.25rem;background:none;border:none;border-bottom:3px solid var(--color-primary);font-weight:600;cursor:pointer;color:var(--color-primary);font-size:0.9rem;">
+            🔄 Vendor Returns
+          </button>
+          <button class="tab-btn" id="tab-farmer" onclick="switchTab('farmer')"
+            style="padding:0.625rem 1.25rem;background:none;border:none;border-bottom:3px solid transparent;font-weight:500;cursor:pointer;color:var(--color-text-secondary);font-size:0.9rem;">
+            🌾 Farmer Rejections
+          </button>
+        </div>
+
+        <!-- Vendor Returns Tab -->
+        <div id="panel-vendor">
+          <div class="card">
+            <div class="card__body" style="padding:0;">
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Return ID</th>
+                      <th>Date</th>
+                      <th>Order</th>
+                      <th>Vendor</th>
+                      <th>Vegetable</th>
+                      <th>Delivered</th>
+                      <th>Returned</th>
+                      <th>Reason</th>
+                      <th>Adjustment</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="vendor-returns-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Farmer Rejections Tab -->
+        <div id="panel-farmer" style="display:none;">
+          <div class="card">
+            <div class="card__body" style="padding:0;">
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Rejection ID</th>
+                      <th>Date</th>
+                      <th>Farmer</th>
+                      <th>Vegetable</th>
+                      <th>Received Qty</th>
+                      <th>Rejected Qty</th>
+                      <th>Reason</th>
+                      <th>Adjustment</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="farmer-returns-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Add Vendor Return Modal -->
+  <div class="modal-overlay" id="modal-vendor-return">
+    <div class="modal modal--lg">
+      <div class="modal__header">
+        <h3 class="modal__title">Add Vendor Return</h3>
+        <button class="modal__close" onclick="Utils.closeModal('modal-vendor-return')">&times;</button>
+      </div>
+      <div class="modal__body">
+        <form id="vendor-return-form">
+          <div class="form-grid form-grid--2">
+            <div class="form-group">
+              <label class="form-label">Order <span class="required">*</span></label>
+              <select class="form-select" id="vr-order" required onchange="onVrOrderSelect()">
+                <option value="">Select Delivered Order</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Vegetable <span class="required">*</span></label>
+              <select class="form-select" id="vr-veg" required>
+                <option value="">Select Vegetable</option>
+              </select>
+            </div>
+          </div>
+          <div id="vr-vendor-info" style="display:none;padding:0.75rem;background:var(--color-bg);border-radius:6px;margin-bottom:1rem;font-size:0.875rem;"></div>
+          <div class="form-grid form-grid--2">
+            <div class="form-group">
+              <label class="form-label">Delivered Qty (kg) <span class="required">*</span></label>
+              <input type="number" class="form-input" id="vr-delivered" placeholder="0" min="1" required oninput="calcReturnAdjustment('vendor')">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Returned Qty (kg) <span class="required">*</span></label>
+              <input type="number" class="form-input" id="vr-returned" placeholder="0" min="1" required oninput="calcReturnAdjustment('vendor')">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Accepted Qty (kg)</label>
+              <input type="number" class="form-input" id="vr-accepted" placeholder="0" min="0" oninput="calcReturnAdjustment('vendor')">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Sell Rate (₹/kg)</label>
+              <input type="number" class="form-input" id="vr-rate" placeholder="0" min="0" step="0.5" oninput="calcReturnAdjustment('vendor')">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Reason <span class="required">*</span></label>
+            <select class="form-select" id="vr-reason" required>
+              <option value="Damaged in transit">Damaged in Transit</option>
+              <option value="Poor Quality">Poor Quality</option>
+              <option value="Rotten">Rotten / Spoilt</option>
+              <option value="Wrong Item">Wrong Item Delivered</option>
+              <option value="Quantity Difference">Quantity Difference</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <!-- Adjustment Preview -->
+          <div id="vr-adjustment-preview" style="padding:0.875rem;background:#fff3cd;border:1px solid #ffc107;border-radius:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:0.875rem;font-weight:500;">Adjustment Amount</span>
+              <strong id="vr-adj-amount" style="font-size:1.125rem;color:var(--color-danger);">₹0</strong>
+            </div>
+            <div style="font-size:0.75rem;color:var(--color-text-secondary);margin-top:0.25rem;" id="vr-adj-formula">Will be deducted from vendor balance.</div>
+          </div>
+          <div class="form-group" style="margin-top:1rem;">
+            <label class="form-label">Date</label>
+            <input type="date" class="form-input" id="vr-date">
+          </div>
+        </form>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn-ghost" onclick="Utils.closeModal('modal-vendor-return')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveVendorReturn()">Save Return</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Farmer Rejection Modal -->
+  <div class="modal-overlay" id="modal-farmer-return">
+    <div class="modal modal--lg">
+      <div class="modal__header">
+        <h3 class="modal__title">Add Farmer Rejection</h3>
+        <button class="modal__close" onclick="Utils.closeModal('modal-farmer-return')">&times;</button>
+      </div>
+      <div class="modal__body">
+        <form id="farmer-return-form">
+          <div class="form-grid form-grid--2">
+            <div class="form-group">
+              <label class="form-label">Farmer <span class="required">*</span></label>
+              <select class="form-select" id="fr-farmer" required>
+                <option value="">Select Farmer</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Vegetable <span class="required">*</span></label>
+              <select class="form-select" id="fr-veg" required>
+                <option value="">Select Vegetable</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid form-grid--2">
+            <div class="form-group">
+              <label class="form-label">Received Qty (kg) <span class="required">*</span></label>
+              <input type="number" class="form-input" id="fr-received" placeholder="0" min="1" required oninput="calcReturnAdjustment('farmer')">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Rejected Qty (kg) <span class="required">*</span></label>
+              <input type="number" class="form-input" id="fr-rejected" placeholder="0" min="1" required oninput="calcReturnAdjustment('farmer')">
+            </div>
+          </div>
+          <div class="form-grid form-grid--2">
+            <div class="form-group">
+              <label class="form-label">Buy Rate (₹/kg)</label>
+              <input type="number" class="form-input" id="fr-rate" placeholder="0" min="0" step="0.5" oninput="calcReturnAdjustment('farmer')">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Date</label>
+              <input type="date" class="form-input" id="fr-date">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Reason</label>
+            <select class="form-select" id="fr-reason">
+              <option value="Quality below standard">Quality Below Standard</option>
+              <option value="Rotten / Spoilt">Rotten / Spoilt</option>
+              <option value="Wrong Vegetable">Wrong Vegetable</option>
+              <option value="Weight Shortage">Weight Shortage</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Notes</label>
+            <textarea class="form-textarea" id="fr-notes" rows="2"></textarea>
+          </div>
+          <!-- Adjustment Preview -->
+          <div style="padding:0.875rem;background:#fff3cd;border:1px solid #ffc107;border-radius:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:0.875rem;font-weight:500;">Adjustment (Deduction from Farmer Payment)</span>
+              <strong id="fr-adj-amount" style="font-size:1.125rem;color:var(--color-danger);">₹0</strong>
+            </div>
+            <div style="font-size:0.75rem;color:var(--color-text-secondary);margin-top:0.25rem;" id="fr-adj-formula">Rejected Qty × Buy Rate = Deduction</div>
+          </div>
+        </form>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn-ghost" onclick="Utils.closeModal('modal-farmer-return')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveFarmerReturn()">Save Rejection</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    let _returns  = [];
+    let _curTab   = 'vendor';
+
+    function switchTab(tab) {
+      _curTab = tab;
+      document.getElementById('panel-vendor').style.display = tab === 'vendor' ? '' : 'none';
+      document.getElementById('panel-farmer').style.display = tab === 'farmer' ? '' : 'none';
+      document.getElementById('tab-vendor').style.borderBottomColor = tab === 'vendor' ? 'var(--color-primary)' : 'transparent';
+      document.getElementById('tab-farmer').style.borderBottomColor = tab === 'farmer' ? 'var(--color-primary)' : 'transparent';
+      document.getElementById('tab-vendor').style.color = tab === 'vendor' ? 'var(--color-primary)' : 'var(--color-text-secondary)';
+      document.getElementById('tab-farmer').style.color = tab === 'farmer' ? 'var(--color-primary)' : 'var(--color-text-secondary)';
+      document.getElementById('tab-vendor').style.fontWeight = tab === 'vendor' ? '600' : '500';
+      document.getElementById('tab-farmer').style.fontWeight = tab === 'farmer' ? '600' : '500';
+    }
+
+    function openAddModal() {
+      if (_curTab === 'vendor') Utils.openModal('modal-vendor-return');
+      else                      Utils.openModal('modal-farmer-return');
+    }
+
+    function onVrOrderSelect() {
+      const orderId = document.getElementById('vr-order').value;
+      const info    = document.getElementById('vr-vendor-info');
+      if (!orderId) { info.style.display = 'none'; return; }
+      const order  = MockDB.getOrderById(orderId);
+      const vendor = order ? MockDB.getVendorById(order.vendorId) : null;
+      info.innerHTML = `<strong>${vendor ? vendor.businessName : ''}</strong> | ${vendor ? vendor.city : ''} | Order Total: ${Utils.formatCurrency(order ? order.total : 0)}`;
+      info.style.display = '';
+    }
+
+    function calcReturnAdjustment(type) {
+      if (type === 'vendor') {
+        const returned = Number(document.getElementById('vr-returned').value) || 0;
+        const rate     = Number(document.getElementById('vr-rate').value) || 0;
+        const adj      = returned * rate;
+        document.getElementById('vr-adj-amount').textContent = Utils.formatCurrency(adj);
+        document.getElementById('vr-adj-formula').textContent = `${returned} kg × ₹${rate}/kg = ${Utils.formatCurrency(adj)} deducted from vendor balance`;
+      } else {
+        const rejected = Number(document.getElementById('fr-rejected').value) || 0;
+        const rate     = Number(document.getElementById('fr-rate').value) || 0;
+        const adj      = rejected * rate;
+        document.getElementById('fr-adj-amount').textContent = Utils.formatCurrency(adj);
+        document.getElementById('fr-adj-formula').textContent = `${rejected} kg × ₹${rate}/kg = ${Utils.formatCurrency(adj)} deducted from farmer payment`;
+      }
+    }
+
+    function saveVendorReturn() {
+      const orderId   = document.getElementById('vr-order').value;
+      const vegId     = document.getElementById('vr-veg').value;
+      const delivered = Number(document.getElementById('vr-delivered').value) || 0;
+      const returned  = Number(document.getElementById('vr-returned').value)  || 0;
+      const rate      = Number(document.getElementById('vr-rate').value)      || 0;
+      if (!orderId || !vegId || !delivered || !returned) {
+        Utils.showToast('Please fill all required fields.', 'error'); return;
+      }
+      const order = MockDB.getOrderById(orderId);
+      const record = {
+        id: Utils.generateId('RET'),
+        type: 'vendor',
+        partyId: order ? order.vendorId : '',
+        orderId,
+        vegId,
+        grade: 'A',
+        qty: returned,
+        reason: document.getElementById('vr-reason').value,
+        date: document.getElementById('vr-date').value || new Date().toISOString().split('T')[0],
+        status: 'processed',
+        creditNote: returned * rate,
+        deliveredQty: delivered,
+        acceptedQty: Number(document.getElementById('vr-accepted').value) || 0,
+      };
+      MockDB.saveRecord('_returns', record);
+      _returns = MockDB.getReturns();
+      Utils.closeModal('modal-vendor-return');
+      Utils.showToast(`Vendor return recorded. Credit note: ${Utils.formatCurrency(record.creditNote)}`, 'success');
+      renderTables();
+    }
+
+    function saveFarmerReturn() {
+      const farmerId = document.getElementById('fr-farmer').value;
+      const vegId    = document.getElementById('fr-veg').value;
+      const received = Number(document.getElementById('fr-received').value)  || 0;
+      const rejected = Number(document.getElementById('fr-rejected').value)  || 0;
+      const rate     = Number(document.getElementById('fr-rate').value)      || 0;
+      if (!farmerId || !vegId || !received || !rejected) {
+        Utils.showToast('Please fill all required fields.', 'error'); return;
+      }
+      const record = {
+        id: Utils.generateId('RET'),
+        type: 'farmer',
+        partyId: farmerId,
+        purchaseId: '',
+        vegId,
+        grade: 'A',
+        qty: rejected,
+        reason: document.getElementById('fr-reason').value,
+        date: document.getElementById('fr-date').value || new Date().toISOString().split('T')[0],
+        status: 'processed',
+        debitNote: rejected * rate,
+        receivedQty: received,
+        notes: document.getElementById('fr-notes').value,
+      };
+      MockDB.saveRecord('_returns', record);
+      _returns = MockDB.getReturns();
+      Utils.closeModal('modal-farmer-return');
+      Utils.showToast(`Farmer rejection recorded. Debit note: ${Utils.formatCurrency(record.debitNote)}`, 'warning');
+      renderTables();
+    }
+
+    function renderTables() {
+      // Vendor Returns
+      const vendorReturns = _returns.filter(r => r.type === 'vendor');
+      document.getElementById('vendor-returns-tbody').innerHTML = vendorReturns.length === 0
+        ? '<tr><td colspan="10" class="empty-row">No vendor returns recorded yet.</td></tr>'
+        : vendorReturns.map(r => {
+            const vendor = MockDB.getVendorById(r.partyId);
+            const veg    = MockDB.getVegetableById(r.vegId);
+            return `<tr>
+              <td><code>${r.id}</code></td>
+              <td>${Utils.formatDate(r.date)}</td>
+              <td><code>${r.orderId || '—'}</code></td>
+              <td>${vendor ? vendor.businessName : r.partyId}</td>
+              <td>${veg ? veg.nameEn : r.vegId}</td>
+              <td>${r.deliveredQty || '—'} kg</td>
+              <td class="text-danger">${r.qty} kg</td>
+              <td>${r.reason}</td>
+              <td class="text-danger">-${Utils.formatCurrency(r.creditNote || 0)}</td>
+              <td>${Utils.statusBadge(r.status)}</td>
+            </tr>`;
+          }).join('');
+
+      // Farmer Rejections
+      const farmerReturns = _returns.filter(r => r.type === 'farmer');
+      document.getElementById('farmer-returns-tbody').innerHTML = farmerReturns.length === 0
+        ? '<tr><td colspan="9" class="empty-row">No farmer rejections recorded yet.</td></tr>'
+        : farmerReturns.map(r => {
+            const farmer = MockDB.getFarmerById(r.partyId);
+            const veg    = MockDB.getVegetableById(r.vegId);
+            return `<tr>
+              <td><code>${r.id}</code></td>
+              <td>${Utils.formatDate(r.date)}</td>
+              <td>${farmer ? farmer.name : r.partyId}</td>
+              <td>${veg ? veg.nameEn : r.vegId}</td>
+              <td>${r.receivedQty || '—'} kg</td>
+              <td class="text-danger">${r.qty} kg</td>
+              <td>${r.reason}</td>
+              <td class="text-danger">-${Utils.formatCurrency(r.debitNote || 0)}</td>
+              <td>${Utils.statusBadge(r.status)}</td>
+            </tr>`;
+          }).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('manager');
+      _returns = MockDB.getReturns();
+
+      // Populate vendor return — orders dropdown (delivered)
+      MockDB.getOrders()
+        .filter(o => ['delivered','dispatched','inTransit'].includes(o.status))
+        .forEach(o => {
+          const vendor = MockDB.getVendorById(o.vendorId);
+          document.getElementById('vr-order').add(new Option(`${o.id} — ${vendor ? vendor.businessName : ''}`, o.id));
+        });
+
+      // Populate vegetables in both modals
+      MockDB.getVegetables().forEach(v => {
+        document.getElementById('vr-veg').add(new Option(v.nameEn, v.id));
+        document.getElementById('fr-veg').add(new Option(v.nameEn, v.id));
+      });
+
+      // Populate farmers
+      MockDB.getFarmers().forEach(f => {
+        document.getElementById('fr-farmer').add(new Option(f.name, f.id));
+      });
+
+      // Set default dates
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('vr-date').value  = today;
+      document.getElementById('fr-date').value  = today;
+
+      renderTables();
+    });
+  </script>
+</body>
+</html>

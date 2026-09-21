@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Ledger — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content">
+        <div class="page-header">
+          <h1 class="page-title">My Ledger</h1>
+          <div class="page-header-actions">
+            <button class="btn btn-secondary" onclick="exportCSV()">⬇ Export CSV</button>
+          </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">
+          <div class="stat-card stat-card--success">
+            <div class="stat-card__icon">🌾</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="kpi-supply-value">—</div>
+              <div class="stat-card__label">Total Supply Value</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--success">
+            <div class="stat-card__icon">✅</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="kpi-received">—</div>
+              <div class="stat-card__label">Total Received</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--warning">
+            <div class="stat-card__icon">⏳</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="kpi-balance">—</div>
+              <div class="stat-card__label">Balance Payable</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Date Range Filter -->
+        <div class="card" style="margin-top:1.25rem;">
+          <div class="card__body">
+            <div style="display:flex;gap:1rem;align-items:flex-end;flex-wrap:wrap;">
+              <div class="form-group" style="margin:0;">
+                <label class="form-label">From Date</label>
+                <input type="date" class="form-input" id="filter-from">
+              </div>
+              <div class="form-group" style="margin:0;">
+                <label class="form-label">To Date</label>
+                <input type="date" class="form-input" id="filter-to">
+              </div>
+              <button class="btn btn-secondary" onclick="applyFilter()">Apply Filter</button>
+              <button class="btn btn-ghost" onclick="clearFilter()">Clear</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ledger Table -->
+        <div class="card" style="margin-top:1.25rem;">
+          <div class="card__header">
+            <h3 class="card__title">📒 Ledger Entries</h3>
+            <span class="badge badge--info" id="entry-count">0 entries</span>
+          </div>
+          <div class="card__body" style="padding:0;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Description</th>
+                  <th class="text-right" style="color:var(--color-success);">Credit (Supply Value)</th>
+                  <th class="text-right" style="color:var(--color-warning);">Debit (Payment Rcvd)</th>
+                  <th class="text-right">Balance</th>
+                </tr>
+              </thead>
+              <tbody id="ledger-tbody">
+                <tr><td colspan="5" class="text-center text-muted">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    let allEntries = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('farmer');
+      const farmerId = APP.user.refId;
+
+      // Load ledger entries for this farmer
+      allEntries = MockDB.getLedgerEntries(farmerId);
+      allEntries.sort((a, b) => a.date.localeCompare(b.date));
+
+      // Build running balance from entries
+      let runningBalance = 0;
+      allEntries = allEntries.map(e => {
+        // Farmer ledger: credit = money owed to farmer (supply), debit = payment received
+        runningBalance += (e.credit - e.debit);
+        return { ...e, runningBalance };
+      });
+
+      const totalCredit = allEntries.reduce((s, e) => s + e.credit, 0);
+      const totalDebit  = allEntries.reduce((s, e) => s + e.debit, 0);
+
+      document.getElementById('kpi-supply-value').textContent = Utils.formatCurrency(totalCredit);
+      document.getElementById('kpi-received').textContent     = Utils.formatCurrency(totalDebit);
+      document.getElementById('kpi-balance').textContent      = Utils.formatCurrency(Math.max(0, totalCredit - totalDebit));
+
+      renderTable(allEntries);
+    });
+
+    function renderTable(data) {
+      document.getElementById('entry-count').textContent = data.length + ' entries';
+      const tbody = document.getElementById('ledger-tbody');
+      if (!data.length) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No ledger entries found</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.map(e => {
+        const isCredit = e.credit > 0;
+        const rowStyle = isCredit ? 'background:#f0fdf4;' : 'background:#fffbeb;';
+        return `<tr style="${rowStyle}">
+          <td>${Utils.formatDate(e.date)}</td>
+          <td>${e.description}</td>
+          <td class="text-right" style="font-weight:600;color:var(--color-success);">${e.credit > 0 ? Utils.formatCurrency(e.credit) : '—'}</td>
+          <td class="text-right" style="font-weight:600;color:var(--color-warning);">${e.debit > 0 ? Utils.formatCurrency(e.debit) : '—'}</td>
+          <td class="text-right" style="font-weight:700;">${Utils.formatCurrency(e.runningBalance)}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    function applyFilter() {
+      const from = document.getElementById('filter-from').value;
+      const to   = document.getElementById('filter-to').value;
+      let filtered = [...allEntries];
+      if (from) filtered = filtered.filter(e => e.date >= from);
+      if (to)   filtered = filtered.filter(e => e.date <= to);
+      renderTable(filtered);
+    }
+
+    function clearFilter() {
+      document.getElementById('filter-from').value = '';
+      document.getElementById('filter-to').value   = '';
+      renderTable(allEntries);
+    }
+
+    function exportCSV() {
+      const headers = ['Date', 'Description', 'Credit', 'Debit', 'Balance'];
+      const rows = allEntries.map(e => [
+        e.date, `"${e.description}"`, e.credit, e.debit, e.runningBalance
+      ]);
+      const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+      const blob = new Blob([csv], { type:'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `golis_farmer_ledger_${APP.user.refId}.csv`;
+      a.click();
+      Utils.showToast('Ledger exported to CSV', 'success');
+    }
+  </script>
+</body>
+</html>

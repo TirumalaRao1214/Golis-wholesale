@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expense Management — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content">
+        <div class="page-header">
+          <h1 class="page-title" data-i18n="page.expenses"></h1>
+          <div class="page-header-actions">
+            <button class="btn btn-primary" onclick="Utils.openModal('modal-expense')">+ Add Expense</button>
+          </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="stats-grid stats-grid--3" style="margin-bottom:1rem;">
+          <div class="stat-card stat-card--warning">
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="exp-today">—</div>
+              <div class="stat-card__label">Today</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--warning">
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="exp-week">—</div>
+              <div class="stat-card__label">This Week</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--warning">
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="exp-month">—</div>
+              <div class="stat-card__label">This Month</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts + Table Row -->
+        <div style="display:grid;grid-template-columns:280px 1fr;gap:1.25rem;">
+          <div class="card">
+            <div class="card__header">
+              <h3 class="card__title" data-i18n="dash.owner.expenseBreakdown"></h3>
+            </div>
+            <div class="card__body">
+              <div class="chart-container" style="height:240px;"><canvas id="expense-chart"></canvas></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card__header">
+              <h3 class="card__title">Expense Records</h3>
+              <div style="display:flex;gap:0.5rem;">
+                <select class="form-select form-select--sm" id="exp-filter-cat" onchange="renderExpenses()">
+                  <option value="">All Categories</option>
+                  <option>Transport</option><option>Labour</option><option>Electricity</option>
+                  <option>Rent</option><option>Packing Materials</option><option>Vehicle Maintenance</option>
+                  <option>Miscellaneous</option>
+                </select>
+                <input type="date" class="form-input form-input--sm" id="exp-filter-from" onchange="renderExpenses()">
+                <input type="date" class="form-input form-input--sm" id="exp-filter-to" onchange="renderExpenses()">
+              </div>
+            </div>
+            <div class="card__body" style="padding:0;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th data-i18n="col.date"></th>
+                    <th data-i18n="col.category"></th>
+                    <th data-i18n="col.amount"></th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody id="expenses-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Add Expense Modal -->
+  <div class="modal-overlay" id="modal-expense">
+    <div class="modal">
+      <div class="modal__header">
+        <h3 class="modal__title">Add Expense</h3>
+        <button class="modal__close" onclick="Utils.closeModal('modal-expense')">&times;</button>
+      </div>
+      <div class="modal__body">
+        <form id="expense-form">
+          <div class="form-grid form-grid--2">
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.expenseCategory"></label>
+              <select class="form-select" id="ex-cat">
+                <option>Transport</option><option>Labour</option><option>Electricity</option>
+                <option>Rent</option><option>Packing Materials</option><option>Vehicle Maintenance</option>
+                <option>Miscellaneous</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.expenseAmount"></label>
+              <input type="number" class="form-input" id="ex-amount" placeholder="Amount (₹)" min="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.expenseDate"></label>
+              <input type="date" class="form-input" id="ex-date">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Description</label>
+              <input type="text" class="form-input" id="ex-desc" placeholder="Brief description">
+            </div>
+            <div class="form-group form-group--full">
+              <label class="form-label" data-i18n="field.expenseNotes"></label>
+              <textarea class="form-textarea" id="ex-notes" rows="2"></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn-ghost" onclick="Utils.closeModal('modal-expense')" data-i18n="common.cancel"></button>
+        <button class="btn btn-primary" onclick="saveExpense()">Save Expense</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    let _expenses = [];
+
+    function renderExpenses() {
+      const cat = document.getElementById('exp-filter-cat').value;
+      const from = document.getElementById('exp-filter-from').value;
+      const to = document.getElementById('exp-filter-to').value;
+      const data = _expenses.filter(e => {
+        if (cat && e.category !== cat) return false;
+        if (from && e.date < from) return false;
+        if (to && e.date > to) return false;
+        return true;
+      }).sort((a, b) => b.date.localeCompare(a.date));
+
+      document.getElementById('expenses-tbody').innerHTML = data.map(e => `
+        <tr>
+          <td>${Utils.formatDate(e.date)}</td>
+          <td><span class="badge badge--warning">${e.category}</span></td>
+          <td><strong>${Utils.formatCurrency(e.amount)}</strong></td>
+          <td class="text-muted">${e.notes || '—'}</td>
+        </tr>
+      `).join('') || '<tr><td colspan="4" class="empty-state" data-i18n="empty.expenses">No expenses recorded</td></tr>';
+
+      updateSummaryCards();
+      Charts.renderExpenseBreakdown('expense-chart');
+    }
+
+    function updateSummaryCards() {
+      const today = new Date().toISOString().split('T')[0];
+      const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
+      const weekStr = weekAgo.toISOString().split('T')[0];
+      const monthStr = today.substring(0, 7);
+      document.getElementById('exp-today').textContent = Utils.formatCurrency(_expenses.filter(e => e.date === today).reduce((s,e)=>s+e.amount,0));
+      document.getElementById('exp-week').textContent = Utils.formatCurrency(_expenses.filter(e => e.date >= weekStr).reduce((s,e)=>s+e.amount,0));
+      document.getElementById('exp-month').textContent = Utils.formatCurrency(_expenses.filter(e => e.date.startsWith(monthStr)).reduce((s,e)=>s+e.amount,0));
+    }
+
+    function saveExpense() {
+      const amount = Number(document.getElementById('ex-amount').value);
+      if (!amount) { Utils.showToast('Amount is required.', 'error'); return; }
+      const record = {
+        id: Utils.generateId('EXP'),
+        category: document.getElementById('ex-cat').value,
+        amount,
+        date: document.getElementById('ex-date').value || new Date().toISOString().split('T')[0],
+        notes: document.getElementById('ex-desc').value.trim() + (document.getElementById('ex-notes').value.trim() ? ' — ' + document.getElementById('ex-notes').value.trim() : ''),
+      };
+      MockDB.saveRecord('_expenses', record);
+      _expenses = MockDB.getExpenses();
+      Utils.closeModal('modal-expense');
+      Utils.showToast(t('toast.expense.saved'), 'success');
+      renderExpenses();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('owner');
+      _expenses = MockDB.getExpenses();
+      document.getElementById('ex-date').value = new Date().toISOString().split('T')[0];
+      renderExpenses();
+    });
+  </script>
+</body>
+</html>

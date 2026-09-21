@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GOLIS Wholesale — B2B Vegetable Trading Platform</title>
+  <meta name="description" content="GOLIS Wholesale — Connecting farmers directly with wholesale buyers through a smarter vegetable trading platform. Guntur, Andhra Pradesh.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/public.css">
+</head>
+<body class="public-page">
+
+  <!-- ═══════════════════════════════════════════════
+       DEMO WARNING BANNER
+  ═══════════════════════════════════════════════ -->
+  <div class="public-demo-banner" role="alert" aria-live="polite">
+    <span class="demo-banner__en">⚠ DEMO APPLICATION — SAMPLE DATA — For demonstration purposes only</span>
+    <span class="demo-banner__sep"> &nbsp;|&nbsp; </span>
+    <span class="demo-banner__te">⚠ డెమో అప్లికేషన్ — నమూనా డేటా — కేవలం ప్రదర్శన కోసం మాత్రమే</span>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       TOP NAVIGATION
+  ═══════════════════════════════════════════════ -->
+  <header class="public-nav" role="banner">
+    <div class="public-nav__inner">
+
+      <!-- Logo -->
+      <a href="index.html" class="public-nav__logo" aria-label="GOLIS Wholesale — Home">
+        <div class="public-nav__logo-mark" aria-hidden="true">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Leaf icon">
+            <circle cx="16" cy="16" r="16" fill="#2d6a4f"/>
+            <path d="M16 6C16 6 8 10 8 18C8 22.4 11.6 26 16 26C16 26 16 18 22 12C19.5 9.5 16 6 16 6Z" fill="#52b788"/>
+            <path d="M16 26C16 26 16 18 22 12" stroke="#d8f3dc" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M16 20C16 20 12 17 11 14" stroke="#d8f3dc" stroke-width="1" stroke-linecap="round" opacity="0.7"/>
+          </svg>
+        </div>
+        <div class="public-nav__brand">
+          <span data-i18n="app.name">GOLIS Wholesale</span>
+        </div>
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <nav class="public-nav__links" aria-label="Main navigation">
+        <a href="#home"     class="public-nav__link" data-i18n="pub.nav.home">Home</a>
+        <a href="#about"    class="public-nav__link" data-i18n="pub.nav.about">About</a>
+        <a href="#how"      class="public-nav__link" data-i18n="pub.nav.how">How It Works</a>
+        <a href="#farmers"  class="public-nav__link" data-i18n="pub.nav.farmers">Farmers</a>
+        <a href="#buyers"   class="public-nav__link" data-i18n="pub.nav.buyers">Wholesale Buyers</a>
+        <a href="#vegetables" class="public-nav__link" data-i18n="pub.nav.vegetables">Vegetables</a>
+        <a href="#contact"  class="public-nav__link" data-i18n="pub.nav.contact">Contact</a>
+      </nav>
+
+      <!-- Actions: Language + Login -->
+      <div class="public-nav__actions">
+        <!-- Language switcher -->
+        <div class="lang-switcher" role="group" aria-label="Language selector">
+          <button class="lang-btn lang-btn--active" data-lang-btn="en" aria-pressed="true" aria-label="Switch to English">EN</button>
+          <span class="lang-sep" aria-hidden="true">|</span>
+          <button class="lang-btn" data-lang-btn="te" aria-pressed="false" aria-label="తెలుగుకు మారండి">తెలుగు</button>
+        </div>
+
+        <!-- Login dropdown -->
+        <div class="login-dropdown" role="navigation" aria-label="Login options">
+          <button class="btn btn-primary btn-sm login-dropdown__trigger" aria-haspopup="true" aria-expanded="false" aria-controls="login-menu">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+            <span data-i18n="pub.login">Login</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <ul class="login-dropdown__menu" id="login-menu" role="menu" aria-label="Login options">
+            <li role="menuitem"><a href="login.html?role=farmer" class="login-dropdown__item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <span data-i18n="pub.login.farmer">Farmer Login</span>
+            </a></li>
+            <li role="menuitem"><a href="login.html?role=vendor" class="login-dropdown__item">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+              <span data-i18n="pub.login.vendor">Vendor Login</span>
+            </a></li>
+            <li class="login-dropdown__divider" role="separator"></li>
+            <li role="menuitem"><a href="login.html" class="login-dropdown__item login-dropdown__item--muted">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+              <span data-i18n="pub.login.all">All Logins</span>
+            </a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Mobile Hamburger -->
+      <button class="public-nav__hamburger" id="hamburger-btn" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-nav">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <!-- Mobile Drawer -->
+    <nav class="public-nav__mobile" id="mobile-nav" aria-label="Mobile navigation" aria-hidden="true">
+      <a href="#home"       class="public-nav__link" data-i18n="pub.nav.home">Home</a>
+      <a href="#about"      class="public-nav__link" data-i18n="pub.nav.about">About</a>
+      <a href="#how"        class="public-nav__link" data-i18n="pub.nav.how">How It Works</a>
+      <a href="#farmers"    class="public-nav__link" data-i18n="pub.nav.farmers">Farmers</a>
+      <a href="#buyers"     class="public-nav__link" data-i18n="pub.nav.buyers">Wholesale Buyers</a>
+      <a href="#vegetables" class="public-nav__link" data-i18n="pub.nav.vegetables">Vegetables</a>
+      <a href="#contact"    class="public-nav__link" data-i18n="pub.nav.contact">Contact</a>
+      <div class="public-nav__mobile-divider"></div>
+      <div class="lang-switcher lang-switcher--mobile" role="group" aria-label="Language selector">
+        <button class="lang-btn lang-btn--active" data-lang-btn="en" aria-pressed="true">EN</button>
+        <span class="lang-sep" aria-hidden="true">|</span>
+        <button class="lang-btn" data-lang-btn="te" aria-pressed="false">తెలుగు</button>
+      </div>
+      <div class="mobile-login-links">
+        <a href="login.html?role=farmer" class="btn btn-primary btn-sm" data-i18n="pub.login.farmer">Farmer Login</a>
+        <a href="login.html?role=vendor" class="btn btn-accent btn-sm" data-i18n="pub.login.vendor">Vendor Login</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main-content">
+
+    <!-- ═══════════════════════════════════════════════
+         HERO SECTION
+    ═══════════════════════════════════════════════ -->
+    <section class="hero-section" id="home" aria-labelledby="hero-title">
+      <div class="hero-inner">
+        <div class="hero-content">
+          <div class="hero-eyebrow" data-i18n="pub.hero.eyebrow">B2B Wholesale Vegetable Trading Platform</div>
+          <h1 class="hero-title" id="hero-title">
+            <span data-i18n="hero.title">From Farm to</span>
+            <span class="highlight" data-i18n="pub.hero.highlight"> Wholesale Market</span>
+          </h1>
+          <div class="hero-subtitle-te">రైతు నుంచి హోల్‌సేల్ మార్కెట్ వరకు</div>
+          <p class="hero-subtitle" data-i18n="pub.hero.desc">Connecting farmers directly with wholesale buyers through a smarter vegetable trading platform. Guntur, Andhra Pradesh.</p>
+          <div class="hero-ctas">
+            <a href="login.html?role=farmer" class="hero-btn-primary" data-i18n="pub.cta.farmer">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              Farmer Login
+            </a>
+            <a href="login.html?role=vendor" class="hero-btn-accent" data-i18n="pub.cta.vendor">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+              Vendor Login
+            </a>
+            <a href="#how" class="hero-btn-outline" data-i18n="pub.cta.explore">
+              Explore Platform
+            </a>
+          </div>
+          <!-- Hero Stats -->
+          <div class="hero-stats" role="list" aria-label="Platform statistics">
+            <div class="hero-stat" role="listitem">
+              <span class="hero-stat__value">500+</span>
+              <span class="hero-stat__label" data-i18n="pub.stat.farmers">Farmers</span>
+            </div>
+            <div class="hero-stat__divider" aria-hidden="true">|</div>
+            <div class="hero-stat" role="listitem">
+              <span class="hero-stat__value">200+</span>
+              <span class="hero-stat__label" data-i18n="pub.stat.vendors">Vendors</span>
+            </div>
+            <div class="hero-stat__divider" aria-hidden="true">|</div>
+            <div class="hero-stat" role="listitem">
+              <span class="hero-stat__value">15+</span>
+              <span class="hero-stat__label" data-i18n="pub.stat.vegetables">Vegetables</span>
+            </div>
+            <div class="hero-stat__divider" aria-hidden="true">|</div>
+            <div class="hero-stat" role="listitem">
+              <span class="hero-stat__value">₹50L+</span>
+              <span class="hero-stat__label" data-i18n="pub.stat.trading">Daily Trading</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hero Visual: CSS supply chain card -->
+        <div class="hero-visual" aria-hidden="true">
+          <div class="hero-card">
+            <div class="hero-card__title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              Live Market Prices — Demo
+            </div>
+            <div class="hero-price-row">
+              <span class="hero-price-row__veg">🍅 Tomato</span>
+              <span class="hero-price-row__price">₹38/kg</span>
+              <span class="hero-price-row__change up">↑ 8.6%</span>
+            </div>
+            <div class="hero-price-row">
+              <span class="hero-price-row__veg">🧅 Onion</span>
+              <span class="hero-price-row__price">₹44/kg</span>
+              <span class="hero-price-row__change neutral">→ 0%</span>
+            </div>
+            <div class="hero-price-row">
+              <span class="hero-price-row__veg">🥔 Potato</span>
+              <span class="hero-price-row__price">₹32/kg</span>
+              <span class="hero-price-row__change up">↑ 6.7%</span>
+            </div>
+            <div class="hero-price-row">
+              <span class="hero-price-row__veg">🍆 Brinjal</span>
+              <span class="hero-price-row__price">₹26/kg</span>
+              <span class="hero-price-row__change down">↓ 7.1%</span>
+            </div>
+            <div class="hero-price-row">
+              <span class="hero-price-row__veg">🌶️ Green Chilli</span>
+              <span class="hero-price-row__price">₹56/kg</span>
+              <span class="hero-price-row__change down">↓ 6.7%</span>
+            </div>
+          </div>
+          <!-- Supply chain decoration -->
+          <div class="hero-chain" aria-hidden="true">
+            <div class="hero-chain__node">🚜</div>
+            <div class="hero-chain__arrow">→</div>
+            <div class="hero-chain__node">⚖️</div>
+            <div class="hero-chain__arrow">→</div>
+            <div class="hero-chain__node">🏪</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════
+         TODAY'S WHOLESALE MARKET PRICES
+    ═══════════════════════════════════════════════ -->
+    <section class="section section-alt" id="prices" aria-labelledby="prices-title">
+      <div class="section-inner">
+        <div class="section-header">
+          <div class="section-eyebrow" data-i18n="pub.prices.eyebrow">Demo Sample Data</div>
+          <h2 class="section-title" id="prices-title" data-i18n="pub.prices.title">Today's Wholesale Prices</h2>
+          <p class="section-subtitle" data-i18n="pub.prices.subtitle">Reference prices for wholesale buyers. Contact GOLIS for actual rates.</p>
+          <div class="demo-badge" role="note" aria-label="Demo data notice">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span data-i18n="pub.prices.demo">Demo / Sample Prices — Not Live Market Data</span>
+          </div>
+        </div>
+        <div class="price-board" id="price-board" role="list" aria-label="Vegetable wholesale prices">
+          <!-- Rendered by renderPriceCards() -->
+        </div>
+        <div class="price-board-note">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span data-i18n="pub.prices.updated">Prices updated: Today, 6:00 AM</span>
+          &nbsp;·&nbsp;
+          <a href="login.html?role=vendor" class="price-board-note__link" data-i18n="pub.prices.viewAll">View Full Price List →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════
+         HOW IT WORKS
+    ═══════════════════════════════════════════════ -->
+    <section class="section" id="how" aria-labelledby="how-title">
+      <div class="section-inner">
+        <div class="section-header">
+          <div class="section-eyebrow" data-i18n="pub.how.eyebrow">Supply Chain</div>
+          <h2 class="section-title" id="how-title" data-i18n="pub.how.title">How It Works</h2>
+          <p class="section-subtitle" data-i18n="pub.how.subtitle">From farm arrival to vendor delivery — every step tracked and transparent.</p>
+        </div>
+        <ol class="process-flow" aria-label="Supply chain steps">
+
+          <li class="process-step">
+            <div class="process-step__number" aria-hidden="true">1</div>
+            <div class="process-step__icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </div>
+            <div class="process-step__label" data-i18n="pub.step.farmer">Farmer</div>
+            <div class="process-step__sub" data-i18n="pub.step.farmer.desc">రైతు</div>
+          </li>
+
+          <li class="process-step">
+            <div class="process-step__number" aria-hidden="true">2</div>
+            <div class="process-step__icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            </div>
+            <div class="process-step__label" data-i18n="pub.step.arrival">Vehicle Arrival</div>
+            <div class="process-step__sub" data-i18n="pub.step.arrival.desc">వాహన రాక</div>
+          </li>
+
+          <li class="process-step">
+            <div class="process-step__number" aria-hidden="true">3</div>
+            <div class="process-step__icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            </div>
+            <div class="process-step__label" data-i18n="pub.step.weighment">Weighment</div>
+            <div class="process-step__sub" data-i18n="pub.step.weighment.desc">తూకం</div>
+          </li>
+
+          <li class="process-step">
+            <div class="process-step__number" aria-hidden="true">4</div>
+            <div class="process-step__icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <div class="process-step__label" data-i18n="pub.step.quality">Quality Check</div>
+            <div class="process-step__sub" data-i18n="pub.step.quality.desc">నాణ్యత తనిఖీ</div>
+          </li>
+
+          <li class="process-step">
+            <div class="process-step__number" aria-hidden="true">5</div>
+            <div class="process-step__icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <div class="process-step__label" data-i18n="pub.step.purchase">Purchase</div>
+            <div class="process-step__sub" data-i18n="pub.step.purchase.desc">కొనుగోలు</div>
+          </li>
+
+          <li class="process-step">
+            <div class="process-step__number" aria-hidden="true">6</div>
+            <div class="process-step__icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+            </div>
+            <div class="process-step__label" data-i18n="pub.step.inventory">Inventory</div>
+            <div class="process-step__sub" data-i18n="pub.step.inventory.desc">నిల్వ</div>
+          </li>
+
+          <li class="process-step">
+            <div class="process-step__number" aria-hidden="true">7</div>
+            <div class="process-step__icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            </div>
+            <div class="process-step__label" data-i18n="pub.step.order">Wholesale Order</div>
+            <div class="process-step__sub" data-i18n="pub.step.order.desc">టోకు ఆర్డర్</div>
+          </li>
+
+          <li class="process-step">
+            <div class="process-step__number" aria-hidden="true">8</div>
+            <div class="process-step__icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+            </div>
+            <div class="process-step__label" data-i18n="pub.step.loading">Loading</div>
+            <div class="process-step__sub" data-i18n="pub.step.loading.desc">లోడింగ్</div>
+          </li>
+
+          <li class="process-step">
+            <div class="process-step__number" aria-hidden="true">9</div>
+            <div class="process-step__icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </div>
+            <div class="process-step__label" data-i18n="pub.step.dispatch">Dispatch</div>
+            <div class="process-step__sub" data-i18n="pub.step.dispatch.desc">పంపిణీ</div>
+          </li>
+
+          <li class="process-step">
+            <div class="process-step__number" aria-hidden="true">10</div>
+            <div class="process-step__icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="process-step__label" data-i18n="pub.step.vendor">Vendor</div>
+            <div class="process-step__sub" data-i18n="pub.step.vendor.desc">వ్యాపారి</div>
+          </li>
+
+        </ol>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════
+         FOR FARMERS
+    ═══════════════════════════════════════════════ -->
+    <section class="section section-alt" id="farmers" aria-labelledby="farmers-title">
+      <div class="section-inner">
+        <div class="role-section">
+          <div class="role-section__content">
+            <div class="role-section__tag" data-i18n="pub.farmers.tag">For Farmers · రైతుల కోసం</div>
+            <h2 class="role-section__title" id="farmers-title" data-i18n="pub.farmers.title">Sell Directly to Wholesale Markets</h2>
+            <p class="role-section__desc" data-i18n="pub.farmers.desc">No middlemen. Fair prices. Transparent payment history. Join 500+ farmers already trading on the GOLIS platform.</p>
+            <ul class="role-section__features" aria-label="Farmer benefits">
+              <li class="role-feature">
+                <span class="role-feature__icon" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+                <span class="role-feature__text"><strong data-i18n="pub.farmers.f1.title">Direct payment</strong> <span data-i18n="pub.farmers.f1.desc">without middlemen</span></span>
+              </li>
+              <li class="role-feature">
+                <span class="role-feature__icon" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+                <span class="role-feature__text"><strong data-i18n="pub.farmers.f2.title">Fair pricing</strong> <span data-i18n="pub.farmers.f2.desc">based on quality grades (A/B/C)</span></span>
+              </li>
+              <li class="role-feature">
+                <span class="role-feature__icon" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+                <span class="role-feature__text"><strong data-i18n="pub.farmers.f3.title">Track supply history</strong> <span data-i18n="pub.farmers.f3.desc">and payment status anytime</span></span>
+              </li>
+              <li class="role-feature">
+                <span class="role-feature__icon" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+                <span class="role-feature__text"><strong data-i18n="pub.farmers.f4.title">Mobile-friendly portal</strong> <span data-i18n="pub.farmers.f4.desc">works on any phone</span></span>
+              </li>
+            </ul>
+            <a href="login.html?role=farmer" class="btn btn-primary" data-i18n="pub.farmers.cta">Register as Farmer</a>
+          </div>
+
+          <div class="role-section__visual" aria-hidden="true">
+            <div class="mock-dashboard">
+              <div class="mock-dashboard__header">
+                <div class="mock-dashboard__title">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  Farmer Dashboard — Demo
+                </div>
+              </div>
+              <div class="mock-stat-row">
+                <div class="mock-stat">
+                  <div class="mock-stat__val">₹4,26,000</div>
+                  <div class="mock-stat__lbl">Total Supply Value</div>
+                </div>
+                <div class="mock-stat">
+                  <div class="mock-stat__val">₹38,500</div>
+                  <div class="mock-stat__lbl">Pending Payment</div>
+                </div>
+              </div>
+              <div class="mock-stat-row">
+                <div class="mock-stat">
+                  <div class="mock-stat__val">14,200 kg</div>
+                  <div class="mock-stat__lbl">Total Supplied</div>
+                </div>
+                <div class="mock-stat">
+                  <div class="mock-stat__val">6</div>
+                  <div class="mock-stat__lbl">Trips This Month</div>
+                </div>
+              </div>
+              <div class="mock-recent">
+                <div class="mock-recent__row">
+                  <span>🍅 Tomato Grade A — 800 kg</span>
+                  <span class="mock-badge mock-badge--green">Paid</span>
+                </div>
+                <div class="mock-recent__row">
+                  <span>🍅 Tomato Grade B — 420 kg</span>
+                  <span class="mock-badge mock-badge--amber">Pending</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════
+         FOR WHOLESALE BUYERS
+    ═══════════════════════════════════════════════ -->
+    <section class="section" id="buyers" aria-labelledby="buyers-title">
+      <div class="section-inner">
+        <div class="role-section role-section--reverse">
+          <div class="role-section__visual" aria-hidden="true">
+            <div class="mock-dashboard">
+              <div class="mock-dashboard__header">
+                <div class="mock-dashboard__title">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                  Vendor Cart — Demo
+                </div>
+              </div>
+              <div class="mock-cart">
+                <div class="mock-cart__item">
+                  <span>🍅 Tomato A</span>
+                  <span class="mock-cart__qty">1,000 kg</span>
+                  <span class="mock-cart__price">₹38,000</span>
+                </div>
+                <div class="mock-cart__item">
+                  <span>🧅 Onion A</span>
+                  <span class="mock-cart__qty">800 kg</span>
+                  <span class="mock-cart__price">₹35,200</span>
+                </div>
+                <div class="mock-cart__item">
+                  <span>🥔 Potato A</span>
+                  <span class="mock-cart__qty">1,200 kg</span>
+                  <span class="mock-cart__price">₹38,400</span>
+                </div>
+                <div class="mock-cart__total">
+                  <span>Order Total</span>
+                  <span>₹1,11,600</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="role-section__content">
+            <div class="role-section__tag" data-i18n="pub.buyers.tag">For Wholesale Buyers · వ్యాపారుల కోసం</div>
+            <h2 class="role-section__title" id="buyers-title" data-i18n="pub.buyers.title">Buy Fresh Vegetables in Bulk</h2>
+            <p class="role-section__desc" data-i18n="pub.buyers.desc">Place bulk orders from graded, fresh vegetables. Transparent pricing. Flexible delivery options across South India.</p>
+            <ul class="role-section__features" aria-label="Vendor benefits">
+              <li class="role-feature">
+                <span class="role-feature__icon" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+                <span class="role-feature__text"><strong data-i18n="pub.buyers.f1.title">Order any quantity</strong> <span data-i18n="pub.buyers.f1.desc">— bulk wholesale orders in 50 kg steps</span></span>
+              </li>
+              <li class="role-feature">
+                <span class="role-feature__icon" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+                <span class="role-feature__text"><strong data-i18n="pub.buyers.f2.title">Grade-based pricing</strong> <span data-i18n="pub.buyers.f2.desc">Grade A, B, C with transparent rates</span></span>
+              </li>
+              <li class="role-feature">
+                <span class="role-feature__icon" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+                <span class="role-feature__text"><strong data-i18n="pub.buyers.f3.title">Multiple payment options</strong> <span data-i18n="pub.buyers.f3.desc">Cash, UPI, Bank Transfer, Credit</span></span>
+              </li>
+              <li class="role-feature">
+                <span class="role-feature__icon" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+                <span class="role-feature__text"><strong data-i18n="pub.buyers.f4.title">Delivery tracking</strong> <span data-i18n="pub.buyers.f4.desc">from dispatch to your doorstep</span></span>
+              </li>
+            </ul>
+            <a href="login.html?role=vendor" class="btn btn-accent" data-i18n="pub.buyers.cta">Register as Vendor</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════
+         VEGETABLES CATALOG
+    ═══════════════════════════════════════════════ -->
+    <section class="section section-alt" id="vegetables" aria-labelledby="veg-title">
+      <div class="section-inner">
+        <div class="section-header">
+          <div class="section-eyebrow" data-i18n="pub.veg.eyebrow">15 Varieties</div>
+          <h2 class="section-title" id="veg-title" data-i18n="pub.veg.title">Fresh Vegetables Available</h2>
+          <p class="section-subtitle" data-i18n="pub.veg.subtitle">Grade A, B, C quality vegetables sourced directly from AP/Telangana farmers.</p>
+        </div>
+        <div class="vegetable-grid" id="vegetable-grid" role="list" aria-label="Available vegetables">
+          <!-- Rendered by renderVegetableCards() -->
+        </div>
+        <div class="section-cta">
+          <a href="login.html?role=vendor" class="btn btn-primary" data-i18n="pub.veg.cta">View All &amp; Place Order →</a>
+          <p class="section-cta__note" data-i18n="pub.veg.note">Login required to view live prices and place orders</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════
+         TRUST BAR
+    ═══════════════════════════════════════════════ -->
+    <div class="trust-bar" aria-label="Platform highlights">
+      <div class="trust-bar__inner">
+        <div class="trust-item">
+          <span class="trust-item__value" data-i18n="pub.trust.est">Est. 2020</span>
+          <span class="trust-item__label" data-i18n="pub.trust.est.label">In Business</span>
+        </div>
+        <div class="trust-item">
+          <span class="trust-item__value">500+</span>
+          <span class="trust-item__label" data-i18n="pub.trust.farmers">Farmer Partners</span>
+        </div>
+        <div class="trust-item">
+          <span class="trust-item__value">200+</span>
+          <span class="trust-item__label" data-i18n="pub.trust.vendors">Vendor Clients</span>
+        </div>
+        <div class="trust-item">
+          <span class="trust-item__value">6</span>
+          <span class="trust-item__label" data-i18n="pub.trust.states">States Served</span>
+        </div>
+        <div class="trust-item">
+          <span class="trust-item__value">₹50L+</span>
+          <span class="trust-item__label" data-i18n="pub.trust.trading">Daily Volume</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         ABOUT SECTION
+    ═══════════════════════════════════════════════ -->
+    <section class="section" id="about" aria-labelledby="about-title">
+      <div class="section-inner">
+        <div class="about-grid">
+          <div class="about-content">
+            <div class="section-eyebrow" data-i18n="pub.about.eyebrow">About Us</div>
+            <h2 class="section-title" id="about-title" data-i18n="pub.about.title">About GOLIS Wholesale</h2>
+            <p class="about-desc" data-i18n="pub.about.desc1">GOLIS Wholesale is a B2B vegetable trading business based in Guntur, Andhra Pradesh. We purchase vegetables directly from farmers across AP and Telangana, and sell wholesale to vendors across South India including Hyderabad, Chennai, Bangalore, and Mumbai.</p>
+            <p class="about-desc" data-i18n="pub.about.desc2">Our platform digitises the entire supply chain — from farmer vehicle arrival through weighment, quality grading, inventory management, order fulfilment, dispatch, and payment — giving every stakeholder complete visibility.</p>
+
+            <div class="about-labour-note">
+              <h3 class="about-labour__title" data-i18n="pub.about.labour.title">Daily-Wage Labour Operations</h3>
+              <p class="about-labour__desc" data-i18n="pub.about.labour.desc">Our operations employ daily-wage labourers for loading, unloading, sorting, and packing — with transparent attendance tracking and wage management.</p>
+              <div class="labour-icons" aria-label="Labour work types">
+                <div class="labour-icon-item">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/></svg>
+                  <span data-i18n="work.loading">Loading</span>
+                </div>
+                <div class="labour-icon-item">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><polyline points="3 8 3 21 21 21 21 8"/><rect x="1" y="3" width="22" height="5"/></svg>
+                  <span data-i18n="work.unloading">Unloading</span>
+                </div>
+                <div class="labour-icon-item">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                  <span data-i18n="work.sorting">Sorting</span>
+                </div>
+                <div class="labour-icon-item">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                  <span data-i18n="work.packing">Packing</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="about-stats">
+            <div class="about-stat-card">
+              <div class="about-stat__value">2020</div>
+              <div class="about-stat__label" data-i18n="pub.about.stat1">Established</div>
+            </div>
+            <div class="about-stat-card">
+              <div class="about-stat__value">500+</div>
+              <div class="about-stat__label" data-i18n="pub.about.stat2">Farmer Partners</div>
+            </div>
+            <div class="about-stat-card">
+              <div class="about-stat__value">200+</div>
+              <div class="about-stat__label" data-i18n="pub.about.stat3">Vendor Clients</div>
+            </div>
+            <div class="about-stat-card">
+              <div class="about-stat__value">15+</div>
+              <div class="about-stat__label" data-i18n="pub.about.stat4">Vegetable Varieties</div>
+            </div>
+            <div class="about-stat-card about-stat-card--wide">
+              <div class="about-stat__value">Guntur, AP</div>
+              <div class="about-stat__label" data-i18n="pub.about.stat5">Head Office — South India Operations</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════
+         CONTACT SECTION
+    ═══════════════════════════════════════════════ -->
+    <section class="section section-alt" id="contact" aria-labelledby="contact-title">
+      <div class="section-inner">
+        <div class="section-header">
+          <div class="section-eyebrow" data-i18n="pub.contact.eyebrow">Get In Touch</div>
+          <h2 class="section-title" id="contact-title" data-i18n="pub.contact.title">Contact GOLIS Wholesale</h2>
+        </div>
+        <div class="contact-grid">
+
+          <div class="contact-info">
+            <div class="contact-info__card">
+              <h3 class="contact-info__name">GOLIS Wholesale</h3>
+              <ul class="contact-details" aria-label="Contact details">
+                <li class="contact-detail">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  <span data-i18n="pub.contact.address">Guntur, Andhra Pradesh — 522001</span>
+                </li>
+                <li class="contact-detail">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.3a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.48h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 10a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.5 17z"/></svg>
+                  <span>+91 98765 43210 <em class="demo-note-inline" data-i18n="pub.contact.demo">(Demo)</em></span>
+                </li>
+                <li class="contact-detail">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                  <span>contact@goliswholesale.com <em class="demo-note-inline" data-i18n="pub.contact.demo">(Demo)</em></span>
+                </li>
+                <li class="contact-detail">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  <span data-i18n="pub.contact.hours">Mon–Sat, 6:00 AM – 8:00 PM</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="contact-login-cta">
+              <p data-i18n="pub.contact.loginNote">Already registered? Login to access your portal.</p>
+              <div class="contact-login-btns">
+                <a href="login.html?role=farmer" class="btn btn-primary btn-sm" data-i18n="pub.login.farmer">Farmer Login</a>
+                <a href="login.html?role=vendor" class="btn btn-accent btn-sm" data-i18n="pub.login.vendor">Vendor Login</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Contact Form (Demo) -->
+          <div class="contact-form-wrap">
+            <div class="demo-badge demo-badge--amber" role="note" aria-label="Demo form notice">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span data-i18n="pub.contact.formDemo">Demo form — no actual submission</span>
+            </div>
+            <form class="contact-form" id="contact-form" novalidate aria-label="Contact form">
+              <div class="form-group">
+                <label class="form-label" for="contact-name" data-i18n="pub.contact.name">Your Name</label>
+                <input class="form-control" type="text" id="contact-name" name="name" placeholder="e.g. Venkatesh Reddy" autocomplete="name" aria-required="true">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="contact-mobile" data-i18n="pub.contact.mobile">Mobile Number</label>
+                <input class="form-control" type="tel" id="contact-mobile" name="mobile" placeholder="10-digit mobile" autocomplete="tel" aria-required="true">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="contact-role" data-i18n="pub.contact.iam">I am a</label>
+                <select class="form-control" id="contact-role" name="role" aria-required="true">
+                  <option value="" data-i18n="pub.contact.role.select">Select…</option>
+                  <option value="farmer" data-i18n="term.farmer">Farmer</option>
+                  <option value="vendor" data-i18n="term.vendor">Vendor</option>
+                  <option value="other" data-i18n="pub.contact.role.other">Other</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="contact-message" data-i18n="pub.contact.message">Message</label>
+                <textarea class="form-control" id="contact-message" name="message" rows="4" placeholder="Tell us how we can help…" aria-required="true"></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary btn-full" id="contact-submit">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                <span data-i18n="common.submit">Submit</span>
+              </button>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ═══════════════════════════════════════════════
+       FOOTER
+  ═══════════════════════════════════════════════ -->
+  <footer class="footer" role="contentinfo" aria-label="Site footer">
+    <div class="footer__inner">
+      <div class="footer__top">
+
+        <!-- Brand -->
+        <div class="footer__brand">
+          <div class="footer__brand-logo">
+            <div class="footer__brand-mark" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="16" r="16" fill="#52b788"/><path d="M16 6C16 6 8 10 8 18C8 22.4 11.6 26 16 26C16 26 16 18 22 12C19.5 9.5 16 6 16 6Z" fill="#d8f3dc"/><path d="M16 26C16 26 16 18 22 12" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+            <span class="footer__brand-name" data-i18n="app.name">GOLIS Wholesale</span>
+          </div>
+          <p class="footer__tagline" data-i18n="app.tagline">B2B Wholesale Vegetable Trading — Guntur, AP</p>
+          <p class="footer__tagline footer__tagline--te">రైతు నుంచి హోల్‌సేల్ మార్కెట్ వరకు</p>
+        </div>
+
+        <!-- Quick Links: Farmers -->
+        <div class="footer__col">
+          <h4 class="footer__col-title" data-i18n="pub.footer.col1">For Farmers</h4>
+          <ul class="footer__links">
+            <li><a href="login.html?role=farmer" class="footer__link" data-i18n="pub.login.farmer">Farmer Login</a></li>
+            <li><a href="#how"  class="footer__link" data-i18n="pub.nav.how">How It Works</a></li>
+            <li><a href="#farmers" class="footer__link" data-i18n="pub.nav.farmers">Farmer Benefits</a></li>
+            <li><a href="#contact" class="footer__link" data-i18n="pub.nav.contact">Contact Us</a></li>
+          </ul>
+        </div>
+
+        <!-- Quick Links: Vendors -->
+        <div class="footer__col">
+          <h4 class="footer__col-title" data-i18n="pub.footer.col2">For Vendors</h4>
+          <ul class="footer__links">
+            <li><a href="login.html?role=vendor" class="footer__link" data-i18n="pub.login.vendor">Vendor Login</a></li>
+            <li><a href="#prices" class="footer__link" data-i18n="pub.footer.prices">Today's Prices</a></li>
+            <li><a href="#vegetables" class="footer__link" data-i18n="pub.nav.vegetables">Vegetables</a></li>
+            <li><a href="#buyers" class="footer__link" data-i18n="pub.nav.buyers">Buyer Benefits</a></li>
+          </ul>
+        </div>
+
+        <!-- Quick Links: Platform -->
+        <div class="footer__col">
+          <h4 class="footer__col-title" data-i18n="pub.footer.col3">Platform</h4>
+          <ul class="footer__links">
+            <li><a href="login.html" class="footer__link" data-i18n="pub.login.all">All Logins</a></li>
+            <li><a href="#about"   class="footer__link" data-i18n="pub.nav.about">About</a></li>
+            <li><a href="#how"     class="footer__link" data-i18n="pub.nav.how">Supply Chain</a></li>
+            <li><a href="#contact" class="footer__link" data-i18n="pub.nav.contact">Contact</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="footer__bottom">
+        <p class="footer__copyright" data-i18n="pub.footer.copyright">© 2026 GOLIS Wholesale. Demo Application — Sample Data.</p>
+        <p class="footer__demo-note" data-i18n="pub.footer.care">Made with care for Indian farmers 🌱</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast container -->
+  <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Scripts -->
+  <script src="js/i18n.js"></script>
+  <script src="js/mock-data.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+  /* ============================================================
+     index.html — Public Landing Page Script
+  ============================================================ */
+
+  /* ── helpers ─────────────────────────────────────── */
+  function t(key) {
+    return (typeof I18N !== 'undefined') ? I18N.t(key) : key;
+  }
+
+  /* ── Price Cards ─────────────────────────────────── */
+  function renderPriceCards() {
+    const board = document.getElementById('price-board');
+    if (!board) return;
+
+    const prices = MockDB.getPrices();           // all 15
+    const vegs   = MockDB.getVegetables();
+    // Show first 8
+    const toShow = prices.slice(0, 8);
+
+    board.innerHTML = toShow.map(p => {
+      const veg = vegs.find(v => v.id === p.vegId) || {};
+      const prev = veg.prevSellPrice || p.sellPrice;
+      const pct  = prev > 0 ? (((p.sellPrice - prev) / prev) * 100).toFixed(1) : '0.0';
+      const changeClass = p.change === 'up' ? 'up' : p.change === 'down' ? 'down' : 'neutral';
+      const changeIcon  = p.change === 'up' ? '↑' : p.change === 'down' ? '↓' : '→';
+      const stockClass  = veg.available < 500 ? 'out' : veg.available < 1000 ? 'low' : '';
+      const stockLabel  = veg.available < 500 ? 'Low' : veg.available < 1000 ? 'Limited' : 'Available';
+
+      return `
+        <article class="price-card" role="listitem" aria-label="${veg.nameEn} wholesale price">
+          <div class="price-card__emoji" aria-hidden="true">${veg.emoji || '🥬'}</div>
+          <div class="price-card__name-en">${veg.nameEn || ''}</div>
+          <div class="price-card__name-te">${veg.nameTe || ''}</div>
+          <div class="price-card__price">₹${p.sellPrice}<span class="price-card__unit">/kg</span></div>
+          <div class="price-card__change ${changeClass}" aria-label="Price ${p.change}">
+            ${changeIcon} ${Math.abs(pct)}%
+          </div>
+          <div class="price-card__stock ${stockClass}" aria-label="Available: ${Utils.formatWeight(veg.available)}">
+            ${Utils.formatWeight(veg.available || 0)} ${stockLabel}
+          </div>
+        </article>`;
+    }).join('');
+  }
+
+  /* ── Vegetable Grid ──────────────────────────────── */
+  function renderVegetableCards() {
+    const grid = document.getElementById('vegetable-grid');
+    if (!grid) return;
+
+    const vegs = MockDB.getVegetables();   // all 15
+
+    grid.innerHTML = vegs.map(veg => {
+      const gradeStr = (veg.grades || ['A']).map(g => `Grade ${g}`).join(', ');
+      return `
+        <article class="vegetable-card" role="listitem" aria-label="${veg.nameEn} — ${veg.nameTe}">
+          <div class="vegetable-card__emoji" aria-hidden="true">${veg.emoji || '🥬'}</div>
+          <div class="vegetable-card__name-en">${veg.nameEn}</div>
+          <div class="vegetable-card__name-te">${veg.nameTe}</div>
+          <div class="vegetable-card__price" aria-label="Demo price ₹${veg.currentSellPrice} per kg">
+            ₹${veg.currentSellPrice}/kg
+            <span class="vegetable-card__demo-tag">DEMO</span>
+          </div>
+          <div class="vegetable-card__grade">${gradeStr}</div>
+        </article>`;
+    }).join('');
+  }
+
+  /* ── Login Dropdown ──────────────────────────────── */
+  function initLoginDropdown() {
+    const trigger = document.querySelector('.login-dropdown__trigger');
+    const menu    = document.querySelector('.login-dropdown__menu');
+    if (!trigger || !menu) return;
+
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const open = menu.classList.toggle('is-open');
+      trigger.setAttribute('aria-expanded', String(open));
+    });
+
+    document.addEventListener('click', () => {
+      menu.classList.remove('is-open');
+      trigger.setAttribute('aria-expanded', 'false');
+    });
+
+    menu.addEventListener('click', e => e.stopPropagation());
+  }
+
+  /* ── Mobile Nav ──────────────────────────────────── */
+  function initMobileNav() {
+    const btn   = document.getElementById('hamburger-btn');
+    const nav   = document.getElementById('mobile-nav');
+    if (!btn || !nav) return;
+
+    btn.addEventListener('click', () => {
+      const open = nav.classList.toggle('is-open');
+      btn.setAttribute('aria-expanded', String(open));
+      nav.setAttribute('aria-hidden', String(!open));
+      btn.setAttribute('aria-label', open ? 'Close navigation menu' : 'Open navigation menu');
+    });
+
+    // Close on anchor click
+    nav.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => {
+        nav.classList.remove('is-open');
+        btn.setAttribute('aria-expanded', 'false');
+        nav.setAttribute('aria-hidden', 'true');
+      });
+    });
+  }
+
+  /* ── Sticky Nav Highlight ─────────────────────────── */
+  function initStickyNav() {
+    const nav = document.querySelector('.public-nav');
+    if (!nav) return;
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('is-scrolled', window.scrollY > 40);
+    }, { passive: true });
+  }
+
+  /* ── Smooth Scroll ────────────────────────────────── */
+  function initSmoothScroll() {
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        const id = a.getAttribute('href').slice(1);
+        const el = document.getElementById(id);
+        if (el) {
+          e.preventDefault();
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  }
+
+  /* ── Active Nav Highlight on Scroll ─────────────── */
+  function initScrollSpy() {
+    const sections = document.querySelectorAll('section[id], div[id="prices"]');
+    const links    = document.querySelectorAll('.public-nav__link[href^="#"]');
+    if (!links.length) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          links.forEach(l => l.classList.remove('active'));
+          const active = document.querySelector(`.public-nav__link[href="#${entry.target.id}"]`);
+          if (active) active.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-30% 0px -60% 0px' });
+
+    sections.forEach(s => observer.observe(s));
+  }
+
+  /* ── Language Switcher ────────────────────────────── */
+  function initLangSwitcher() {
+    document.querySelectorAll('[data-lang-btn]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const lang = btn.dataset.langBtn;
+        I18N.setLanguage(lang);
+        // Update all lang buttons
+        document.querySelectorAll('[data-lang-btn]').forEach(b => {
+          const active = b.dataset.langBtn === lang;
+          b.classList.toggle('lang-btn--active', active);
+          b.setAttribute('aria-pressed', String(active));
+        });
+        // Re-render dynamic content with potentially translated labels
+        renderPriceCards();
+        renderVegetableCards();
+      });
+    });
+  }
+
+  /* ── Contact Form ─────────────────────────────────── */
+  function initContactForm() {
+    const form = document.getElementById('contact-form');
+    if (!form) return;
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+
+      const name    = form.querySelector('#contact-name').value.trim();
+      const mobile  = form.querySelector('#contact-mobile').value.trim();
+      const role    = form.querySelector('#contact-role').value;
+      const message = form.querySelector('#contact-message').value.trim();
+
+      // Basic validation
+      if (!name) { showFormError('contact-name', "Name is required"); return; }
+      if (!mobile || !/^\d{10}$/.test(mobile.replace(/\s+/g,''))) {
+        showFormError('contact-mobile', "Enter a valid 10-digit mobile number"); return;
+      }
+      if (!role)    { showFormError('contact-role', "Please select a role"); return; }
+      if (!message) { showFormError('contact-message', "Message is required"); return; }
+
+      // Clear errors
+      form.querySelectorAll('.form-error').forEach(el => el.remove());
+
+      // Show success toast
+      showContactToast("We'll contact you within 24 hours ✓", 'success');
+
+      // Reset
+      form.reset();
+    });
+
+    // Clear error on input
+    form.querySelectorAll('.form-control').forEach(input => {
+      input.addEventListener('input', () => {
+        const err = input.parentNode.querySelector('.form-error');
+        if (err) err.remove();
+        input.classList.remove('is-invalid');
+      });
+    });
+  }
+
+  function showFormError(fieldId, message) {
+    const field = document.getElementById(fieldId);
+    if (!field) return;
+    field.classList.add('is-invalid');
+    let err = field.parentNode.querySelector('.form-error');
+    if (!err) {
+      err = document.createElement('span');
+      err.className = 'form-error';
+      field.parentNode.appendChild(err);
+    }
+    err.textContent = message;
+    field.focus();
+  }
+
+  function showContactToast(message, type) {
+    // Use Utils.showToast if available
+    if (typeof Utils !== 'undefined' && Utils.showToast) {
+      Utils.showToast(message, type);
+      return;
+    }
+    // Fallback
+    const container = document.getElementById('toast-container') || document.body;
+    const toast = document.createElement('div');
+    toast.className = `toast toast--${type}`;
+    toast.setAttribute('role', 'alert');
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => toast.classList.add('toast--visible'), 10);
+    setTimeout(() => {
+      toast.classList.remove('toast--visible');
+      setTimeout(() => toast.remove(), 300);
+    }, 4000);
+  }
+
+  /* ══ DOMContentLoaded ══════════════════════════════ */
+  document.addEventListener('DOMContentLoaded', () => {
+    // Init mock data + i18n
+    MockDB.init();
+    I18N.currentLang = I18N.getLanguage();
+    I18N.applyTranslations();
+
+    // Render dynamic sections
+    renderPriceCards();
+    renderVegetableCards();
+
+    // Wire up interactions
+    initLoginDropdown();
+    initMobileNav();
+    initStickyNav();
+    initSmoothScroll();
+    initScrollSpy();
+    initLangSwitcher();
+    initContactForm();
+
+    // Sync lang button active state with persisted lang
+    const currentLang = I18N.currentLang || 'en';
+    document.querySelectorAll('[data-lang-btn]').forEach(btn => {
+      const active = btn.dataset.langBtn === currentLang;
+      btn.classList.toggle('lang-btn--active', active);
+      btn.setAttribute('aria-pressed', String(active));
+    });
+  });
+  </script>
+</body>
+</html>

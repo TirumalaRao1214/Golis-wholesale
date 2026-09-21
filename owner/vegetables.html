@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vegetable Master — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content">
+        <div class="page-header">
+          <h1 class="page-title" data-i18n="page.vegetables"></h1>
+          <div class="page-header-actions">
+            <button class="btn btn-secondary" onclick="togglePriceEdit()">Edit Today's Prices</button>
+            <button class="btn btn-primary" onclick="openAddVegetable()">+ Add Vegetable</button>
+          </div>
+        </div>
+
+        <!-- Today's Price Management Section -->
+        <div class="card" id="price-edit-panel" style="margin-bottom:1rem;display:none;">
+          <div class="card__header">
+            <h3 class="card__title">Today's Price Management</h3>
+            <button class="btn btn-sm btn-ghost" onclick="togglePriceEdit()">Close</button>
+          </div>
+          <div class="card__body" style="padding:0;">
+            <table class="data-table">
+              <thead><tr><th>Vegetable</th><th>Telugu</th><th>Prev Sell Price</th><th>Today's Sell Price (₹/kg)</th><th>Change</th></tr></thead>
+              <tbody id="price-edit-tbody"></tbody>
+            </table>
+          </div>
+          <div class="card__footer" style="padding:1rem;text-align:right;">
+            <button class="btn btn-primary" onclick="savePrices()">Save All Prices</button>
+          </div>
+        </div>
+
+        <!-- Vegetable Table -->
+        <div class="card">
+          <div class="card__body" style="padding:0;">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Vegetable</th>
+                    <th>Telugu</th>
+                    <th>Grades</th>
+                    <th data-i18n="col.currentBuyPrice"></th>
+                    <th data-i18n="col.currentSellPrice"></th>
+                    <th data-i18n="col.available"></th>
+                    <th>Trend</th>
+                    <th data-i18n="common.actions"></th>
+                  </tr>
+                </thead>
+                <tbody id="veg-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Add/Edit Vegetable Modal -->
+  <div class="modal-overlay" id="modal-veg">
+    <div class="modal">
+      <div class="modal__header">
+        <h3 class="modal__title" id="veg-modal-title">Add Vegetable</h3>
+        <button class="modal__close" onclick="Utils.closeModal('modal-veg')">&times;</button>
+      </div>
+      <div class="modal__body">
+        <form id="veg-form">
+          <input type="hidden" id="veg-edit-id">
+          <div class="form-grid form-grid--2">
+            <div class="form-group">
+              <label class="form-label">Name (English)</label>
+              <input type="text" class="form-input" id="vg-name" placeholder="e.g. Tomato">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Name (Telugu)</label>
+              <input type="text" class="form-input" id="vg-namete" placeholder="e.g. టమాటా">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Buy Price (₹/kg)</label>
+              <input type="number" class="form-input" id="vg-buy" placeholder="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Sell Price (₹/kg)</label>
+              <input type="number" class="form-input" id="vg-sell" placeholder="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Available (kg)</label>
+              <input type="number" class="form-input" id="vg-avail" placeholder="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Grades (comma-separated)</label>
+              <input type="text" class="form-input" id="vg-grades" placeholder="A,B,C">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn-ghost" onclick="Utils.closeModal('modal-veg')" data-i18n="common.cancel"></button>
+        <button class="btn btn-primary" onclick="saveVegetable()" data-i18n="common.save"></button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    let _vegs = [];
+    let _prices = [];
+
+    function renderVegTable() {
+      document.getElementById('veg-tbody').innerHTML = _vegs.map(v => {
+        const change = v.currentSellPrice > v.prevSellPrice ? 'up' : v.currentSellPrice < v.prevSellPrice ? 'down' : 'neutral';
+        return `
+        <tr>
+          <td><code>${v.id}</code></td>
+          <td><strong>${v.emoji || ''} ${v.nameEn}</strong></td>
+          <td class="telugu-text">${v.nameTe}</td>
+          <td>${v.grades.map(g => `<span class="badge badge--info" style="margin-right:2px;">${g}</span>`).join('')}</td>
+          <td>₹${v.currentBuyPrice}/kg</td>
+          <td>₹${v.currentSellPrice}/kg</td>
+          <td>${Utils.formatWeight(v.available)}</td>
+          <td>${Utils.priceIcon(change)}</td>
+          <td>
+            <button class="btn btn-sm btn-secondary" onclick="editVegetable('${v.id}')">Edit</button>
+          </td>
+        </tr>
+        `;
+      }).join('');
+    }
+
+    function renderPriceEditTable() {
+      document.getElementById('price-edit-tbody').innerHTML = _vegs.map(v => {
+        const change = v.currentSellPrice > v.prevSellPrice ? 'up' : v.currentSellPrice < v.prevSellPrice ? 'down' : 'neutral';
+        return `
+        <tr>
+          <td><strong>${v.emoji || ''} ${v.nameEn}</strong></td>
+          <td class="telugu-text">${v.nameTe}</td>
+          <td>₹${v.prevSellPrice}/kg</td>
+          <td><input type="number" class="form-input form-input--sm" id="price-${v.id}" value="${v.currentSellPrice}" style="width:100px;" oninput="updatePriceIndicator('${v.id}')"></td>
+          <td id="price-icon-${v.id}">${Utils.priceIcon(change)}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    function updatePriceIndicator(vegId) {
+      const v = _vegs.find(x => x.id === vegId);
+      if (!v) return;
+      const newPrice = Number(document.getElementById(`price-${vegId}`).value);
+      const change = newPrice > v.prevSellPrice ? 'up' : newPrice < v.prevSellPrice ? 'down' : 'neutral';
+      document.getElementById(`price-icon-${vegId}`).innerHTML = Utils.priceIcon(change);
+    }
+
+    function togglePriceEdit() {
+      const panel = document.getElementById('price-edit-panel');
+      if (panel.style.display === 'none') {
+        panel.style.display = '';
+        renderPriceEditTable();
+      } else {
+        panel.style.display = 'none';
+      }
+    }
+
+    function savePrices() {
+      _vegs.forEach(v => {
+        const input = document.getElementById(`price-${v.id}`);
+        if (input) {
+          const newPrice = Number(input.value);
+          MockDB.updateRecord('_vegetables', v.id, { prevSellPrice: v.currentSellPrice, currentSellPrice: newPrice });
+        }
+      });
+      _vegs = MockDB.getVegetables();
+      Utils.showToast('Prices updated successfully.', 'success');
+      renderVegTable();
+      renderPriceEditTable();
+    }
+
+    function openAddVegetable() {
+      document.getElementById('veg-modal-title').textContent = 'Add Vegetable';
+      document.getElementById('veg-edit-id').value = '';
+      document.getElementById('veg-form').reset();
+      Utils.openModal('modal-veg');
+    }
+
+    function editVegetable(id) {
+      const v = _vegs.find(x => x.id === id);
+      if (!v) return;
+      document.getElementById('veg-modal-title').textContent = 'Edit Vegetable';
+      document.getElementById('veg-edit-id').value = id;
+      document.getElementById('vg-name').value = v.nameEn;
+      document.getElementById('vg-namete').value = v.nameTe;
+      document.getElementById('vg-buy').value = v.currentBuyPrice;
+      document.getElementById('vg-sell').value = v.currentSellPrice;
+      document.getElementById('vg-avail').value = v.available;
+      document.getElementById('vg-grades').value = v.grades.join(',');
+      Utils.openModal('modal-veg');
+    }
+
+    function saveVegetable() {
+      const name = document.getElementById('vg-name').value.trim();
+      if (!name) { Utils.showToast('Vegetable name is required.', 'error'); return; }
+      const editId = document.getElementById('veg-edit-id').value;
+      const record = {
+        nameEn: name,
+        nameTe: document.getElementById('vg-namete').value.trim(),
+        currentBuyPrice: Number(document.getElementById('vg-buy').value) || 0,
+        currentSellPrice: Number(document.getElementById('vg-sell').value) || 0,
+        available: Number(document.getElementById('vg-avail').value) || 0,
+        grades: document.getElementById('vg-grades').value.split(',').map(g => g.trim()).filter(Boolean),
+        prevSellPrice: Number(document.getElementById('vg-sell').value) || 0,
+      };
+      if (editId) {
+        MockDB.updateRecord('_vegetables', editId, record);
+      } else {
+        record.id = 'VG' + String(MockDB.getVegetables().length + 1).padStart(2, '0');
+        MockDB.saveRecord('_vegetables', record);
+      }
+      _vegs = MockDB.getVegetables();
+      Utils.closeModal('modal-veg');
+      Utils.showToast('Vegetable saved.', 'success');
+      renderVegTable();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('owner');
+      _vegs = MockDB.getVegetables();
+      renderVegTable();
+    });
+  </script>
+</body>
+</html>

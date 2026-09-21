@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Business Profile — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content">
+        <div class="page-header">
+          <h1 class="page-title">Business Profile</h1>
+          <div class="page-header-actions">
+            <button class="btn btn-secondary" id="btn-edit" onclick="toggleEdit()">✏️ Edit Profile</button>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 340px;gap:1.5rem;">
+          <!-- Business Profile Form -->
+          <div>
+            <div class="card">
+              <div class="card__header"><h3 class="card__title">Business Details</h3></div>
+              <div class="card__body">
+                <form id="profile-form" onsubmit="saveProfile(event)">
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                    <div class="form-group">
+                      <label class="form-label">Business Name</label>
+                      <input type="text" class="form-input" id="f-biz-name" disabled>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Contact Person</label>
+                      <input type="text" class="form-input" id="f-contact" disabled>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Mobile</label>
+                      <input type="tel" class="form-input" id="f-mobile" disabled>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">WhatsApp</label>
+                      <input type="tel" class="form-input" id="f-whatsapp" placeholder="+91..." disabled>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">City</label>
+                      <input type="text" class="form-input" id="f-city" disabled>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">State</label>
+                      <input type="text" class="form-input" id="f-state" disabled>
+                    </div>
+                    <div class="form-group" style="grid-column:span 2;">
+                      <label class="form-label">GST Number</label>
+                      <input type="text" class="form-input" id="f-gst" disabled>
+                    </div>
+                  </div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:0.5rem;">
+                    <div class="form-group">
+                      <label class="form-label">Payment Terms</label>
+                      <input type="text" class="form-input" id="f-payment-terms" disabled>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Credit Limit</label>
+                      <input type="text" class="form-input" id="f-credit-limit" disabled>
+                    </div>
+                  </div>
+                  <div id="save-actions" style="display:none;margin-top:0.5rem;">
+                    <div style="display:flex;gap:0.75rem;justify-content:flex-end;">
+                      <button type="button" class="btn btn-ghost" onclick="cancelEdit()">Cancel</button>
+                      <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Delivery Addresses -->
+            <div class="card" style="margin-top:1.25rem;">
+              <div class="card__header">
+                <h3 class="card__title">📍 Delivery Addresses</h3>
+              </div>
+              <div class="card__body">
+                <div id="delivery-addresses"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Stats -->
+          <div style="display:flex;flex-direction:column;gap:1rem;">
+            <!-- Business Card -->
+            <div class="card" style="border-left:4px solid var(--color-primary);">
+              <div class="card__body" style="text-align:center;padding:1.5rem;">
+                <div style="font-size:3rem;">🏢</div>
+                <div style="font-weight:800;font-size:1.15rem;margin-top:0.75rem;color:var(--color-primary);" id="profile-biz-display">—</div>
+                <div class="text-muted" style="font-size:0.875rem;margin-top:0.25rem;" id="profile-city-display">—</div>
+                <div style="margin-top:0.75rem;">
+                  <span class="badge badge--success">Active Vendor</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Account Statistics -->
+            <div class="card">
+              <div class="card__header"><h3 class="card__title">📊 Account Statistics</h3></div>
+              <div class="card__body">
+                <div style="display:flex;flex-direction:column;gap:0.75rem;">
+                  <div style="display:flex;justify-content:space-between;padding:0.5rem;background:var(--color-bg);border-radius:var(--radius-md);">
+                    <span class="text-muted">Total Orders</span>
+                    <span style="font-weight:700;" id="stat-total-orders">—</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;padding:0.5rem;background:var(--color-primary-pale);border-radius:var(--radius-md);">
+                    <span class="text-muted">Total Value</span>
+                    <span style="font-weight:700;color:var(--color-primary);" id="stat-total-value">—</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;padding:0.5rem;background:var(--color-bg);border-radius:var(--radius-md);">
+                    <span class="text-muted">Outstanding</span>
+                    <span style="font-weight:700;color:var(--color-danger);" id="stat-outstanding">—</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;padding:0.5rem;background:var(--color-bg);border-radius:var(--radius-md);">
+                    <span class="text-muted">Member Since</span>
+                    <span style="font-weight:700;" id="stat-member-since">—</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    let currentVendor = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('vendor');
+      const user     = APP.user;
+      currentVendor  = MockDB.getVendorById(user.refId);
+      const stats    = MockDB.getVendorStats(user.refId);
+      const orders   = MockDB.getOrders().filter(o => o.vendorId === user.refId);
+      const payments = MockDB.getPayments().filter(p => p.partyId === user.refId && p.partyType === 'vendor');
+
+      if (currentVendor) {
+        document.getElementById('f-biz-name').value      = currentVendor.businessName  || '';
+        document.getElementById('f-contact').value       = currentVendor.contactPerson || '';
+        document.getElementById('f-mobile').value        = currentVendor.mobile        || '';
+        document.getElementById('f-whatsapp').value      = currentVendor.mobile        || '';
+        document.getElementById('f-city').value          = currentVendor.city          || '';
+        document.getElementById('f-state').value         = currentVendor.state         || '';
+        document.getElementById('f-gst').value           = currentVendor.gst           || '';
+        document.getElementById('f-payment-terms').value = currentVendor.paymentTerms  || '';
+        document.getElementById('f-credit-limit').value  = Utils.formatCurrency(currentVendor.creditLimit);
+
+        document.getElementById('profile-biz-display').textContent  = currentVendor.businessName;
+        document.getElementById('profile-city-display').textContent = `${currentVendor.city}, ${currentVendor.state}`;
+
+        // Delivery addresses (demo: one address based on profile)
+        document.getElementById('delivery-addresses').innerHTML = `
+          <div style="border:1px solid var(--color-border);border-radius:var(--radius-md);padding:1rem;">
+            <div style="font-weight:600;margin-bottom:0.25rem;">${currentVendor.city}</div>
+            <div class="text-muted">${currentVendor.city}, ${currentVendor.state}</div>
+            <span class="badge badge--success" style="margin-top:0.5rem;">Primary</span>
+          </div>`;
+      }
+
+      const totalValue = orders.reduce((s, o) => s + o.total, 0);
+      const totalPaid  = payments.reduce((s, p) => s + p.amount, 0);
+
+      document.getElementById('stat-total-orders').textContent  = orders.length;
+      document.getElementById('stat-total-value').textContent   = Utils.formatCurrency(totalValue);
+      document.getElementById('stat-outstanding').textContent   = Utils.formatCurrency(Math.max(0, totalValue - totalPaid));
+      document.getElementById('stat-member-since').textContent  = currentVendor ? new Date(currentVendor.joinedDate).getFullYear() : '2023';
+    });
+
+    function toggleEdit() {
+      document.querySelectorAll('#profile-form input').forEach(f => {
+        if (f.id !== 'f-credit-limit') f.disabled = false;
+      });
+      document.getElementById('save-actions').style.display = 'block';
+      document.getElementById('btn-edit').style.display = 'none';
+    }
+
+    function cancelEdit() {
+      document.querySelectorAll('#profile-form input').forEach(f => f.disabled = true);
+      document.getElementById('save-actions').style.display = 'none';
+      document.getElementById('btn-edit').style.display = 'inline-flex';
+      if (currentVendor) {
+        document.getElementById('f-biz-name').value = currentVendor.businessName  || '';
+        document.getElementById('f-contact').value  = currentVendor.contactPerson || '';
+        document.getElementById('f-mobile').value   = currentVendor.mobile        || '';
+        document.getElementById('f-city').value     = currentVendor.city          || '';
+        document.getElementById('f-state').value    = currentVendor.state         || '';
+        document.getElementById('f-gst').value      = currentVendor.gst           || '';
+      }
+    }
+
+    function saveProfile(e) {
+      e.preventDefault();
+      const updates = {
+        businessName:  document.getElementById('f-biz-name').value.trim(),
+        contactPerson: document.getElementById('f-contact').value.trim(),
+        mobile:        document.getElementById('f-mobile').value.trim(),
+        city:          document.getElementById('f-city').value.trim(),
+        state:         document.getElementById('f-state').value.trim(),
+        gst:           document.getElementById('f-gst').value.trim(),
+        paymentTerms:  document.getElementById('f-payment-terms').value.trim(),
+      };
+      MockDB.updateRecord('_vendors', currentVendor.id, updates);
+      currentVendor = { ...currentVendor, ...updates };
+      document.getElementById('profile-biz-display').textContent = currentVendor.businessName;
+
+      document.querySelectorAll('#profile-form input').forEach(f => f.disabled = true);
+      document.getElementById('save-actions').style.display = 'none';
+      document.getElementById('btn-edit').style.display = 'inline-flex';
+      Utils.showToast('Business profile updated ✅', 'success');
+    }
+  </script>
+</body>
+</html>

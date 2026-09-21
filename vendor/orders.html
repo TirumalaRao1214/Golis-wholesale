@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orders — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <style>
+    .order-timeline { display:flex; align-items:center; gap:0; margin:1.5rem 0; flex-wrap:wrap; }
+    .timeline-step { display:flex; align-items:center; flex-direction:column; flex:1; min-width:80px; text-align:center; position:relative; }
+    .timeline-step:not(:last-child)::after { content:'→'; position:absolute; right:-12px; top:12px; color:var(--color-border); font-size:1.1rem; }
+    .timeline-dot { width:28px; height:28px; border-radius:50%; border:2px solid var(--color-border); background:var(--color-bg); display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:700; margin-bottom:0.3rem; }
+    .timeline-dot.active { background:var(--color-primary); border-color:var(--color-primary); color:white; }
+    .timeline-dot.done   { background:var(--color-success); border-color:var(--color-success); color:white; }
+    .timeline-label { font-size:0.7rem; color:var(--color-text-secondary); line-height:1.2; }
+    .timeline-label.active { color:var(--color-primary); font-weight:700; }
+    .checkout-form { max-width:600px; }
+    .success-modal-content { text-align:center; padding:2rem; }
+  </style>
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content">
+        <!-- MODE: CHECKOUT -->
+        <div id="mode-checkout" style="display:none;">
+          <div class="page-header">
+            <h1 class="page-title">Place Order</h1>
+            <a href="cart.html" class="btn btn-ghost">← Back to Cart</a>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 340px;gap:1.5rem;align-items:start;">
+            <!-- Order Form -->
+            <div class="card checkout-form" style="max-width:100%;">
+              <div class="card__header"><h3 class="card__title">Delivery & Contact Details</h3></div>
+              <div class="card__body">
+                <form id="checkout-form" onsubmit="placeOrder(event)">
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                    <div class="form-group">
+                      <label class="form-label">Business Name</label>
+                      <input type="text" class="form-input" id="co-biz-name" required>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Contact Person</label>
+                      <input type="text" class="form-input" id="co-contact" required>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Mobile</label>
+                      <input type="tel" class="form-input" id="co-mobile" required>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">GST Number</label>
+                      <input type="text" class="form-input" id="co-gst">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Delivery Address <span class="text-danger">*</span></label>
+                    <textarea class="form-textarea" id="co-address" rows="2" required></textarea>
+                  </div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;">
+                    <div class="form-group">
+                      <label class="form-label">City</label>
+                      <input type="text" class="form-input" id="co-city">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">State</label>
+                      <input type="text" class="form-input" id="co-state">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Pincode</label>
+                      <input type="text" class="form-input" id="co-pincode">
+                    </div>
+                  </div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                    <div class="form-group">
+                      <label class="form-label">Preferred Delivery Date</label>
+                      <input type="date" class="form-input" id="co-delivery-date">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Notes</label>
+                      <input type="text" class="form-input" id="co-notes" placeholder="Any special instructions...">
+                    </div>
+                  </div>
+                  <div style="display:flex;gap:0.75rem;justify-content:flex-end;margin-top:0.5rem;">
+                    <a href="cart.html" class="btn btn-ghost">Cancel</a>
+                    <button type="submit" class="btn btn-primary" style="padding:0.75rem 2rem;">Place Order →</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <!-- Order Summary -->
+            <div class="card" style="position:sticky;top:1rem;">
+              <div class="card__header"><h3 class="card__title">Order Summary</h3></div>
+              <div class="card__body" style="padding:0;">
+                <table class="table">
+                  <thead><tr><th>Item</th><th class="text-right">Qty</th><th class="text-right">Total</th></tr></thead>
+                  <tbody id="checkout-items"></tbody>
+                </table>
+                <div style="padding:1rem;border-top:2px solid var(--color-primary);display:flex;justify-content:space-between;align-items:center;">
+                  <strong style="font-size:1rem;">Grand Total</strong>
+                  <strong style="font-size:1.4rem;color:var(--color-primary);" id="checkout-total">₹0</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MODE: ORDER HISTORY -->
+        <div id="mode-history">
+          <div class="page-header">
+            <h1 class="page-title">My Orders</h1>
+            <div class="page-header-actions">
+              <a href="prices.html" class="btn btn-primary">🛒 New Order</a>
+            </div>
+          </div>
+          <!-- Filters -->
+          <div class="card">
+            <div class="card__body">
+              <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:flex-end;">
+                <div class="form-group" style="margin:0;">
+                  <label class="form-label">Status</label>
+                  <select class="form-select" id="filter-status">
+                    <option value="">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="confirmed">Confirmed</option>
+                    <option value="preparing">Preparing</option>
+                    <option value="dispatched">Dispatched</option>
+                    <option value="delivered">Delivered</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin:0;">
+                  <label class="form-label">From Date</label>
+                  <input type="date" class="form-input" id="filter-date-from">
+                </div>
+                <button class="btn btn-secondary" onclick="applyFilter()">Filter</button>
+              </div>
+            </div>
+          </div>
+          <!-- Orders Table -->
+          <div class="card" style="margin-top:1.25rem;">
+            <div class="card__body" style="padding:0;">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Order ID</th>
+                    <th>Date</th>
+                    <th>Items</th>
+                    <th class="text-right">Total Qty</th>
+                    <th class="text-right">Total Value</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="orders-tbody">
+                  <tr><td colspan="7" class="text-center text-muted">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Order Detail Modal -->
+  <div class="modal-overlay" id="modal-order-detail">
+    <div class="modal" style="max-width:680px;">
+      <div class="modal__header">
+        <h3 class="modal__title" id="order-modal-title">Order Details</h3>
+        <button class="modal__close" data-modal-close>&times;</button>
+      </div>
+      <div class="modal__body" id="order-modal-body">
+      </div>
+    </div>
+  </div>
+
+  <!-- Order Success Modal -->
+  <div class="modal-overlay" id="modal-order-success">
+    <div class="modal" style="max-width:420px;">
+      <div class="modal__body">
+        <div class="success-modal-content">
+          <div style="font-size:4rem;">🎉</div>
+          <h2 style="margin-top:1rem;color:var(--color-primary);">Order Placed Successfully!</h2>
+          <p style="font-size:1.1rem;color:var(--color-text-secondary);margin-top:0.5rem;">
+            Order <strong id="success-order-id"></strong>
+          </p>
+          <p class="text-muted" style="margin-top:0.5rem;">We'll confirm your order within 2 hours.</p>
+          <button class="btn btn-primary" style="margin-top:1.5rem;padding:0.75rem 2rem;" onclick="closeSuccessAndRedirect()">View My Orders</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    let allOrders    = [];
+    let allOrderItems = [];
+
+    const statusMap = {
+      pending:'badge--warning', confirmed:'badge--info', preparing:'badge--info',
+      stockAllocated:'badge--info', loading:'badge--info', dispatched:'badge--primary',
+      inTransit:'badge--primary', delivered:'badge--success', partiallyFulfilled:'badge--warning',
+    };
+    const statusLabels = {
+      pending:'Pending', confirmed:'Confirmed', preparing:'Preparing',
+      stockAllocated:'Stock Ready', loading:'Loading', dispatched:'Dispatched',
+      inTransit:'In Transit', delivered:'Delivered', partiallyFulfilled:'Partially Fulfilled',
+    };
+    const TIMELINE_STEPS = ['pending','confirmed','preparing','stockAllocated','loading','dispatched','inTransit','delivered'];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('vendor');
+      const user   = APP.user;
+      const vendor = MockDB.getVendorById(user.refId);
+      const params = new URLSearchParams(window.location.search);
+      const action = params.get('action');
+
+      allOrders = MockDB.getOrders().filter(o => o.vendorId === user.refId);
+
+      if (action === 'checkout') {
+        showCheckout(vendor);
+      } else {
+        showHistory();
+      }
+    });
+
+    function showCheckout(vendor) {
+      document.getElementById('mode-checkout').style.display = 'block';
+      document.getElementById('mode-history').style.display  = 'none';
+
+      // Pre-fill form from vendor profile
+      if (vendor) {
+        document.getElementById('co-biz-name').value = vendor.businessName  || '';
+        document.getElementById('co-contact').value  = vendor.contactPerson || '';
+        document.getElementById('co-mobile').value   = vendor.mobile        || '';
+        document.getElementById('co-gst').value      = vendor.gst           || '';
+        document.getElementById('co-city').value     = vendor.city          || '';
+        document.getElementById('co-state').value    = vendor.state         || '';
+      }
+
+      // Delivery date default: 2 days from now
+      const d = new Date(); d.setDate(d.getDate() + 2);
+      document.getElementById('co-delivery-date').value = Utils.formatDateInput(d);
+
+      // Show cart summary
+      const cart = JSON.parse(localStorage.getItem('golis_cart') || '[]');
+      const vegetables = MockDB.getVegetables();
+      const total = cart.reduce((s, c) => s + c.total, 0);
+      document.getElementById('checkout-total').textContent = Utils.formatCurrency(total);
+      document.getElementById('checkout-items').innerHTML = cart.map(c => {
+        const veg = vegetables.find(v => v.id === c.vegetableId);
+        return `<tr>
+          <td>${veg ? veg.emoji : ''} ${c.nameEn} <span class="badge badge--info" style="font-size:0.7rem;">Gr.${c.grade}</span></td>
+          <td class="text-right">${Utils.formatIndianNumber(c.qty)} kg</td>
+          <td class="text-right">${Utils.formatCurrency(c.total)}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    function showHistory() {
+      document.getElementById('mode-checkout').style.display = 'none';
+      document.getElementById('mode-history').style.display  = 'block';
+      renderOrders(allOrders);
+    }
+
+    function renderOrders(data) {
+      const tbody = document.getElementById('orders-tbody');
+      if (!data.length) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No orders found</td></tr>';
+        return;
+      }
+      const vegs = MockDB.getVegetables();
+      tbody.innerHTML = [...data].sort((a, b) => b.orderDate.localeCompare(a.orderDate)).map(o => {
+        const items = MockDB.getOrderItems(o.id);
+        const totalQty = items.reduce((s, i) => s + i.qty, 0);
+        const itemSummary = items.slice(0, 2).map(i => {
+          const v = vegs.find(v2 => v2.id === i.vegId);
+          return v ? `${v.nameEn} ${i.grade}` : i.vegId;
+        }).join(', ') + (items.length > 2 ? ` +${items.length-2} more` : '');
+        return `<tr>
+          <td style="font-weight:700;">${o.id}</td>
+          <td>${Utils.formatDate(o.orderDate)}</td>
+          <td style="font-size:0.85rem;">${itemSummary || '—'}</td>
+          <td class="text-right">${totalQty ? Utils.formatWeight(totalQty) : '—'}</td>
+          <td class="text-right" style="font-weight:700;">${Utils.formatCurrency(o.total)}</td>
+          <td><span class="badge ${statusMap[o.status] || ''}">${statusLabels[o.status] || o.status}</span></td>
+          <td><button class="btn btn-ghost btn-sm" onclick="viewOrderDetail('${o.id}')">View</button></td>
+        </tr>`;
+      }).join('');
+    }
+
+    function applyFilter() {
+      const status = document.getElementById('filter-status').value;
+      const from   = document.getElementById('filter-date-from').value;
+      let filtered = [...allOrders];
+      if (status) filtered = filtered.filter(o => o.status === status);
+      if (from)   filtered = filtered.filter(o => o.orderDate >= from);
+      renderOrders(filtered);
+    }
+
+    function viewOrderDetail(orderId) {
+      const order = allOrders.find(o => o.id === orderId);
+      if (!order) return;
+      const items  = MockDB.getOrderItems(orderId);
+      const vegs   = MockDB.getVegetables();
+      const vendor = MockDB.getVendorById(APP.user.refId);
+
+      const stepIdx  = TIMELINE_STEPS.indexOf(order.status);
+      const timeline = TIMELINE_STEPS.map((step, i) => {
+        const cls = i < stepIdx ? 'done' : i === stepIdx ? 'active' : '';
+        const lbl = statusLabels[step] || step;
+        return `<div class="timeline-step">
+          <div class="timeline-dot ${cls}">${i < stepIdx ? '✓' : i+1}</div>
+          <div class="timeline-label ${cls === 'active' ? 'active' : ''}">${lbl}</div>
+        </div>`;
+      }).join('');
+
+      const itemRows = items.map(item => {
+        const veg = vegs.find(v => v.id === item.vegId);
+        const confirmedQty = item.qty; // demo: same as ordered
+        const shortage = Math.max(0, item.qty - confirmedQty);
+        return `<tr>
+          <td>${veg ? `${veg.emoji} ${veg.nameEn}` : item.vegId}</td>
+          <td><span class="badge badge--info">Grade ${item.grade}</span></td>
+          <td class="text-right">${Utils.formatIndianNumber(item.qty)} kg</td>
+          <td class="text-right">${Utils.formatIndianNumber(confirmedQty)} kg ${shortage > 0 ? `<br><span style="color:var(--color-warning);font-size:0.75rem;">Shortage: ${Utils.formatWeight(shortage)}</span>` : ''}</td>
+          <td class="text-right">₹${item.rate}</td>
+          <td class="text-right" style="font-weight:700;">${Utils.formatCurrency(item.amount)}</td>
+        </tr>`;
+      }).join('');
+
+      document.getElementById('order-modal-title').textContent = `Order #${orderId}`;
+      document.getElementById('order-modal-body').innerHTML = `
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem;font-size:0.875rem;">
+          <div><strong>Date:</strong> ${Utils.formatDate(order.orderDate)}</div>
+          <div><strong>Delivery:</strong> ${Utils.formatDate(order.deliveryDate)}</div>
+          <div><strong>Status:</strong> <span class="badge ${statusMap[order.status] || ''}">${statusLabels[order.status] || order.status}</span></div>
+          <div><strong>Vendor:</strong> ${vendor ? vendor.businessName : ''}</div>
+        </div>
+        <div>
+          <strong>Order Progress</strong>
+          <div class="order-timeline">${timeline}</div>
+        </div>
+        <table class="table" style="margin-top:0.5rem;">
+          <thead><tr><th>Vegetable</th><th>Grade</th><th class="text-right">Ordered Qty</th><th class="text-right">Confirmed Qty</th><th class="text-right">Rate</th><th class="text-right">Total</th></tr></thead>
+          <tbody>${itemRows || '<tr><td colspan="6" class="text-center text-muted">No items</td></tr>'}</tbody>
+        </table>
+        <div style="text-align:right;padding:0.75rem;font-size:1.1rem;font-weight:800;color:var(--color-primary);">
+          Grand Total: ${Utils.formatCurrency(order.total)}
+        </div>
+        ${order.notes ? `<p class="text-muted" style="font-size:0.85rem;margin-top:0.5rem;">📝 Notes: ${order.notes}</p>` : ''}`;
+
+      Utils.openModal('modal-order-detail');
+    }
+
+    function placeOrder(e) {
+      e.preventDefault();
+      const cart   = JSON.parse(localStorage.getItem('golis_cart') || '[]');
+      const user   = APP.user;
+      const vendor = MockDB.getVendorById(user.refId);
+
+      if (!cart.length) {
+        Utils.showToast('Cart is empty. Add items first.', 'error');
+        return;
+      }
+
+      const orderId    = Utils.generateId('ORD');
+      const total      = cart.reduce((s, c) => s + c.total, 0);
+      const orderDate  = new Date().toISOString().split('T')[0];
+      const deliveryDate = document.getElementById('co-delivery-date').value;
+
+      const order = {
+        id:           orderId,
+        vendorId:     user.refId,
+        orderDate,
+        deliveryDate: deliveryDate || '',
+        status:       'pending',
+        total,
+        notes:        document.getElementById('co-notes').value.trim(),
+        deliveryAddress: document.getElementById('co-address').value.trim(),
+        city:         document.getElementById('co-city').value.trim(),
+        state:        document.getElementById('co-state').value.trim(),
+        pincode:      document.getElementById('co-pincode').value.trim(),
+      };
+
+      MockDB.saveRecord('_orders', order);
+
+      // Save order items
+      const vegetables = MockDB.getVegetables();
+      cart.forEach(c => {
+        const veg = vegetables.find(v => v.id === c.vegetableId);
+        MockDB.saveRecord('_orderItems', {
+          id:      Utils.generateId('OI'),
+          orderId: orderId,
+          vegId:   c.vegetableId,
+          grade:   c.grade,
+          qty:     c.qty,
+          rate:    c.rate,
+          amount:  c.total,
+        });
+      });
+
+      // Clear cart
+      localStorage.removeItem('golis_cart');
+
+      document.getElementById('success-order-id').textContent = orderId;
+      Utils.openModal('modal-order-success');
+    }
+
+    function closeSuccessAndRedirect() {
+      Utils.closeModal('modal-order-success');
+      window.location.href = 'orders.html';
+    }
+  </script>
+</body>
+</html>

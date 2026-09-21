@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Supplies — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content">
+        <div class="page-header">
+          <h1 class="page-title">My Supplies</h1>
+          <div class="page-header-actions">
+            <button class="btn btn-primary" onclick="Utils.openModal('modal-add-supply')">+ Add New Supply</button>
+          </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);">
+          <div class="stat-card stat-card--info">
+            <div class="stat-card__icon">📦</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="kpi-total-supplies">—</div>
+              <div class="stat-card__label">Total Supplies</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--success">
+            <div class="stat-card__icon">⚖️</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="kpi-month-qty">—</div>
+              <div class="stat-card__label">This Month Qty</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--success">
+            <div class="stat-card__icon">₹</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="kpi-month-value">—</div>
+              <div class="stat-card__label">This Month Value</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--warning">
+            <div class="stat-card__icon">⏳</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="kpi-pending-count">—</div>
+              <div class="stat-card__label">Pending Payment</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="card" style="margin-top:1.25rem;">
+          <div class="card__body">
+            <div style="display:grid;grid-template-columns:repeat(4,1fr) auto;gap:0.75rem;align-items:end;">
+              <div class="form-group" style="margin:0;">
+                <label class="form-label">Vegetable</label>
+                <select class="form-select" id="filter-vegetable">
+                  <option value="">All Vegetables</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin:0;">
+                <label class="form-label">Grade</label>
+                <select class="form-select" id="filter-grade">
+                  <option value="">All Grades</option>
+                  <option value="A">Grade A</option>
+                  <option value="B">Grade B</option>
+                  <option value="C">Grade C</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin:0;">
+                <label class="form-label">Status</label>
+                <select class="form-select" id="filter-status">
+                  <option value="">All Status</option>
+                  <option value="pending">Pending</option>
+                  <option value="completed">Completed</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin:0;">
+                <label class="form-label">Date From</label>
+                <input type="date" class="form-input" id="filter-date-from">
+              </div>
+              <button class="btn btn-secondary" onclick="applyFilters()">Filter</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Supply History Table -->
+        <div class="card" style="margin-top:1.25rem;">
+          <div class="card__header">
+            <h3 class="card__title">Supply History</h3>
+            <span class="badge badge--info" id="supply-count">0 records</span>
+          </div>
+          <div class="card__body" style="padding:0;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Vegetable</th>
+                  <th>Grade</th>
+                  <th>Qty (kg)</th>
+                  <th>Rate (₹/kg)</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody id="supplies-tbody">
+                <tr><td colspan="8" class="text-center text-muted">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Add New Supply Modal -->
+  <div class="modal-overlay" id="modal-add-supply">
+    <div class="modal" style="max-width:560px;">
+      <div class="modal__header">
+        <h3 class="modal__title">Add New Supply</h3>
+        <button class="modal__close" data-modal-close>&times;</button>
+      </div>
+      <div class="modal__body">
+        <form id="form-add-supply" onsubmit="submitSupply(event)">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div class="form-group">
+              <label class="form-label">Vegetable <span class="text-danger">*</span></label>
+              <select class="form-select" id="supply-vegetable" required>
+                <option value="">Select vegetable...</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Grade <span class="text-danger">*</span></label>
+              <select class="form-select" id="supply-grade" required>
+                <option value="">Select grade...</option>
+                <option value="A">Grade A (Premium)</option>
+                <option value="B">Grade B (Standard)</option>
+                <option value="C">Grade C (Economy)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Quantity (kg) <span class="text-danger">*</span></label>
+              <input type="number" class="form-input" id="supply-qty" min="1" step="1" placeholder="e.g. 500" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Expected Rate (₹/kg)</label>
+              <input type="number" class="form-input" id="supply-rate" min="0" step="0.5" placeholder="e.g. 32">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Delivery Date <span class="text-danger">*</span></label>
+              <input type="date" class="form-input" id="supply-date" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Vehicle Number</label>
+              <input type="text" class="form-input" id="supply-vehicle" placeholder="e.g. AP29AJ4567">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Notes</label>
+            <textarea class="form-textarea" id="supply-notes" rows="2" placeholder="Any notes about this supply..."></textarea>
+          </div>
+          <div style="background:var(--color-primary-pale);padding:0.75rem;border-radius:var(--radius-md);font-size:0.85rem;color:var(--color-primary);margin-bottom:1rem;">
+            ℹ️ Your supply will be recorded and the actual purchase price will be confirmed after quality inspection.
+          </div>
+          <div style="display:flex;gap:0.75rem;justify-content:flex-end;">
+            <button type="button" class="btn btn-ghost" data-modal-close>Cancel</button>
+            <button type="submit" class="btn btn-primary">Register Supply</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    let allSupplies = [];
+    let vegetables  = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('farmer');
+
+      const user = APP.user;
+      vegetables = MockDB.getVegetables();
+
+      // Populate vegetable dropdowns
+      const vegSelectFilter = document.getElementById('filter-vegetable');
+      const vegSelectForm   = document.getElementById('supply-vegetable');
+      vegetables.forEach(v => {
+        vegSelectFilter.innerHTML += `<option value="${v.id}">${v.nameEn} (${v.nameTe})</option>`;
+        vegSelectForm.innerHTML   += `<option value="${v.id}">${v.nameEn} (${v.nameTe})</option>`;
+      });
+
+      // Set today's date as default in form
+      document.getElementById('supply-date').value = Utils.formatDateInput(new Date());
+
+      // Load supplies for this farmer
+      allSupplies = MockDB.getPurchases().filter(p => p.farmerId === user.refId);
+      allSupplies.sort((a, b) => b.date.localeCompare(a.date));
+
+      // Compute summary
+      const now        = new Date();
+      const monthStart = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+      const monthSups  = allSupplies.filter(p => p.date.startsWith(monthStart));
+      const pendingCount = allSupplies.filter(p => p.status === 'pending').length;
+
+      document.getElementById('kpi-total-supplies').textContent = allSupplies.length;
+      document.getElementById('kpi-month-qty').textContent      = Utils.formatWeight(monthSups.reduce((s,p) => s+p.qty, 0));
+      document.getElementById('kpi-month-value').textContent    = Utils.formatCurrency(monthSups.reduce((s,p) => s+p.total, 0));
+      document.getElementById('kpi-pending-count').textContent  = pendingCount + ' items';
+
+      renderTable(allSupplies);
+    });
+
+    function statusBadge(status) {
+      const map = {
+        pending:  'badge--warning',
+        completed:'badge--success',
+      };
+      const labels = {
+        pending:  'Pending',
+        completed:'Completed',
+      };
+      const cls = map[status] || '';
+      return `<span class="badge ${cls}">${labels[status] || status}</span>`;
+    }
+
+    function renderTable(data) {
+      document.getElementById('supply-count').textContent = data.length + ' records';
+      const tbody = document.getElementById('supplies-tbody');
+      if (!data.length) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted empty-state-text">No supplies found for the selected filters</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.map(p => {
+        const veg = vegetables.find(v => v.id === p.vegetableId);
+        return `<tr>
+          <td>${Utils.formatDate(p.date)}</td>
+          <td>${veg ? `${veg.emoji} ${veg.nameEn} <span class="text-muted" style="font-size:0.8em;">(${veg.nameTe})</span>` : p.vegetableId}</td>
+          <td><span class="badge badge--info">Grade ${p.grade}</span></td>
+          <td class="text-right">${Utils.formatIndianNumber(p.qty)}</td>
+          <td class="text-right">${p.rate ? '₹' + p.rate : '—'}</td>
+          <td class="text-right" style="font-weight:600;">${Utils.formatCurrency(p.total)}</td>
+          <td>${statusBadge(p.status)}</td>
+          <td class="text-muted">${p.notes || '—'}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    function applyFilters() {
+      const veg    = document.getElementById('filter-vegetable').value;
+      const grade  = document.getElementById('filter-grade').value;
+      const status = document.getElementById('filter-status').value;
+      const from   = document.getElementById('filter-date-from').value;
+
+      let filtered = [...allSupplies];
+      if (veg)    filtered = filtered.filter(p => p.vegetableId === veg);
+      if (grade)  filtered = filtered.filter(p => p.grade === grade);
+      if (status) filtered = filtered.filter(p => p.status === status);
+      if (from)   filtered = filtered.filter(p => p.date >= from);
+
+      renderTable(filtered);
+    }
+
+    function submitSupply(e) {
+      e.preventDefault();
+      const user      = APP.user;
+      const vegId     = document.getElementById('supply-vegetable').value;
+      const grade     = document.getElementById('supply-grade').value;
+      const qty       = parseInt(document.getElementById('supply-qty').value);
+      const rate      = parseFloat(document.getElementById('supply-rate').value) || 0;
+      const date      = document.getElementById('supply-date').value;
+      const vehicleNo = document.getElementById('supply-vehicle').value.trim();
+      const notes     = document.getElementById('supply-notes').value.trim();
+
+      if (!vegId || !grade || !qty || !date) {
+        Utils.showToast('Please fill all required fields', 'error');
+        return;
+      }
+
+      const record = {
+        id:          Utils.generateId('PUR'),
+        farmerId:    user.refId,
+        vegetableId: vegId,
+        grade,
+        qty,
+        rate,
+        total:       qty * rate,
+        date,
+        bags:        Math.ceil(qty / 50),
+        vehicleNo:   vehicleNo || '',
+        paymentMode: 'Pending',
+        status:      'pending',
+        notes,
+      };
+
+      MockDB.saveRecord('_purchases', record);
+      Utils.closeModal('modal-add-supply');
+      Utils.showToast('Supply registered successfully! 🌾', 'success');
+      document.getElementById('form-add-supply').reset();
+      document.getElementById('supply-date').value = Utils.formatDateInput(new Date());
+
+      // Refresh table
+      allSupplies = MockDB.getPurchases().filter(p => p.farmerId === user.refId);
+      allSupplies.sort((a, b) => b.date.localeCompare(a.date));
+      renderTable(allSupplies);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loading Management — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content">
+        <div class="page-header">
+          <h1 class="page-title">Loading Management</h1>
+          <div class="page-header-actions">
+            <button class="btn btn-primary" onclick="Utils.openModal('modal-loading')">+ Add Loading Record</button>
+          </div>
+        </div>
+
+        <!-- Orders Ready Queue -->
+        <div class="card" style="margin-bottom:1.5rem;">
+          <div class="card__header">
+            <h3 class="card__title">📦 Orders Ready for Loading</h3>
+            <span class="badge badge--success" id="ready-count"></span>
+          </div>
+          <div class="card__body">
+            <div id="ready-queue">
+              <div class="empty-state"><p class="empty-state__text">No orders ready for loading.</p></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Loading Records Table -->
+        <div class="card">
+          <div class="card__header">
+            <h3 class="card__title">Loading Records</h3>
+          </div>
+          <div class="card__body" style="padding:0;">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Loading ID</th>
+                    <th>Order</th>
+                    <th>Vendor</th>
+                    <th>Workers</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Duration</th>
+                    <th>Labour Cost</th>
+                    <th data-i18n="col.status"></th>
+                  </tr>
+                </thead>
+                <tbody id="loading-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Add Loading Modal -->
+  <div class="modal-overlay" id="modal-loading">
+    <div class="modal modal--lg">
+      <div class="modal__header">
+        <h3 class="modal__title">Add Loading Record</h3>
+        <button class="modal__close" onclick="Utils.closeModal('modal-loading')">&times;</button>
+      </div>
+      <div class="modal__body">
+        <form id="loading-form">
+          <div class="form-group">
+            <label class="form-label">Order <span class="required">*</span></label>
+            <select class="form-select" id="ld-order" required onchange="onOrderSelect()">
+              <option value="">Select Order (Stock Allocated)</option>
+            </select>
+          </div>
+          <!-- Order preview -->
+          <div id="ld-order-preview" style="display:none;padding:0.75rem;background:var(--color-primary-pale);border-radius:8px;margin-bottom:1rem;font-size:0.875rem;"></div>
+
+          <div class="form-group">
+            <label class="form-label">Assign Workers <span class="required">*</span></label>
+            <div id="worker-checkboxes" style="display:grid;grid-template-columns:repeat(2,1fr);gap:0.5rem;padding:0.75rem;border:1px solid var(--color-border);border-radius:6px;background:var(--color-bg);"></div>
+          </div>
+
+          <div class="form-grid form-grid--2">
+            <div class="form-group">
+              <label class="form-label">Start Time <span class="required">*</span></label>
+              <input type="datetime-local" class="form-input" id="ld-start" oninput="calcLabourCost()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">End Time</label>
+              <input type="datetime-local" class="form-input" id="ld-end" oninput="calcLabourCost()">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Supervisor</label>
+            <select class="form-select" id="ld-supervisor">
+              <option value="Suresh Babu">Suresh Babu (Manager)</option>
+              <option value="Ramaiah Goli">Ramaiah Goli (Owner)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Loading Status</label>
+            <select class="form-select" id="ld-status">
+              <option value="pending">Pending</option>
+              <option value="inProgress" selected>In Progress</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+
+          <!-- Labour Cost Preview -->
+          <div id="labour-cost-preview" style="padding:1rem;background:var(--color-bg);border:1px solid var(--color-border);border-radius:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span>Estimated Labour Cost</span>
+              <strong id="ld-cost-display" style="font-size:1.125rem;color:var(--color-primary);">₹0</strong>
+            </div>
+            <div style="font-size:0.75rem;color:var(--color-text-secondary);margin-top:0.25rem;" id="ld-cost-formula">Select workers and time range to calculate.</div>
+          </div>
+        </form>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn-ghost" onclick="Utils.closeModal('modal-loading')" data-i18n="common.cancel"></button>
+        <button class="btn btn-primary" onclick="saveLoading()">Save Loading Record</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    let _loading = [];
+    let _labour  = [];
+
+    function onOrderSelect() {
+      const orderId = document.getElementById('ld-order').value;
+      const preview = document.getElementById('ld-order-preview');
+      if (!orderId) { preview.style.display = 'none'; return; }
+      const order  = MockDB.getOrderById(orderId);
+      const vendor = order ? MockDB.getVendorById(order.vendorId) : null;
+      const items  = MockDB.getOrderItems(orderId);
+      preview.innerHTML =
+        `<strong>${orderId}</strong> — ${vendor ? vendor.businessName : ''} (${vendor ? vendor.city : ''})<br>
+        Items: ${items.map(i => { const v = MockDB.getVegetableById(i.vegId); return `${v ? v.nameEn : ''} ${i.qty} kg`; }).join(', ')}<br>
+        Total: <strong>${Utils.formatCurrency(order ? order.total : 0)}</strong>`;
+      preview.style.display = 'block';
+    }
+
+    function calcLabourCost() {
+      const start = document.getElementById('ld-start').value;
+      const end   = document.getElementById('ld-end').value;
+      const selectedWorkers = [...document.querySelectorAll('#worker-checkboxes input:checked')];
+      const selectedLabour  = selectedWorkers.map(cb => _labour.find(l => l.id === cb.value)).filter(Boolean);
+
+      if (!start || !end || selectedLabour.length === 0) {
+        document.getElementById('ld-cost-display').textContent = '₹0';
+        document.getElementById('ld-cost-formula').textContent = 'Select workers and time range to calculate.';
+        return;
+      }
+      const startMs = new Date(start).getTime();
+      const endMs   = new Date(end).getTime();
+      if (endMs <= startMs) { document.getElementById('ld-cost-formula').textContent = 'End time must be after start time.'; return; }
+
+      const hours = (endMs - startMs) / (1000 * 3600);
+      const hourlyRate = (worker) => worker.dailyWage / 8;
+      const totalCost  = selectedLabour.reduce((s, l) => s + (hourlyRate(l) * hours), 0);
+
+      document.getElementById('ld-cost-display').textContent = Utils.formatCurrency(Math.round(totalCost));
+      document.getElementById('ld-cost-formula').textContent =
+        `${selectedLabour.length} worker(s) × ${hours.toFixed(1)} hrs × avg ₹${Math.round(selectedLabour.reduce((s, l) => s + hourlyRate(l), 0) / selectedLabour.length)}/hr = ${Utils.formatCurrency(Math.round(totalCost))}`;
+    }
+
+    function renderReadyQueue() {
+      const orders = MockDB.getOrders().filter(o => o.status === 'stockAllocated');
+      document.getElementById('ready-count').textContent = orders.length + ' orders ready';
+      if (orders.length === 0) {
+        document.getElementById('ready-queue').innerHTML = '<div class="empty-state"><p class="empty-state__text">No orders ready for loading. Allocate stock first.</p></div>';
+        return;
+      }
+      document.getElementById('ready-queue').innerHTML =
+        `<div style="display:flex;flex-wrap:wrap;gap:1rem;">` +
+        orders.map(o => {
+          const vendor = MockDB.getVendorById(o.vendorId);
+          return `<div style="padding:0.875rem 1rem;border:2px solid var(--color-success);border-radius:8px;min-width:250px;">
+            <div style="font-weight:700;">${o.id}</div>
+            <div style="font-size:0.8rem;color:var(--color-text-secondary);margin-bottom:0.5rem;">${vendor ? vendor.businessName : ''} — ${Utils.formatCurrency(o.total)}</div>
+            ${Utils.statusBadge(o.status)}
+            <button class="btn btn-sm btn-primary" style="margin-left:0.5rem;" onclick="document.getElementById('ld-order').value='${o.id}';onOrderSelect();Utils.openModal('modal-loading');">+ Add Loading</button>
+          </div>`;
+        }).join('') + '</div>';
+    }
+
+    function renderLoadingTable() {
+      const orders = MockDB.getOrders();
+      document.getElementById('loading-tbody').innerHTML = _loading.length === 0
+        ? '<tr><td colspan="9" class="empty-row">No loading records yet.</td></tr>'
+        : _loading.map(l => {
+            const order  = orders.find(o => o.id === l.orderId);
+            const vendor = order ? MockDB.getVendorById(order.vendorId) : null;
+            const workers = (l.labourIds || []).map(id => {
+              const w = MockDB.getLabour().find(lb => lb.id === id);
+              return w ? w.name : id;
+            });
+            // Duration
+            let duration = '—';
+            if (l.startTime && l.endTime) {
+              const ms = new Date(l.endTime) - new Date(l.startTime);
+              const hrs = ms / 3600000;
+              duration = hrs.toFixed(1) + ' hrs';
+            }
+            return `<tr>
+              <td><code>${l.id}</code></td>
+              <td><code>${l.orderId}</code></td>
+              <td>${vendor ? vendor.businessName : '—'}</td>
+              <td>${workers.join(', ') || '—'}</td>
+              <td>${l.startTime ? new Date(l.startTime).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '—'}</td>
+              <td>${l.endTime ? new Date(l.endTime).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '<span class="badge badge--warning">In Progress</span>'}</td>
+              <td>${duration}</td>
+              <td>${l.labourCost ? Utils.formatCurrency(l.labourCost) : '—'}</td>
+              <td>${Utils.statusBadge(l.status || 'pending')}</td>
+            </tr>`;
+          }).join('');
+    }
+
+    function saveLoading() {
+      const orderId  = document.getElementById('ld-order').value;
+      const startVal = document.getElementById('ld-start').value;
+      if (!orderId || !startVal) { Utils.showToast('Order and Start Time are required.', 'error'); return; }
+
+      const selectedWorkers = [...document.querySelectorAll('#worker-checkboxes input:checked')].map(cb => cb.value);
+      if (selectedWorkers.length === 0) { Utils.showToast('Assign at least one worker.', 'error'); return; }
+
+      const endVal = document.getElementById('ld-end').value;
+      let labourCost = 0;
+      if (endVal) {
+        const hours = (new Date(endVal) - new Date(startVal)) / 3600000;
+        selectedWorkers.forEach(id => {
+          const w = _labour.find(l => l.id === id);
+          if (w) labourCost += (w.dailyWage / 8) * hours;
+        });
+      }
+
+      const record = {
+        id: Utils.generateId('LDG'),
+        orderId,
+        labourIds: selectedWorkers,
+        supervisor: document.getElementById('ld-supervisor').value,
+        startTime: startVal,
+        endTime: endVal || '',
+        totalQty: 0,
+        labourCost: Math.round(labourCost),
+        status: document.getElementById('ld-status').value,
+        notes: '',
+      };
+      MockDB.saveRecord('_loadingRecords', record);
+      // Update order status to loading
+      MockDB.updateRecord('_orders', orderId, { status: 'loading' });
+
+      _loading = MockDB.getLoadingRecords();
+      Utils.closeModal('modal-loading');
+      Utils.showToast('Loading record saved! Order status updated to Loading.', 'success');
+      renderReadyQueue();
+      renderLoadingTable();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('manager');
+      _loading = MockDB.getLoadingRecords();
+      _labour  = MockDB.getLabour();
+
+      // Populate orders dropdown (stockAllocated)
+      MockDB.getOrders()
+        .filter(o => ['stockAllocated','confirmed'].includes(o.status))
+        .forEach(o => {
+          const vendor = MockDB.getVendorById(o.vendorId);
+          document.getElementById('ld-order').add(new Option(`${o.id} — ${vendor ? vendor.businessName : ''} (${Utils.statusBadge ? o.status : o.status})`, o.id));
+        });
+
+      // Build worker checkboxes
+      const cbContainer = document.getElementById('worker-checkboxes');
+      _labour.forEach(l => {
+        const div = document.createElement('div');
+        div.innerHTML = `<label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-size:0.875rem;">
+          <input type="checkbox" value="${l.id}" onchange="calcLabourCost()">
+          <span>${l.name}</span>
+          <span style="font-size:0.75rem;color:var(--color-text-secondary);">${l.workType} (₹${l.dailyWage}/day)</span>
+        </label>`;
+        cbContainer.appendChild(div);
+      });
+
+      // Default start time
+      document.getElementById('ld-start').value = new Date().toISOString().slice(0,16);
+
+      renderReadyQueue();
+      renderLoadingTable();
+    });
+  </script>
+</body>
+</html>

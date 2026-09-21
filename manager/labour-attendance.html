@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Labour Attendance — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content">
+        <div class="page-header">
+          <h1 class="page-title">Labour Attendance</h1>
+          <div class="page-header-actions">
+            <input type="date" class="form-input" id="att-date" style="width:170px;" onchange="loadAttendance()">
+            <button class="btn btn-primary" id="save-btn" onclick="saveAttendance()">Save Attendance</button>
+          </div>
+        </div>
+
+        <!-- Date Display -->
+        <div style="padding:0.875rem 1.25rem;background:var(--color-primary-pale);border-radius:8px;margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <span style="font-size:1.125rem;font-weight:700;color:var(--color-primary);" id="date-display">Date: 21 September 2026</span>
+            <span id="saved-badge" style="display:none;margin-left:0.75rem;" class="badge badge--success">✅ Saved</span>
+          </div>
+          <button class="btn btn-ghost" id="edit-btn" style="display:none;" onclick="enableEditing()">Edit</button>
+        </div>
+
+        <!-- Attendance Cards Grid -->
+        <div id="attendance-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;margin-bottom:1.5rem;"></div>
+
+        <!-- Summary Row -->
+        <div class="card">
+          <div class="card__header">
+            <h3 class="card__title">Daily Summary</h3>
+          </div>
+          <div class="card__body">
+            <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;text-align:center;">
+              <div>
+                <div style="font-size:1.5rem;font-weight:700;color:var(--color-success);" id="sum-present">—</div>
+                <div style="font-size:0.8rem;color:var(--color-text-secondary);">Present</div>
+              </div>
+              <div>
+                <div style="font-size:1.5rem;font-weight:700;color:var(--color-warning);" id="sum-halfday">—</div>
+                <div style="font-size:0.8rem;color:var(--color-text-secondary);">Half Day</div>
+              </div>
+              <div>
+                <div style="font-size:1.5rem;font-weight:700;color:var(--color-danger);" id="sum-absent">—</div>
+                <div style="font-size:0.8rem;color:var(--color-text-secondary);">Absent</div>
+              </div>
+              <div>
+                <div style="font-size:1.5rem;font-weight:700;color:var(--color-info);" id="sum-overtime">—</div>
+                <div style="font-size:0.8rem;color:var(--color-text-secondary);">Overtime</div>
+              </div>
+              <div style="background:var(--color-primary-pale);border-radius:8px;padding:0.5rem;">
+                <div style="font-size:1.25rem;font-weight:700;color:var(--color-primary);" id="sum-wage">—</div>
+                <div style="font-size:0.8rem;color:var(--color-primary);">Total Wage Today</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    const OT_RATE_PER_HOUR = 100; // ₹100 per overtime hour
+    let _labour     = [];
+    let _attendance = {};  // map labourId → { status, overtimeHours }
+    let _isSaved    = false;
+    let _editing    = true;
+
+    function loadAttendance() {
+      const date = document.getElementById('att-date').value;
+      if (!date) return;
+      const dt = new Date(date);
+      document.getElementById('date-display').textContent = 'Date: ' + dt.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+
+      // Load existing attendance for this date
+      const existing = MockDB.getAttendance(date);
+      _attendance = {};
+      existing.forEach(a => {
+        _attendance[a.labourId] = { status: a.status, overtimeHours: a.overtimeHours || 0, id: a.id };
+      });
+
+      // Determine if already saved (has records)
+      _isSaved = existing.length > 0;
+      _editing = !_isSaved;
+      document.getElementById('saved-badge').style.display = _isSaved ? '' : 'none';
+      document.getElementById('edit-btn').style.display    = _isSaved ? '' : 'none';
+      document.getElementById('save-btn').style.display    = _isSaved && !_editing ? 'none' : '';
+
+      renderCards();
+      updateSummary();
+    }
+
+    function enableEditing() {
+      _editing = true;
+      document.getElementById('save-btn').style.display = '';
+      document.getElementById('edit-btn').style.display = 'none';
+      renderCards();
+    }
+
+    function onStatusChange(labourId, select) {
+      const val = select.value;
+      if (!_attendance[labourId]) _attendance[labourId] = { status: val, overtimeHours: 0 };
+      else _attendance[labourId].status = val;
+      // Show/hide OT input
+      const otDiv = document.getElementById(`ot-${labourId}`);
+      if (otDiv) otDiv.style.display = val === 'overtime' ? 'flex' : 'none';
+      updateSummary();
+    }
+
+    function onOtChange(labourId, input) {
+      if (!_attendance[labourId]) _attendance[labourId] = { status: 'overtime', overtimeHours: 0 };
+      _attendance[labourId].overtimeHours = Number(input.value) || 0;
+      updateSummary();
+    }
+
+    function renderCards() {
+      const grid = document.getElementById('attendance-grid');
+      grid.innerHTML = _labour.map(l => {
+        const att = _attendance[l.id] || { status: 'present', overtimeHours: 0 };
+        const statusColors = {
+          present:  'var(--color-success)',
+          halfDay:  'var(--color-warning)',
+          absent:   'var(--color-danger)',
+          overtime: 'var(--color-info)',
+        };
+        const statusWage = {
+          present:  l.dailyWage,
+          halfDay:  Math.round(l.dailyWage * 0.5),
+          absent:   0,
+          overtime: l.dailyWage + (att.overtimeHours * OT_RATE_PER_HOUR),
+        };
+        const workTypeBadge = { Loading: 'badge--info', Unloading: 'badge--warning', Sorting: 'badge--success', Packing: 'badge--primary', Cleaning: 'badge--ghost' };
+        const disabled = !_editing ? 'disabled' : '';
+        return `<div style="padding:1rem;border:1px solid var(--color-border);border-radius:10px;background:var(--color-surface);border-left:4px solid ${statusColors[att.status] || 'var(--color-border)'};">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.75rem;">
+            <div>
+              <div style="font-weight:600;">${l.name}</div>
+              <span class="badge ${workTypeBadge[l.workType] || 'badge--ghost'}" style="font-size:0.7rem;">${l.workType}</span>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:0.75rem;color:var(--color-text-secondary);">Daily Wage</div>
+              <div style="font-weight:700;color:var(--color-primary);">₹${l.dailyWage}</div>
+            </div>
+          </div>
+          <div style="margin-bottom:0.75rem;">
+            <label style="font-size:0.8rem;color:var(--color-text-secondary);display:block;margin-bottom:0.25rem;">Attendance Status</label>
+            <select class="form-select" ${disabled} onchange="onStatusChange('${l.id}',this)" style="font-size:0.875rem;">
+              <option value="present"  ${att.status === 'present'  ? 'selected' : ''}>✅ Present (₹${l.dailyWage})</option>
+              <option value="halfDay"  ${att.status === 'halfDay'  ? 'selected' : ''}>🌓 Half Day (₹${Math.round(l.dailyWage*0.5)})</option>
+              <option value="absent"   ${att.status === 'absent'   ? 'selected' : ''}>❌ Absent (₹0)</option>
+              <option value="overtime" ${att.status === 'overtime' ? 'selected' : ''}>⏱ Overtime</option>
+            </select>
+          </div>
+          <div id="ot-${l.id}" style="display:${att.status === 'overtime' ? 'flex' : 'none'};align-items:center;gap:0.5rem;margin-bottom:0.75rem;">
+            <label style="font-size:0.8rem;white-space:nowrap;">OT Hours:</label>
+            <input type="number" class="form-input" ${disabled} value="${att.overtimeHours || 0}" min="0" max="8" step="0.5"
+              oninput="onOtChange('${l.id}',this)" style="width:80px;padding:0.25rem 0.5rem;font-size:0.875rem;">
+            <span style="font-size:0.8rem;color:var(--color-text-secondary);">× ₹${OT_RATE_PER_HOUR}/hr</span>
+          </div>
+          <div style="font-size:0.875rem;text-align:right;color:${statusColors[att.status] || 'var(--color-text-primary)'};font-weight:600;">
+            Wage Today: ₹${statusWage[att.status] !== undefined ? statusWage[att.status] : l.dailyWage}
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function updateSummary() {
+      let present = 0, halfday = 0, absent = 0, overtime = 0, totalWage = 0;
+      _labour.forEach(l => {
+        const att = _attendance[l.id] || { status: 'present', overtimeHours: 0 };
+        if (att.status === 'present')  { present++;  totalWage += l.dailyWage; }
+        if (att.status === 'halfDay')  { halfday++;  totalWage += Math.round(l.dailyWage * 0.5); }
+        if (att.status === 'absent')   { absent++; }
+        if (att.status === 'overtime') { overtime++; totalWage += l.dailyWage + ((att.overtimeHours || 0) * OT_RATE_PER_HOUR); }
+      });
+      document.getElementById('sum-present').textContent  = present;
+      document.getElementById('sum-halfday').textContent  = halfday;
+      document.getElementById('sum-absent').textContent   = absent;
+      document.getElementById('sum-overtime').textContent = overtime;
+      document.getElementById('sum-wage').textContent     = Utils.formatCurrency(totalWage);
+    }
+
+    function saveAttendance() {
+      const date = document.getElementById('att-date').value;
+      if (!date) { Utils.showToast('Please select a date.', 'error'); return; }
+      let saved = 0;
+      _labour.forEach(l => {
+        const att = _attendance[l.id] || { status: 'present', overtimeHours: 0 };
+        const existing = MockDB.getAttendance(date).find(a => a.labourId === l.id);
+        const record = {
+          labourId: l.id,
+          date,
+          status: att.status,
+          overtimeHours: att.overtimeHours || 0,
+          notes: '',
+        };
+        if (existing) {
+          MockDB.updateRecord('_attendance', existing.id, record);
+        } else {
+          MockDB.saveRecord('_attendance', { id: Utils.generateId('ATT'), ...record });
+        }
+        saved++;
+      });
+      _isSaved = true;
+      _editing = false;
+      document.getElementById('saved-badge').style.display = '';
+      document.getElementById('edit-btn').style.display    = '';
+      document.getElementById('save-btn').style.display    = 'none';
+      Utils.showToast(`Attendance saved for ${saved} workers!`, 'success');
+      renderCards();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('manager');
+      _labour = MockDB.getLabour();
+      // Default to today
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('att-date').value = today;
+      loadAttendance();
+    });
+  </script>
+</body>
+</html>

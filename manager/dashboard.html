@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manager Dashboard — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content">
+        <div class="page-header">
+          <h1 class="page-title">Operations Dashboard</h1>
+          <div class="page-header-actions">
+            <span id="today-date" class="text-muted" style="font-size:0.875rem;"></span>
+          </div>
+        </div>
+
+        <!-- KPI Cards — 6 cards -->
+        <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">
+          <div class="stat-card stat-card--info">
+            <div class="stat-card__icon">🚛</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="kpi-arrivals">—</div>
+              <div class="stat-card__label">Today's Arrivals</div>
+              <div class="stat-card__trend">Vehicles at yard</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--warning">
+            <div class="stat-card__icon">⚖</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="kpi-weighment">—</div>
+              <div class="stat-card__label">Pending Weighment</div>
+              <div class="stat-card__trend trend-warning">Action needed</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--info">
+            <div class="stat-card__icon">#</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="kpi-orders">—</div>
+              <div class="stat-card__label">Orders In Progress</div>
+              <div class="stat-card__trend">Active processing</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--success">
+            <div class="stat-card__icon">👷</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="kpi-labour">—</div>
+              <div class="stat-card__label">Labour Present Today</div>
+              <div class="stat-card__trend trend-up">Out of 10 workers</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--success">
+            <div class="stat-card__icon">₹</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="kpi-purchases">—</div>
+              <div class="stat-card__label">Today's Purchases</div>
+              <div class="stat-card__trend trend-up">↑ Today</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--warning">
+            <div class="stat-card__icon">🚚</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="kpi-dispatches">—</div>
+              <div class="stat-card__label">Pending Dispatches</div>
+              <div class="stat-card__trend trend-warning">Needs action</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity Queue + Chart -->
+        <div style="display:grid;grid-template-columns:1fr 380px;gap:1.25rem;margin-top:1.5rem;">
+          <!-- Priority Action Queue -->
+          <div class="card">
+            <div class="card__header">
+              <h3 class="card__title">⚡ Priority Action Queue</h3>
+              <span class="badge badge--info" id="queue-count">Loading...</span>
+            </div>
+            <div class="card__body" style="padding:0.5rem;">
+              <div id="action-queue"></div>
+            </div>
+          </div>
+          <!-- Daily Activity Chart -->
+          <div>
+            <div class="card" style="margin-bottom:1.25rem;">
+              <div class="card__header">
+                <h3 class="card__title">Today's Activity</h3>
+              </div>
+              <div class="card__body">
+                <div class="chart-container" style="height:180px;"><canvas id="chart-daily"></canvas></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card__header">
+                <h3 class="card__title">Quick Actions</h3>
+              </div>
+              <div class="card__body">
+                <div style="display:flex;flex-direction:column;gap:0.5rem;">
+                  <a href="arrivals.html" class="btn btn-primary" style="text-align:center;">+ New Arrival</a>
+                  <a href="weighment.html" class="btn btn-secondary" style="text-align:center;">Start Weighment</a>
+                  <a href="orders.html" class="btn btn-secondary" style="text-align:center;">Process Orders</a>
+                  <a href="labour-attendance.html" class="btn btn-ghost" style="text-align:center;">Mark Attendance</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('manager');
+
+      const stats = MockDB.getManagerStats();
+      const today = new Date().toISOString().split('T')[0];
+      const todayAttendance = MockDB.getAttendance(today);
+      const presentCount = todayAttendance.filter(a => ['present','overtime'].includes(a.status)).length;
+
+      document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-IN', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+      document.getElementById('kpi-arrivals').textContent  = stats.todayArrivals || 4;
+      document.getElementById('kpi-weighment').textContent = stats.pendingWeighment || 3;
+      document.getElementById('kpi-orders').textContent    = stats.ordersInProgress || 7;
+      document.getElementById('kpi-labour').textContent    = (presentCount || 8) + '/10';
+      document.getElementById('kpi-purchases').textContent = Utils.formatCurrency(stats.todayPurchases || 184500);
+      document.getElementById('kpi-dispatches').textContent= stats.pendingDispatches || 3;
+
+      // Build priority action queue
+      const arrivals   = MockDB.getArrivals();
+      const orders     = MockDB.getOrders();
+      const inventory  = MockDB.getInventory();
+      const vegetables = MockDB.getVegetables();
+
+      const queueItems = [];
+
+      // Arrivals awaiting weighment (status = Arrived or Waiting)
+      const awaitingWeighment = arrivals.filter(a => ['arrived','waiting'].includes(a.status));
+      if (awaitingWeighment.length) {
+        queueItems.push({
+          icon: '⚖️', color: 'warning',
+          title: 'Arrivals Awaiting Weighment',
+          desc: awaitingWeighment.map(a => {
+            const f = MockDB.getFarmerById(a.farmerId);
+            const v = MockDB.getVegetableById(a.vegetableId);
+            return `${f ? f.name : a.farmerId} — ${v ? v.nameEn : ''} (${a.expectedQty} kg)`;
+          }).join('; '),
+          count: awaitingWeighment.length,
+          link: 'weighment.html',
+        });
+      }
+
+      // Orders awaiting confirmation (pending)
+      const pendingOrders = orders.filter(o => o.status === 'pending');
+      if (pendingOrders.length) {
+        queueItems.push({
+          icon: '📋', color: 'info',
+          title: 'Orders Awaiting Confirmation',
+          desc: pendingOrders.map(o => {
+            const v = MockDB.getVendorById(o.vendorId);
+            return `${o.id} — ${v ? v.businessName : ''} (${Utils.formatCurrency(o.total)})`;
+          }).join('; '),
+          count: pendingOrders.length,
+          link: 'orders.html',
+        });
+      }
+
+      // Orders ready for loading (stockAllocated)
+      const readyForLoading = orders.filter(o => o.status === 'stockAllocated');
+      if (readyForLoading.length) {
+        queueItems.push({
+          icon: '📦', color: 'success',
+          title: 'Orders Ready for Loading',
+          desc: readyForLoading.map(o => {
+            const v = MockDB.getVendorById(o.vendorId);
+            return `${o.id} — ${v ? v.businessName : ''}`;
+          }).join('; '),
+          count: readyForLoading.length,
+          link: 'loading.html',
+        });
+      }
+
+      // Low stock alerts (closing < 200 kg)
+      const lowStock = inventory.filter(i => i.closing < 200);
+      if (lowStock.length) {
+        queueItems.push({
+          icon: '⚠️', color: 'danger',
+          title: 'Low Stock Alerts',
+          desc: lowStock.map(i => {
+            const v = MockDB.getVegetableById(i.vegId);
+            return `${v ? v.nameEn : ''} Grade ${i.grade}: ${i.closing} kg remaining`;
+          }).join('; '),
+          count: lowStock.length,
+          link: 'inventory.html',
+        });
+      }
+
+      // Labour not yet marked today
+      const allLabour   = MockDB.getLabour();
+      const markedIds   = todayAttendance.map(a => a.labourId);
+      const notMarked   = allLabour.filter(l => !markedIds.includes(l.id));
+      if (notMarked.length) {
+        queueItems.push({
+          icon: '👷', color: 'warning',
+          title: 'Labour Attendance Not Marked',
+          desc: notMarked.map(l => l.name).join(', '),
+          count: notMarked.length,
+          link: 'labour-attendance.html',
+        });
+      }
+
+      document.getElementById('queue-count').textContent = queueItems.length + ' items';
+
+      const queueEl = document.getElementById('action-queue');
+      if (queueItems.length === 0) {
+        queueEl.innerHTML = '<div class="empty-state"><p class="empty-state__text">✅ All tasks completed for today!</p></div>';
+      } else {
+        queueEl.innerHTML = queueItems.map(item => `
+          <div style="display:flex;align-items:flex-start;gap:0.75rem;padding:0.875rem;border-radius:8px;margin-bottom:0.5rem;border:1px solid var(--color-border);background:var(--color-bg);">
+            <div style="font-size:1.5rem;line-height:1;">${item.icon}</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-weight:600;font-size:0.875rem;margin-bottom:0.25rem;">${item.title}
+                <span class="badge badge--${item.color}" style="margin-left:0.5rem;">${item.count}</span>
+              </div>
+              <div style="font-size:0.8rem;color:var(--color-text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.desc}</div>
+            </div>
+            <a href="${item.link}" class="btn btn-sm btn-primary" style="white-space:nowrap;flex-shrink:0;">Take Action →</a>
+          </div>`).join('');
+      }
+
+      // Daily activity bar chart
+      if (typeof Chart !== 'undefined') {
+        new Chart(document.getElementById('chart-daily'), {
+          type: 'bar',
+          data: {
+            labels: ['06:00','07:00','08:00','09:00','10:00','11:00'],
+            datasets: [
+              { label: 'Arrivals', data: [2,1,1,0,0,0], backgroundColor: '#4361ee88' },
+              { label: 'Purchases', data: [1,0,2,0,1,0], backgroundColor: '#40916c88' },
+            ]
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 11 } } } },
+            scales: { x: { stacked: false, ticks: { font: { size: 11 } } }, y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } } } }
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Processing — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content">
+        <div class="page-header">
+          <h1 class="page-title" data-i18n="page.orders"></h1>
+        </div>
+
+        <!-- Pending Orders Queue -->
+        <div class="card" style="margin-bottom:1.5rem;">
+          <div class="card__header">
+            <h3 class="card__title">🔔 Pending Orders — Awaiting Confirmation</h3>
+            <span class="badge badge--warning" id="pending-count"></span>
+          </div>
+          <div class="card__body">
+            <div id="pending-queue">
+              <div class="empty-state"><p class="empty-state__text">No pending orders.</p></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- All Orders Table -->
+        <div class="card">
+          <div class="card__header">
+            <h3 class="card__title">All Orders</h3>
+            <div style="display:flex;gap:0.5rem;align-items:center;">
+              <select class="form-select" id="filter-status" style="font-size:0.875rem;padding:0.375rem 0.75rem;" onchange="renderOrdersTable()">
+                <option value="">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="stockAllocated">Stock Allocated</option>
+                <option value="loading">Loading</option>
+                <option value="dispatched">Dispatched</option>
+                <option value="delivered">Delivered</option>
+                <option value="partiallyFulfilled">Partially Fulfilled</option>
+              </select>
+            </div>
+          </div>
+          <div class="card__body" style="padding:0;">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Order ID</th>
+                    <th>Order Date</th>
+                    <th>Vendor</th>
+                    <th>Total Value</th>
+                    <th data-i18n="col.status"></th>
+                    <th>Delivery Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="orders-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Stock Check Modal -->
+  <div class="modal-overlay" id="modal-stock-check">
+    <div class="modal modal--lg">
+      <div class="modal__header">
+        <h3 class="modal__title">Stock Check for Order <span id="sc-order-id"></span></h3>
+        <button class="modal__close" onclick="Utils.closeModal('modal-stock-check')">&times;</button>
+      </div>
+      <div class="modal__body">
+        <div id="sc-vendor-info" style="padding:0.75rem;background:var(--color-bg);border-radius:8px;margin-bottom:1rem;font-size:0.875rem;"></div>
+        <div class="table-responsive">
+          <table class="data-table" style="margin-bottom:1rem;">
+            <thead>
+              <tr>
+                <th>Vegetable</th>
+                <th>Grade</th>
+                <th>Ordered Qty</th>
+                <th>Available Stock</th>
+                <th>Fulfillment</th>
+              </tr>
+            </thead>
+            <tbody id="sc-items-tbody"></tbody>
+          </table>
+        </div>
+        <div id="sc-summary" style="padding:1rem;background:var(--color-bg);border-radius:8px;"></div>
+      </div>
+      <div class="modal__footer" id="sc-actions">
+        <!-- Populated dynamically based on fulfillment -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Update Status Modal -->
+  <div class="modal-overlay" id="modal-update-status">
+    <div class="modal">
+      <div class="modal__header">
+        <h3 class="modal__title">Update Order Status</h3>
+        <button class="modal__close" onclick="Utils.closeModal('modal-update-status')">&times;</button>
+      </div>
+      <div class="modal__body">
+        <input type="hidden" id="us-order-id">
+        <div class="form-group">
+          <label class="form-label">New Status</label>
+          <select class="form-select" id="us-status">
+            <option value="pending">Pending</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="preparing">Preparing</option>
+            <option value="stockAllocated">Stock Allocated</option>
+            <option value="loading">Loading</option>
+            <option value="dispatched">Dispatched</option>
+            <option value="delivered">Delivered</option>
+            <option value="partiallyFulfilled">Partially Fulfilled</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notes</label>
+          <textarea class="form-textarea" id="us-notes" rows="2"></textarea>
+        </div>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn-ghost" onclick="Utils.closeModal('modal-update-status')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveStatusUpdate()">Update</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    let _orders = [];
+
+    function checkStock(orderId) {
+      const order  = MockDB.getOrderById(orderId);
+      if (!order) return;
+      const vendor = MockDB.getVendorById(order.vendorId);
+      const items  = MockDB.getOrderItems(orderId);
+
+      document.getElementById('sc-order-id').textContent = orderId;
+      document.getElementById('sc-vendor-info').innerHTML =
+        `<strong>${vendor ? vendor.businessName : ''}</strong> — ${vendor ? vendor.city : ''} | Order Date: ${Utils.formatDate(order.orderDate)} | Total: ${Utils.formatCurrency(order.total)}`;
+
+      let allAvailable = true;
+      let anyAvailable = false;
+      let totalOrdered = 0, totalAvailable = 0;
+
+      const rows = items.map(item => {
+        const veg = MockDB.getVegetableById(item.vegId);
+        const inv = MockDB.getInventoryByVegetable(item.vegId, item.grade);
+        const avail = inv ? (inv.closing || 0) : 0;
+        const canFulfill = avail >= item.qty;
+        const partial = avail > 0 && avail < item.qty;
+        totalOrdered   += item.qty;
+        totalAvailable += Math.min(avail, item.qty);
+        if (!canFulfill) allAvailable = false;
+        if (avail > 0)   anyAvailable = true;
+        const icon = canFulfill ? '✅' : partial ? '⚠️' : '❌';
+        const rowClass = canFulfill ? 'color:var(--color-success)' : partial ? 'color:var(--color-warning)' : 'color:var(--color-danger)';
+        return `<tr>
+          <td>${veg ? veg.nameEn : item.vegId}</td>
+          <td><span class="badge badge--success">Grade ${item.grade}</span></td>
+          <td>${item.qty.toLocaleString('en-IN')} kg</td>
+          <td style="${rowClass};font-weight:600;">${avail.toLocaleString('en-IN')} kg</td>
+          <td>
+            <span style="${rowClass}">${icon} </span>
+            ${canFulfill ? 'Full' : partial ? `Partial (${avail.toLocaleString('en-IN')} of ${item.qty.toLocaleString('en-IN')} kg)` : 'Unavailable'}
+            ${!canFulfill ? `<br><small class="text-danger">Shortage: ${(item.qty - avail).toLocaleString('en-IN')} kg</small>` : ''}
+          </td>
+        </tr>`;
+      });
+      document.getElementById('sc-items-tbody').innerHTML = rows.join('');
+
+      const shortage = totalOrdered - totalAvailable;
+      document.getElementById('sc-summary').innerHTML = `
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;text-align:center;">
+          <div><div style="font-size:0.75rem;color:var(--color-text-secondary);">Requested</div><div style="font-size:1.125rem;font-weight:700;">${totalOrdered.toLocaleString('en-IN')} kg</div></div>
+          <div><div style="font-size:0.75rem;color:var(--color-text-secondary);">Available</div><div style="font-size:1.125rem;font-weight:700;color:var(--color-success);">${totalAvailable.toLocaleString('en-IN')} kg</div></div>
+          <div><div style="font-size:0.75rem;color:var(--color-text-secondary);">Shortage</div><div style="font-size:1.125rem;font-weight:700;color:${shortage > 0 ? 'var(--color-danger)' : 'var(--color-success)'};">${shortage > 0 ? shortage.toLocaleString('en-IN') + ' kg' : 'None'}</div></div>
+        </div>`;
+
+      // Action buttons based on fulfillment
+      let actions = `<button class="btn btn-ghost" onclick="Utils.closeModal('modal-stock-check')">Cancel</button>
+        <button class="btn btn-danger" onclick="confirmOrder('${orderId}','cancelled')">Reject Order</button>`;
+      if (allAvailable) {
+        actions += `<button class="btn btn-primary" onclick="confirmOrder('${orderId}','confirmed')">✅ Accept Full Order</button>`;
+      } else if (anyAvailable) {
+        actions += `<button class="btn btn-warning" onclick="confirmOrder('${orderId}','partiallyFulfilled')">⚠ Accept Partial</button>`;
+        if (allAvailable) actions += `<button class="btn btn-primary" onclick="confirmOrder('${orderId}','confirmed')">Accept Full</button>`;
+      } else {
+        actions += `<button class="btn btn-secondary" disabled>No Stock Available</button>`;
+      }
+      document.getElementById('sc-actions').innerHTML = actions;
+
+      Utils.openModal('modal-stock-check');
+    }
+
+    function confirmOrder(orderId, newStatus) {
+      MockDB.updateRecord('_orders', orderId, { status: newStatus });
+      _orders = MockDB.getOrders();
+      Utils.closeModal('modal-stock-check');
+      const labels = { confirmed: 'Order confirmed!', partiallyFulfilled: 'Order partially accepted.', cancelled: 'Order rejected.' };
+      const types  = { confirmed: 'success', partiallyFulfilled: 'warning', cancelled: 'error' };
+      Utils.showToast(labels[newStatus] || 'Status updated.', types[newStatus] || 'info');
+      renderPendingQueue();
+      renderOrdersTable();
+    }
+
+    function openStatusModal(orderId) {
+      const order = MockDB.getOrderById(orderId);
+      document.getElementById('us-order-id').value = orderId;
+      document.getElementById('us-status').value   = order ? order.status : 'pending';
+      document.getElementById('us-notes').value    = order ? (order.notes || '') : '';
+      Utils.openModal('modal-update-status');
+    }
+
+    function saveStatusUpdate() {
+      const id     = document.getElementById('us-order-id').value;
+      const status = document.getElementById('us-status').value;
+      const notes  = document.getElementById('us-notes').value;
+      MockDB.updateRecord('_orders', id, { status, notes });
+      _orders = MockDB.getOrders();
+      Utils.closeModal('modal-update-status');
+      Utils.showToast('Order status updated.', 'success');
+      renderPendingQueue();
+      renderOrdersTable();
+    }
+
+    function renderPendingQueue() {
+      const pending = _orders.filter(o => o.status === 'pending');
+      document.getElementById('pending-count').textContent = pending.length + ' pending';
+      if (pending.length === 0) {
+        document.getElementById('pending-queue').innerHTML = '<div class="empty-state"><p class="empty-state__text">✅ No pending orders.</p></div>';
+        return;
+      }
+      document.getElementById('pending-queue').innerHTML =
+        `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem;">` +
+        pending.map(o => {
+          const vendor = MockDB.getVendorById(o.vendorId);
+          const items  = MockDB.getOrderItems(o.id);
+          return `<div style="padding:1rem;border:1px solid var(--color-border);border-radius:8px;background:var(--color-surface);">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.5rem;">
+              <div>
+                <div style="font-weight:700;">${o.id}</div>
+                <div style="font-size:0.875rem;color:var(--color-text-secondary);">${vendor ? vendor.businessName : ''} — ${vendor ? vendor.city : ''}</div>
+              </div>
+              ${Utils.statusBadge(o.status)}
+            </div>
+            <div style="font-size:0.8rem;color:var(--color-text-secondary);margin-bottom:0.5rem;">
+              ${items.length > 0 ? items.slice(0,2).map(i => {
+                const v = MockDB.getVegetableById(i.vegId);
+                return `${v ? v.nameEn : ''} ${i.qty} kg`;
+              }).join(', ') + (items.length > 2 ? ` +${items.length - 2} more` : '') : 'No items'}
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <strong style="color:var(--color-primary);">${Utils.formatCurrency(o.total)}</strong>
+              <button class="btn btn-sm btn-primary" onclick="checkStock('${o.id}')">Check Stock &amp; Confirm</button>
+            </div>
+          </div>`;
+        }).join('') + '</div>';
+    }
+
+    function renderOrdersTable() {
+      const filter = document.getElementById('filter-status').value;
+      const list = filter ? _orders.filter(o => o.status === filter) : _orders;
+      document.getElementById('orders-tbody').innerHTML = list.map(o => {
+        const vendor = MockDB.getVendorById(o.vendorId);
+        return `<tr>
+          <td><code>${o.id}</code></td>
+          <td>${Utils.formatDate(o.orderDate)}</td>
+          <td>${vendor ? vendor.businessName : o.vendorId}</td>
+          <td><strong>${Utils.formatCurrency(o.total)}</strong></td>
+          <td>${Utils.statusBadge(o.status)}</td>
+          <td>${o.deliveryDate ? Utils.formatDate(o.deliveryDate) : '—'}</td>
+          <td>
+            ${o.status === 'pending' ? `<button class="btn btn-sm btn-primary" onclick="checkStock('${o.id}')">Check Stock</button>` : ''}
+            <button class="btn btn-sm btn-ghost" onclick="openStatusModal('${o.id}')">Update Status</button>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('manager');
+      _orders = MockDB.getOrders();
+      renderPendingQueue();
+      renderOrdersTable();
+    });
+  </script>
+</body>
+</html>

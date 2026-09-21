@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vendor Ledger — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content">
+        <div class="page-header">
+          <h1 class="page-title" data-i18n="page.vendorLedger"></h1>
+          <div class="page-header-actions">
+            <button class="btn btn-ghost" onclick="printLedger()">🖨 Print</button>
+            <button class="btn btn-secondary" onclick="exportLedger()">⬇ Export CSV</button>
+          </div>
+        </div>
+
+        <!-- Vendor Selector -->
+        <div class="card" style="margin-bottom:1rem;">
+          <div class="card__body">
+            <div class="filter-row">
+              <label class="form-label" style="white-space:nowrap;margin:0 0.5rem 0 0;">Select Vendor:</label>
+              <select class="form-select" id="ledger-vendor-sel" onchange="loadVendorLedger()">
+                <option value="">— Select Vendor —</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary Strip -->
+        <div id="vendor-ledger-summary" style="display:none;">
+          <div class="stats-grid stats-grid--3" style="margin-bottom:1rem;">
+            <div class="stat-card stat-card--info">
+              <div class="stat-card__body">
+                <div class="stat-card__value" id="vl-total-orders">—</div>
+                <div class="stat-card__label">Total Order Value</div>
+              </div>
+            </div>
+            <div class="stat-card stat-card--success">
+              <div class="stat-card__body">
+                <div class="stat-card__value" id="vl-total-received">—</div>
+                <div class="stat-card__label">Total Received</div>
+              </div>
+            </div>
+            <div class="stat-card stat-card--warning">
+              <div class="stat-card__body">
+                <div class="stat-card__value" id="vl-outstanding">—</div>
+                <div class="stat-card__label">Outstanding Balance</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ledger Table -->
+          <div class="card">
+            <div class="card__header">
+              <h3 class="card__title" id="vl-vendor-name">Ledger</h3>
+            </div>
+            <div class="card__body" style="padding:0;">
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th data-i18n="col.date"></th>
+                      <th data-i18n="col.description"></th>
+                      <th>Invoiced (Dr)</th>
+                      <th>Received (Cr)</th>
+                      <th data-i18n="common.balance"></th>
+                      <th>Ref</th>
+                    </tr>
+                  </thead>
+                  <tbody id="vendor-ledger-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="vendor-ledger-empty" class="empty-state-card">
+          <div class="empty-state">Select a vendor above to view their ledger.</div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    let _currentVendorId = null;
+
+    function loadVendorLedger() {
+      const vendorId = document.getElementById('ledger-vendor-sel').value;
+      if (!vendorId) {
+        document.getElementById('vendor-ledger-summary').style.display = 'none';
+        document.getElementById('vendor-ledger-empty').style.display = '';
+        return;
+      }
+      _currentVendorId = vendorId;
+      const vendor = MockDB.getVendorById(vendorId);
+      const entries = MockDB.getLedgerEntries(vendorId).sort((a, b) => a.date.localeCompare(b.date));
+      const payments = MockDB.getPayments().filter(p => p.partyId === vendorId && p.partyType === 'vendor');
+
+      const totalOrders = entries.filter(e => e.debit > 0).reduce((s, e) => s + e.debit, 0);
+      const totalReceived = payments.reduce((s, p) => s + p.amount, 0);
+      const outstanding = totalOrders - totalReceived;
+
+      document.getElementById('vl-vendor-name').textContent = (vendor ? vendor.businessName : vendorId) + ' — Ledger';
+      document.getElementById('vl-total-orders').textContent = Utils.formatCurrency(totalOrders);
+      document.getElementById('vl-total-received').textContent = Utils.formatCurrency(totalReceived);
+      document.getElementById('vl-outstanding').textContent = Utils.formatCurrency(Math.max(0, outstanding));
+
+      document.getElementById('vendor-ledger-tbody').innerHTML = entries.map(e => `
+        <tr class="${e.credit > 0 ? 'row--credit' : 'row--debit'}">
+          <td>${Utils.formatDate(e.date)}</td>
+          <td>${e.description}</td>
+          <td class="${e.debit > 0 ? 'text-warning font-bold' : 'text-muted'}">${e.debit > 0 ? Utils.formatCurrency(e.debit) : '—'}</td>
+          <td class="${e.credit > 0 ? 'text-success font-bold' : 'text-muted'}">${e.credit > 0 ? Utils.formatCurrency(e.credit) : '—'}</td>
+          <td><strong class="${e.balance > 0 ? 'text-warning' : 'text-success'}">${Utils.formatCurrency(e.balance)}</strong></td>
+          <td class="text-muted"><small>${e.refId || ''}</small></td>
+        </tr>
+      `).join('') || '<tr><td colspan="6" class="empty-state" data-i18n="empty.ledger">No ledger entries</td></tr>';
+
+      document.getElementById('vendor-ledger-summary').style.display = '';
+      document.getElementById('vendor-ledger-empty').style.display = 'none';
+    }
+
+    function printLedger() {
+      window.print();
+    }
+
+    function exportLedger() {
+      if (!_currentVendorId) { Utils.showToast('Please select a vendor first.', 'warning'); return; }
+      const entries = MockDB.getLedgerEntries(_currentVendorId);
+      const data = entries.map(e => ({ Date: e.date, Description: e.description, Debit: e.debit, Credit: e.credit, Balance: e.balance }));
+      const vendor = MockDB.getVendorById(_currentVendorId);
+      Utils.exportCSV(data, `ledger-${vendor ? vendor.businessName.replace(/\s/g,'-') : _currentVendorId}.csv`);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('owner');
+      const vendors = MockDB.getVendors();
+      const sel = document.getElementById('ledger-vendor-sel');
+      vendors.forEach(v => sel.add(new Option(v.businessName + ' (' + v.id + ')', v.id)));
+
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      if (id) {
+        sel.value = id;
+        loadVendorLedger();
+      }
+    });
+  </script>
+</body>
+</html>

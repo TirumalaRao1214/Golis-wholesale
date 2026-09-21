@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Management — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content">
+        <div class="page-header">
+          <h1 class="page-title" data-i18n="page.orders"></h1>
+        </div>
+
+        <!-- Summary Row -->
+        <div class="stats-grid stats-grid--4" style="margin-bottom:1rem;">
+          <div class="stat-card stat-card--warning" style="cursor:pointer;" onclick="filterByStatus('pending')">
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="count-pending">—</div>
+              <div class="stat-card__label">Pending</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--info" style="cursor:pointer;" onclick="filterByStatus('confirmed')">
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="count-confirmed">—</div>
+              <div class="stat-card__label">Confirmed</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--success" style="cursor:pointer;" onclick="filterByStatus('inTransit')">
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="count-transit">—</div>
+              <div class="stat-card__label">In Transit</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--success" style="cursor:pointer;" onclick="filterByStatus('delivered')">
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="count-delivered">—</div>
+              <div class="stat-card__label">Delivered</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="card" style="margin-bottom:1rem;">
+          <div class="card__body">
+            <div class="filter-row">
+              <select class="form-select" id="ord-filter-status" onchange="renderOrderTable()">
+                <option value="">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="preparing">Preparing</option>
+                <option value="stockAllocated">Stock Allocated</option>
+                <option value="loading">Loading</option>
+                <option value="dispatched">Dispatched</option>
+                <option value="inTransit">In Transit</option>
+                <option value="delivered">Delivered</option>
+                <option value="cancelled">Cancelled</option>
+                <option value="partiallyFulfilled">Partially Fulfilled</option>
+              </select>
+              <select class="form-select" id="ord-filter-vendor" onchange="renderOrderTable()">
+                <option value="">All Vendors</option>
+              </select>
+              <input type="date" class="form-input" id="ord-filter-from" onchange="renderOrderTable()">
+              <input type="date" class="form-input" id="ord-filter-to" onchange="renderOrderTable()">
+              <button class="btn btn-ghost btn-sm" onclick="clearOrderFilters()">Clear</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Orders Table -->
+        <div class="card">
+          <div class="card__body" style="padding:0;">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th data-i18n="col.orderId"></th>
+                    <th data-i18n="col.vendor"></th>
+                    <th>Location</th>
+                    <th>Items</th>
+                    <th>Total Qty</th>
+                    <th>Total Value</th>
+                    <th data-i18n="col.orderDate"></th>
+                    <th data-i18n="col.status"></th>
+                    <th data-i18n="common.actions"></th>
+                  </tr>
+                </thead>
+                <tbody id="orders-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Order Detail Modal -->
+  <div class="modal-overlay" id="modal-order-detail">
+    <div class="modal modal--xl">
+      <div class="modal__header">
+        <h3 class="modal__title" id="order-detail-title">Order Details</h3>
+        <button class="modal__close" onclick="Utils.closeModal('modal-order-detail')">&times;</button>
+      </div>
+      <div class="modal__body" id="order-detail-body"></div>
+      <div class="modal__footer">
+        <button class="btn btn-ghost" onclick="Utils.closeModal('modal-order-detail')" data-i18n="common.close"></button>
+        <button class="btn btn-primary" id="order-detail-update-btn" onclick="promptStatusUpdate()">Update Status</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status Update Modal -->
+  <div class="modal-overlay" id="modal-status-update">
+    <div class="modal">
+      <div class="modal__header">
+        <h3 class="modal__title">Update Order Status</h3>
+        <button class="modal__close" onclick="Utils.closeModal('modal-status-update')">&times;</button>
+      </div>
+      <div class="modal__body">
+        <div class="form-group">
+          <label class="form-label">Order ID</label>
+          <input type="text" class="form-input" id="su-order-id" readonly>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Current Status</label>
+          <input type="text" class="form-input" id="su-current-status" readonly>
+        </div>
+        <div class="form-group">
+          <label class="form-label">New Status</label>
+          <select class="form-select" id="su-new-status">
+            <option value="confirmed">Confirmed</option>
+            <option value="preparing">Preparing</option>
+            <option value="stockAllocated">Stock Allocated</option>
+            <option value="loading">Loading</option>
+            <option value="dispatched">Dispatched</option>
+            <option value="inTransit">In Transit</option>
+            <option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
+            <option value="partiallyFulfilled">Partially Fulfilled</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn-ghost" onclick="Utils.closeModal('modal-status-update')" data-i18n="common.cancel"></button>
+        <button class="btn btn-primary" onclick="applyStatusUpdate()">Update</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    let _orders = [];
+    let _currentOrderId = null;
+
+    const STATUS_FLOW = ['pending','confirmed','preparing','stockAllocated','loading','dispatched','inTransit','delivered'];
+
+    function renderOrderTable() {
+      const statusFilter = document.getElementById('ord-filter-status').value;
+      const vendorFilter = document.getElementById('ord-filter-vendor').value;
+      const from = document.getElementById('ord-filter-from').value;
+      const to = document.getElementById('ord-filter-to').value;
+
+      const data = _orders.filter(o => {
+        if (statusFilter && o.status !== statusFilter) return false;
+        if (vendorFilter && o.vendorId !== vendorFilter) return false;
+        if (from && o.orderDate < from) return false;
+        if (to && o.orderDate > to) return false;
+        return true;
+      });
+
+      document.getElementById('orders-tbody').innerHTML = data.map(o => {
+        const vendor = MockDB.getVendorById(o.vendorId);
+        const items = MockDB.getOrderItems(o.id);
+        const totalQty = items.reduce((s, i) => s + i.qty, 0);
+        return `<tr>
+          <td><strong>${o.id}</strong></td>
+          <td>${vendor ? vendor.businessName : o.vendorId}<br><small class="text-muted">${vendor ? vendor.city : ''}</small></td>
+          <td>${vendor ? vendor.city + ', ' + vendor.state : '—'}</td>
+          <td>${items.length} item${items.length !== 1 ? 's' : ''}</td>
+          <td>${totalQty.toLocaleString('en-IN')} kg</td>
+          <td><strong>${Utils.formatCurrency(o.total)}</strong></td>
+          <td>${Utils.formatDate(o.orderDate)}</td>
+          <td>${Utils.statusBadge(o.status)}</td>
+          <td>
+            <button class="btn btn-sm btn-ghost" onclick="viewOrder('${o.id}')">View</button>
+            <button class="btn btn-sm btn-secondary" onclick="openStatusUpdate('${o.id}')">Status</button>
+          </td>
+        </tr>`;
+      }).join('') || '<tr><td colspan="9" class="empty-state" data-i18n="empty.orders">No orders found</td></tr>';
+
+      // Update counts
+      document.getElementById('count-pending').textContent = _orders.filter(o => o.status === 'pending').length;
+      document.getElementById('count-confirmed').textContent = _orders.filter(o => o.status === 'confirmed').length;
+      document.getElementById('count-transit').textContent = _orders.filter(o => o.status === 'inTransit').length;
+      document.getElementById('count-delivered').textContent = _orders.filter(o => o.status === 'delivered').length;
+    }
+
+    function filterByStatus(status) {
+      document.getElementById('ord-filter-status').value = status;
+      renderOrderTable();
+    }
+
+    function clearOrderFilters() {
+      document.getElementById('ord-filter-status').value = '';
+      document.getElementById('ord-filter-vendor').value = '';
+      document.getElementById('ord-filter-from').value = '';
+      document.getElementById('ord-filter-to').value = '';
+      renderOrderTable();
+    }
+
+    function viewOrder(id) {
+      _currentOrderId = id;
+      const order = _orders.find(o => o.id === id);
+      if (!order) return;
+      const vendor = MockDB.getVendorById(order.vendorId);
+      const items = MockDB.getOrderItems(id);
+      document.getElementById('order-detail-title').textContent = `Order ${id}`;
+
+      const timeline = STATUS_FLOW.map((s, i) => {
+        const idx = STATUS_FLOW.indexOf(order.status);
+        const done = i < idx;
+        const current = s === order.status;
+        return `<div class="timeline-step ${done ? 'done' : current ? 'current' : ''}">
+          <div class="timeline-step__dot"></div>
+          <div class="timeline-step__label">${s.replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase())}</div>
+        </div>`;
+      }).join('');
+
+      document.getElementById('order-detail-body').innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
+          <div><strong>Vendor:</strong> ${vendor ? vendor.businessName : order.vendorId}</div>
+          <div><strong>Contact:</strong> ${vendor ? vendor.contactPerson + ' — ' + vendor.mobile : '—'}</div>
+          <div><strong>Order Date:</strong> ${Utils.formatDate(order.orderDate)}</div>
+          <div><strong>Delivery Date:</strong> ${Utils.formatDate(order.deliveryDate)}</div>
+          <div><strong>Status:</strong> ${Utils.statusBadge(order.status)}</div>
+          <div><strong>Notes:</strong> ${order.notes || '—'}</div>
+        </div>
+        <h4 style="margin-bottom:0.75rem;">Order Items</h4>
+        <table class="data-table" style="margin-bottom:1.5rem;">
+          <thead><tr><th>Vegetable</th><th>Grade</th><th>Qty</th><th>Rate</th><th>Amount</th></tr></thead>
+          <tbody>${items.map(i => {
+            const veg = MockDB.getVegetableById(i.vegId);
+            return `<tr><td>${veg ? veg.nameEn : i.vegId}</td><td>${i.grade}</td><td>${i.qty.toLocaleString('en-IN')} kg</td><td>₹${i.rate}/kg</td><td>${Utils.formatCurrency(i.amount)}</td></tr>`;
+          }).join('')}</tbody>
+          <tfoot><tr><th colspan="4">Total</th><th>${Utils.formatCurrency(order.total)}</th></tr></tfoot>
+        </table>
+        ${order.status === 'partiallyFulfilled' ? `<div class="alert alert--warning"><strong>⚠ Partial Fulfillment:</strong> ${order.notes || 'Some items could not be fully fulfilled due to stock shortage.'}</div>` : ''}
+        <h4 style="margin-bottom:0.75rem;">Status Timeline</h4>
+        <div class="timeline">${timeline}</div>
+      `;
+      document.getElementById('order-detail-update-btn').setAttribute('data-order-id', id);
+      Utils.openModal('modal-order-detail');
+    }
+
+    function openStatusUpdate(id) {
+      const order = _orders.find(o => o.id === id);
+      if (!order) return;
+      _currentOrderId = id;
+      document.getElementById('su-order-id').value = id;
+      document.getElementById('su-current-status').value = order.status;
+      Utils.openModal('modal-status-update');
+    }
+
+    function promptStatusUpdate() {
+      Utils.closeModal('modal-order-detail');
+      openStatusUpdate(_currentOrderId);
+    }
+
+    function applyStatusUpdate() {
+      const id = _currentOrderId;
+      const newStatus = document.getElementById('su-new-status').value;
+      MockDB.updateRecord('_orders', id, { status: newStatus });
+      _orders = MockDB.getOrders();
+      Utils.closeModal('modal-status-update');
+      Utils.showToast(t('toast.order.statusUpdated'), 'success');
+      renderOrderTable();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('owner');
+      _orders = MockDB.getOrders();
+      const vendors = MockDB.getVendors();
+      const sel = document.getElementById('ord-filter-vendor');
+      vendors.forEach(v => sel.add(new Option(v.businessName, v.id)));
+      renderOrderTable();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dispatch Management — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content">
+        <div class="page-header">
+          <h1 class="page-title" data-i18n="page.dispatch"></h1>
+          <div class="page-header-actions">
+            <button class="btn btn-primary" onclick="Utils.openModal('modal-dispatch')">+ Create Dispatch</button>
+          </div>
+        </div>
+
+        <!-- Active Dispatches Summary -->
+        <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:1.25rem;">
+          <div class="stat-card stat-card--warning">
+            <div class="stat-card__icon">📦</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="d-loading">—</div>
+              <div class="stat-card__label">Loading</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--info">
+            <div class="stat-card__icon">🚚</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="d-dispatched">—</div>
+              <div class="stat-card__label">Dispatched</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--info">
+            <div class="stat-card__icon">🛣</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="d-transit">—</div>
+              <div class="stat-card__label">In Transit</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--success">
+            <div class="stat-card__icon">✅</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="d-delivered">—</div>
+              <div class="stat-card__label">Delivered</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active Dispatches Timeline Cards -->
+        <div class="card" style="margin-bottom:1.25rem;">
+          <div class="card__header">
+            <h3 class="card__title">Active Dispatches</h3>
+          </div>
+          <div class="card__body">
+            <div id="active-dispatches">
+              <div class="empty-state"><p class="empty-state__text">No active dispatches.</p></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dispatch History Table -->
+        <div class="card">
+          <div class="card__header">
+            <h3 class="card__title">Dispatch History</h3>
+          </div>
+          <div class="card__body" style="padding:0;">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Dispatch ID</th>
+                    <th>Order</th>
+                    <th>Vendor</th>
+                    <th>Vehicle</th>
+                    <th>Driver</th>
+                    <th>From → To</th>
+                    <th>Dispatch Date</th>
+                    <th>Est. Arrival</th>
+                    <th data-i18n="col.status"></th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="dispatch-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Create Dispatch Modal -->
+  <div class="modal-overlay" id="modal-dispatch">
+    <div class="modal modal--lg">
+      <div class="modal__header">
+        <h3 class="modal__title">Create New Dispatch</h3>
+        <button class="modal__close" onclick="Utils.closeModal('modal-dispatch')">&times;</button>
+      </div>
+      <div class="modal__body">
+        <form id="dispatch-form">
+          <div class="form-grid form-grid--2">
+            <div class="form-group">
+              <label class="form-label">Link to Order <span class="required">*</span></label>
+              <select class="form-select" id="dp-order" required onchange="onOrderSelect()">
+                <option value="">Select Order (Loading Completed)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Vehicle <span class="required">*</span></label>
+              <select class="form-select" id="dp-vehicle" required onchange="onVehicleSelect()">
+                <option value="">Select Available Vehicle</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Driver auto-filled -->
+          <div class="form-grid form-grid--2">
+            <div class="form-group">
+              <label class="form-label">Driver (auto-filled from vehicle)</label>
+              <input type="text" class="form-input" id="dp-driver" readonly style="background:var(--color-bg);">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Driver Mobile</label>
+              <input type="text" class="form-input" id="dp-driver-mobile" readonly style="background:var(--color-bg);">
+            </div>
+          </div>
+
+          <div class="form-grid form-grid--2">
+            <div class="form-group">
+              <label class="form-label">From</label>
+              <input type="text" class="form-input" id="dp-from" value="Guntur Market">
+            </div>
+            <div class="form-group">
+              <label class="form-label">To (Vendor City — auto-filled)</label>
+              <input type="text" class="form-input" id="dp-to" readonly style="background:var(--color-bg);">
+            </div>
+          </div>
+
+          <div class="form-grid form-grid--2">
+            <div class="form-group">
+              <label class="form-label">Dispatch Date &amp; Time <span class="required">*</span></label>
+              <input type="datetime-local" class="form-input" id="dp-date" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Expected Delivery Date</label>
+              <input type="date" class="form-input" id="dp-delivery">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="common.notes"></label>
+            <textarea class="form-textarea" id="dp-notes" rows="2"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn-ghost" onclick="Utils.closeModal('modal-dispatch')" data-i18n="common.cancel"></button>
+        <button class="btn btn-primary" onclick="saveDispatch()">Create Dispatch</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Update Status Modal -->
+  <div class="modal-overlay" id="modal-dsp-status">
+    <div class="modal">
+      <div class="modal__header">
+        <h3 class="modal__title">Update Dispatch Status</h3>
+        <button class="modal__close" onclick="Utils.closeModal('modal-dsp-status')">&times;</button>
+      </div>
+      <div class="modal__body">
+        <input type="hidden" id="dsp-status-id">
+        <div class="form-group">
+          <label class="form-label">New Status</label>
+          <select class="form-select" id="dsp-new-status">
+            <option value="loading">Loading</option>
+            <option value="dispatched">Dispatched</option>
+            <option value="inTransit">In Transit</option>
+            <option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+        <div class="form-group" id="actual-arrival-grp" style="display:none;">
+          <label class="form-label">Actual Arrival Date</label>
+          <input type="date" class="form-input" id="dsp-actual-arrival">
+        </div>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn-ghost" onclick="Utils.closeModal('modal-dsp-status')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveDispatchStatus()">Update</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    let _dispatches = [];
+
+    function onOrderSelect() {
+      const orderId = document.getElementById('dp-order').value;
+      if (!orderId) { document.getElementById('dp-to').value = ''; return; }
+      const order  = MockDB.getOrderById(orderId);
+      const vendor = order ? MockDB.getVendorById(order.vendorId) : null;
+      if (vendor) document.getElementById('dp-to').value = vendor.city;
+      // Estimate delivery based on city
+      const deliveryDays = { Hyderabad: 1, Vijayawada: 1, Chennai: 2, Bangalore: 2, Mumbai: 3 };
+      const city = vendor ? vendor.city : '';
+      const days = deliveryDays[city] || 2;
+      const delivDate = new Date(); delivDate.setDate(delivDate.getDate() + days);
+      document.getElementById('dp-delivery').value = delivDate.toISOString().split('T')[0];
+    }
+
+    function onVehicleSelect() {
+      const vehicleId = document.getElementById('dp-vehicle').value;
+      if (!vehicleId) {
+        document.getElementById('dp-driver').value        = '';
+        document.getElementById('dp-driver-mobile').value = '';
+        return;
+      }
+      const vehicle = MockDB.getVehicles().find(v => v.id === vehicleId);
+      if (vehicle) {
+        document.getElementById('dp-driver').value        = vehicle.driverName || '';
+        document.getElementById('dp-driver-mobile').value = vehicle.driverMobile || '';
+      }
+    }
+
+    function openStatusModal(dispatchId) {
+      const dsp = _dispatches.find(d => d.id === dispatchId);
+      document.getElementById('dsp-status-id').value   = dispatchId;
+      document.getElementById('dsp-new-status').value  = dsp ? dsp.status : 'dispatched';
+      document.getElementById('actual-arrival-grp').style.display = dsp && dsp.status === 'inTransit' ? '' : 'none';
+      document.getElementById('dsp-new-status').addEventListener('change', function() {
+        document.getElementById('actual-arrival-grp').style.display = this.value === 'delivered' ? '' : 'none';
+      });
+      Utils.openModal('modal-dsp-status');
+    }
+
+    function saveDispatchStatus() {
+      const id        = document.getElementById('dsp-status-id').value;
+      const newStatus = document.getElementById('dsp-new-status').value;
+      const arrival   = document.getElementById('dsp-actual-arrival').value;
+      const updates   = { status: newStatus };
+      if (newStatus === 'delivered' && arrival) updates.actualArrival = arrival;
+      MockDB.updateRecord('_dispatches', id, updates);
+      // If delivered, update order status too
+      if (newStatus === 'delivered') {
+        const dsp = _dispatches.find(d => d.id === id);
+        if (dsp) MockDB.updateRecord('_orders', dsp.orderId, { status: 'delivered' });
+        // Free up vehicle
+        const dspUpdated = MockDB.getDispatches().find(d => d.id === id);
+        if (dspUpdated) {
+          const veh = MockDB.getVehicles().find(v => v.vehicleNo === dspUpdated.vehicleNo);
+          if (veh) MockDB.updateRecord('_vehicles', veh.id, { status: 'available' });
+        }
+      }
+      _dispatches = MockDB.getDispatches();
+      Utils.closeModal('modal-dsp-status');
+      Utils.showToast('Dispatch status updated.', 'success');
+      renderDispatches();
+    }
+
+    function saveDispatch() {
+      const orderId   = document.getElementById('dp-order').value;
+      const vehicleId = document.getElementById('dp-vehicle').value;
+      const dpDate    = document.getElementById('dp-date').value;
+      if (!orderId || !vehicleId || !dpDate) {
+        Utils.showToast('Order, Vehicle, and Dispatch Date are required.', 'error'); return;
+      }
+      const vehicle = MockDB.getVehicles().find(v => v.id === vehicleId);
+      const record  = {
+        id: Utils.generateId('DSP'),
+        orderId,
+        vehicleId,
+        vehicleNo: vehicle ? vehicle.vehicleNo : '',
+        driverName: document.getElementById('dp-driver').value,
+        from: document.getElementById('dp-from').value,
+        to: document.getElementById('dp-to').value,
+        dispatchDate: dpDate.split('T')[0],
+        estimatedArrival: document.getElementById('dp-delivery').value,
+        actualArrival: '',
+        status: 'dispatched',
+        notes: document.getElementById('dp-notes').value,
+      };
+      MockDB.saveRecord('_dispatches', record);
+      // Update vehicle status to dispatched
+      if (vehicle) MockDB.updateRecord('_vehicles', vehicleId, { status: 'inUse' });
+      // Update order status to dispatched
+      MockDB.updateRecord('_orders', orderId, { status: 'dispatched' });
+
+      _dispatches = MockDB.getDispatches();
+      Utils.closeModal('modal-dispatch');
+      Utils.showToast('Dispatch created! Vehicle marked as In Use.', 'success');
+      renderDispatches();
+    }
+
+    const STATUS_STEPS = { loading: 1, dispatched: 2, inTransit: 3, delivered: 4 };
+    const STEP_LABELS  = ['Loading', 'Dispatched', 'In Transit', 'Delivered'];
+
+    function renderDispatches() {
+      const counts = { loading: 0, dispatched: 0, inTransit: 0, delivered: 0 };
+      _dispatches.forEach(d => { if (counts[d.status] !== undefined) counts[d.status]++; });
+      document.getElementById('d-loading').textContent   = counts.loading;
+      document.getElementById('d-dispatched').textContent= counts.dispatched;
+      document.getElementById('d-transit').textContent   = counts.inTransit;
+      document.getElementById('d-delivered').textContent = counts.delivered;
+
+      // Active dispatches (not delivered/cancelled)
+      const active = _dispatches.filter(d => d.status !== 'delivered' && d.status !== 'cancelled');
+      if (active.length === 0) {
+        document.getElementById('active-dispatches').innerHTML = '<div class="empty-state"><p class="empty-state__text">No active dispatches.</p></div>';
+      } else {
+        document.getElementById('active-dispatches').innerHTML =
+          `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1rem;">` +
+          active.map(d => {
+            const order  = MockDB.getOrderById(d.orderId);
+            const vendor = order ? MockDB.getVendorById(order.vendorId) : null;
+            const step   = STATUS_STEPS[d.status] || 1;
+            const stepsHtml = STEP_LABELS.map((label, i) =>
+              `<div style="text-align:center;flex:1;">
+                <div style="width:24px;height:24px;border-radius:50%;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;
+                  background:${i < step ? 'var(--color-primary)' : 'var(--color-border)'};
+                  color:${i < step ? '#fff' : 'var(--color-text-secondary)'};">${i < step ? '✓' : i + 1}</div>
+                <div style="font-size:0.7rem;${i < step ? 'color:var(--color-primary);font-weight:600;' : 'color:var(--color-text-secondary);'}">${label}</div>
+              </div>`).join('<div style="flex:1;height:2px;background:var(--color-border);margin-top:11px;"></div>');
+            return `<div style="padding:1rem;border:1px solid var(--color-border);border-radius:8px;background:var(--color-surface);">
+              <div style="display:flex;justify-content:space-between;margin-bottom:0.75rem;">
+                <div><strong>${d.id}</strong><br><span style="font-size:0.8rem;color:var(--color-text-secondary);">${d.orderId} — ${vendor ? vendor.businessName : ''}</span></div>
+                ${Utils.statusBadge(d.status)}
+              </div>
+              <div style="font-size:0.8rem;color:var(--color-text-secondary);margin-bottom:0.75rem;">
+                🚛 ${d.vehicleNo} | 👤 ${d.driverName}<br>
+                📍 ${d.from} → ${d.to} | Est: ${d.estimatedArrival ? Utils.formatDate(d.estimatedArrival) : '—'}
+              </div>
+              <div style="display:flex;align-items:center;gap:0;margin-bottom:0.75rem;">${stepsHtml}</div>
+              <button class="btn btn-sm btn-ghost" onclick="openStatusModal('${d.id}')">Update Status</button>
+            </div>`;
+          }).join('') + '</div>';
+      }
+
+      // History table
+      document.getElementById('dispatch-tbody').innerHTML = _dispatches.map(d => {
+        const order  = MockDB.getOrderById(d.orderId);
+        const vendor = order ? MockDB.getVendorById(order.vendorId) : null;
+        return `<tr>
+          <td><code>${d.id}</code></td>
+          <td><code>${d.orderId}</code></td>
+          <td>${vendor ? vendor.businessName : '—'}</td>
+          <td><code>${d.vehicleNo}</code></td>
+          <td>${d.driverName}</td>
+          <td>${d.from} → ${d.to}</td>
+          <td>${d.dispatchDate ? Utils.formatDate(d.dispatchDate) : '—'}</td>
+          <td>${d.estimatedArrival ? Utils.formatDate(d.estimatedArrival) : '—'}</td>
+          <td>${Utils.statusBadge(d.status)}</td>
+          <td><button class="btn btn-sm btn-ghost" onclick="openStatusModal('${d.id}')">Update</button></td>
+        </tr>`;
+      }).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('manager');
+      _dispatches = MockDB.getDispatches();
+
+      // Populate orders dropdown (loading or stockAllocated)
+      MockDB.getOrders()
+        .filter(o => ['loading','stockAllocated'].includes(o.status))
+        .forEach(o => {
+          const vendor = MockDB.getVendorById(o.vendorId);
+          document.getElementById('dp-order').add(new Option(`${o.id} — ${vendor ? vendor.businessName : ''} [${o.status}]`, o.id));
+        });
+
+      // Populate available vehicles
+      MockDB.getVehicles()
+        .filter(v => v.status === 'available')
+        .forEach(v => {
+          document.getElementById('dp-vehicle').add(new Option(`${v.vehicleNo} (${v.type}) — ${v.driverName}`, v.id));
+        });
+
+      document.getElementById('dp-date').value = new Date().toISOString().slice(0,16);
+      renderDispatches();
+    });
+  </script>
+</body>
+</html>

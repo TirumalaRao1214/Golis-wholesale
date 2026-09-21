@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arrival Register — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content">
+        <div class="page-header">
+          <h1 class="page-title" data-i18n="page.arrivals"></h1>
+          <div class="page-header-actions">
+            <button class="btn btn-primary" onclick="Utils.openModal('modal-arrival')">+ New Arrival</button>
+          </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:1.25rem;">
+          <div class="stat-card stat-card--info">
+            <div class="stat-card__icon">🚛</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="sum-today">—</div>
+              <div class="stat-card__label">Today's Arrivals</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--warning">
+            <div class="stat-card__icon">⚖</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="sum-pending">—</div>
+              <div class="stat-card__label">Awaiting Weighment</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--success">
+            <div class="stat-card__icon">✅</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="sum-done">—</div>
+              <div class="stat-card__label">Completed</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="card" style="margin-bottom:1rem;">
+          <div class="card__body">
+            <div class="form-grid form-grid--4">
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">Filter by Status</label>
+                <select class="form-select" id="filter-status" onchange="renderArrivals()">
+                  <option value="">All Statuses</option>
+                  <option value="arrived">Arrived</option>
+                  <option value="waiting">Waiting</option>
+                  <option value="weighing">Weighing</option>
+                  <option value="qualityCheck">Quality Check</option>
+                  <option value="accepted">Accepted</option>
+                  <option value="rejected">Rejected</option>
+                  <option value="completed">Completed</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">Filter by Vegetable</label>
+                <select class="form-select" id="filter-veg" onchange="renderArrivals()">
+                  <option value="">All Vegetables</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">Filter by Date</label>
+                <input type="date" class="form-input" id="filter-date" onchange="renderArrivals()">
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">&nbsp;</label>
+                <button class="btn btn-ghost" onclick="clearFilters()">Clear Filters</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="card">
+          <div class="card__body" style="padding:0;">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Arrival ID</th>
+                    <th data-i18n="col.date"></th>
+                    <th>Farmer</th>
+                    <th>Vehicle No</th>
+                    <th>Vegetable</th>
+                    <th>Expected Qty</th>
+                    <th data-i18n="col.status"></th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="arrivals-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Add Arrival Modal -->
+  <div class="modal-overlay" id="modal-arrival">
+    <div class="modal modal--lg">
+      <div class="modal__header">
+        <h3 class="modal__title">New Arrival Entry</h3>
+        <button class="modal__close" onclick="Utils.closeModal('modal-arrival')">&times;</button>
+      </div>
+      <div class="modal__body">
+        <form id="arrival-form">
+          <div class="form-grid form-grid--2">
+            <div class="form-group">
+              <label class="form-label">Farmer <span class="required">*</span></label>
+              <select class="form-select" id="a-farmer" required>
+                <option value="">Select Farmer</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Vegetable <span class="required">*</span></label>
+              <select class="form-select" id="a-veg" required>
+                <option value="">Select Vegetable</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Vehicle Number <span class="required">*</span></label>
+              <input type="text" class="form-input" id="a-vehicle" placeholder="e.g. AP29AJ4567" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Driver Name</label>
+              <input type="text" class="form-input" id="a-driver" placeholder="Driver name">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Expected Quantity (kg) <span class="required">*</span></label>
+              <input type="number" class="form-input" id="a-qty" placeholder="0" min="1" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Arrival Date &amp; Time</label>
+              <input type="datetime-local" class="form-input" id="a-datetime">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="common.notes"></label>
+            <textarea class="form-textarea" id="a-notes" rows="2" placeholder="Any observations..."></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn-ghost" onclick="Utils.closeModal('modal-arrival')" data-i18n="common.cancel"></button>
+        <button class="btn btn-primary" onclick="saveArrival()">Save Arrival</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Update Status Modal -->
+  <div class="modal-overlay" id="modal-status">
+    <div class="modal">
+      <div class="modal__header">
+        <h3 class="modal__title">Update Arrival Status</h3>
+        <button class="modal__close" onclick="Utils.closeModal('modal-status')">&times;</button>
+      </div>
+      <div class="modal__body">
+        <input type="hidden" id="status-arrival-id">
+        <div class="form-group">
+          <label class="form-label">Arrival</label>
+          <div id="status-arrival-info" style="padding:0.5rem 0.75rem;background:var(--color-bg);border-radius:6px;font-size:0.875rem;"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">New Status <span class="required">*</span></label>
+          <select class="form-select" id="status-new">
+            <option value="arrived">Arrived</option>
+            <option value="waiting">Waiting</option>
+            <option value="weighing">Weighing</option>
+            <option value="qualityCheck">Quality Check</option>
+            <option value="accepted">Accepted</option>
+            <option value="rejected">Rejected</option>
+            <option value="completed">Completed</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notes</label>
+          <textarea class="form-textarea" id="status-notes" rows="2"></textarea>
+        </div>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn-ghost" onclick="Utils.closeModal('modal-status')">Cancel</button>
+        <button class="btn btn-primary" onclick="updateStatus()">Update Status</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    let _arrivals = [];
+
+    function renderArrivals() {
+      const statusFilter = document.getElementById('filter-status').value;
+      const vegFilter    = document.getElementById('filter-veg').value;
+      const dateFilter   = document.getElementById('filter-date').value;
+
+      let list = [..._arrivals];
+      if (statusFilter) list = list.filter(a => a.status === statusFilter);
+      if (vegFilter)    list = list.filter(a => a.vegetableId === vegFilter);
+      if (dateFilter)   list = list.filter(a => a.arrivalDate === dateFilter);
+
+      const today = new Date().toISOString().split('T')[0];
+      const todayList = _arrivals.filter(a => a.arrivalDate === today);
+      document.getElementById('sum-today').textContent   = todayList.length;
+      document.getElementById('sum-pending').textContent = _arrivals.filter(a => ['arrived','waiting'].includes(a.status)).length;
+      document.getElementById('sum-done').textContent    = _arrivals.filter(a => a.status === 'completed').length;
+
+      document.getElementById('arrivals-tbody').innerHTML = list.length === 0
+        ? '<tr><td colspan="8" class="empty-row">No arrivals found.</td></tr>'
+        : list.map(a => {
+            const farmer = MockDB.getFarmerById(a.farmerId);
+            const veg    = MockDB.getVegetableById(a.vegetableId);
+            const statusBadge = Utils.statusBadge(a.status);
+            const canWeigh = ['arrived','waiting'].includes(a.status);
+            return `<tr>
+              <td><code>${a.id}</code></td>
+              <td>${Utils.formatDate(a.arrivalDate)}<br><span class="text-muted" style="font-size:0.75rem;">${a.arrivalTime || ''}</span></td>
+              <td>${farmer ? farmer.name : a.farmerId}</td>
+              <td><code>${a.vehicleNo}</code></td>
+              <td>${veg ? veg.nameEn : a.vegetableId}</td>
+              <td>${a.expectedQty.toLocaleString('en-IN')} kg</td>
+              <td>${statusBadge}</td>
+              <td>
+                <button class="btn btn-sm btn-ghost" onclick="openStatusModal('${a.id}')">Update Status</button>
+                ${canWeigh ? `<a href="weighment.html" class="btn btn-sm btn-primary" style="margin-left:0.25rem;">→ Weighment</a>` : ''}
+              </td>
+            </tr>`;
+          }).join('');
+    }
+
+    function openStatusModal(id) {
+      const arrival = _arrivals.find(a => a.id === id);
+      if (!arrival) return;
+      const farmer = MockDB.getFarmerById(arrival.farmerId);
+      const veg    = MockDB.getVegetableById(arrival.vegetableId);
+      document.getElementById('status-arrival-id').value = id;
+      document.getElementById('status-arrival-info').innerHTML =
+        `<strong>${id}</strong> — ${farmer ? farmer.name : ''} / ${veg ? veg.nameEn : ''} (${arrival.expectedQty} kg)`;
+      document.getElementById('status-new').value = arrival.status;
+      document.getElementById('status-notes').value = arrival.notes || '';
+      Utils.openModal('modal-status');
+    }
+
+    function updateStatus() {
+      const id = document.getElementById('status-arrival-id').value;
+      const newStatus = document.getElementById('status-new').value;
+      const notes = document.getElementById('status-notes').value;
+      if (!id || !newStatus) return;
+      MockDB.updateRecord('_arrivals', id, { status: newStatus, notes });
+      _arrivals = MockDB.getArrivals();
+      Utils.closeModal('modal-status');
+      Utils.showToast('Arrival status updated successfully.', 'success');
+      renderArrivals();
+    }
+
+    function saveArrival() {
+      const farmerId = document.getElementById('a-farmer').value;
+      const vegId    = document.getElementById('a-veg').value;
+      const vehicle  = document.getElementById('a-vehicle').value.trim();
+      const qty      = Number(document.getElementById('a-qty').value);
+      if (!farmerId || !vegId || !vehicle || !qty) {
+        Utils.showToast('Please fill all required fields.', 'error');
+        return;
+      }
+      const dt = document.getElementById('a-datetime').value || new Date().toISOString();
+      const record = {
+        id: Utils.generateId('ARR'),
+        farmerId, vegetableId: vegId,
+        vehicleNo: vehicle.toUpperCase(),
+        expectedQty: qty,
+        arrivalDate: dt.split('T')[0],
+        arrivalTime: dt.split('T')[1] ? dt.split('T')[1].substring(0,5) : '',
+        status: 'arrived',
+        notes: document.getElementById('a-notes').value.trim(),
+      };
+      MockDB.saveRecord('_arrivals', record);
+      _arrivals = MockDB.getArrivals();
+      Utils.closeModal('modal-arrival');
+      Utils.showToast('Arrival logged successfully!', 'success');
+      renderArrivals();
+    }
+
+    function clearFilters() {
+      document.getElementById('filter-status').value = '';
+      document.getElementById('filter-veg').value    = '';
+      document.getElementById('filter-date').value   = '';
+      renderArrivals();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('manager');
+      _arrivals = MockDB.getArrivals();
+
+      // Populate farmer dropdown
+      MockDB.getFarmers().forEach(f => {
+        document.getElementById('a-farmer').add(new Option(f.name, f.id));
+      });
+
+      // Populate vegetable dropdowns (filter + form)
+      MockDB.getVegetables().forEach(v => {
+        document.getElementById('filter-veg').add(new Option(v.nameEn, v.id));
+        document.getElementById('a-veg').add(new Option(v.nameEn, v.id));
+      });
+
+      // Default date filter to today
+      document.getElementById('filter-date').value = new Date().toISOString().split('T')[0];
+      // Set default arrival datetime
+      document.getElementById('a-datetime').value = new Date().toISOString().slice(0,16);
+
+      renderArrivals();
+    });
+  </script>
+</body>
+</html>

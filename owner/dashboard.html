@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content">
+        <div class="page-header">
+          <h1 class="page-title" data-i18n="page.dashboard"></h1>
+          <div class="page-header-actions">
+            <span id="today-date" class="text-muted" style="font-size:0.875rem;"></span>
+          </div>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="stats-grid" id="kpi-row" style="grid-template-columns:repeat(4,1fr);">
+          <div class="stat-card stat-card--success">
+            <div class="stat-card__icon">₹</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="kpi-purchases">—</div>
+              <div class="stat-card__label" data-i18n="dash.owner.todayPurchases"></div>
+              <div class="stat-card__trend trend-up">↑ Today</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--success">
+            <div class="stat-card__icon">₹</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="kpi-sales">—</div>
+              <div class="stat-card__label" data-i18n="dash.owner.todaySales"></div>
+              <div class="stat-card__trend trend-up">↑ Today</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--warning">
+            <div class="stat-card__icon">₹</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="kpi-expenses">—</div>
+              <div class="stat-card__label" data-i18n="dash.owner.labourCost"></div>
+              <div class="stat-card__trend trend-neutral">→ Today</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--success">
+            <div class="stat-card__icon">₹</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="kpi-profit">—</div>
+              <div class="stat-card__label" data-i18n="dash.owner.grossProfit"></div>
+              <div class="stat-card__trend trend-up">↑ Today</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--info">
+            <div class="stat-card__icon">#</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="kpi-pending-orders">—</div>
+              <div class="stat-card__label" data-i18n="dash.owner.pendingOrders"></div>
+              <div class="stat-card__trend">Orders active</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--success">
+            <div class="stat-card__icon">⚖</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="kpi-stock-value">—</div>
+              <div class="stat-card__label" data-i18n="dash.owner.stockValue"></div>
+              <div class="stat-card__trend trend-up">Available stock</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--warning">
+            <div class="stat-card__icon">👨‍🌾</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="kpi-farmers">—</div>
+              <div class="stat-card__label" data-i18n="dash.owner.totalFarmers"></div>
+              <div class="stat-card__trend trend-warning">Payables pending</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--info">
+            <div class="stat-card__icon">🏪</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="kpi-vendors">—</div>
+              <div class="stat-card__label" data-i18n="dash.owner.activeVendors"></div>
+              <div class="stat-card__trend">Receivables outstanding</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Row 1 -->
+        <div class="charts-grid charts-grid--2col" style="margin-top:1.5rem;">
+          <div class="card">
+            <div class="card__header">
+              <h3 class="card__title" data-i18n="dash.owner.salesTrend"></h3>
+            </div>
+            <div class="card__body">
+              <div class="chart-container" style="height:220px;"><canvas id="chart-sales-trend"></canvas></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card__header">
+              <h3 class="card__title">7-Day Profit Trend</h3>
+            </div>
+            <div class="card__body">
+              <div class="chart-container" style="height:220px;"><canvas id="chart-profit-trend"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Row 2 -->
+        <div class="charts-grid charts-grid--2col" style="margin-top:1.25rem;">
+          <div class="card">
+            <div class="card__header">
+              <h3 class="card__title" data-i18n="dash.owner.topVegetables"></h3>
+            </div>
+            <div class="card__body">
+              <div class="chart-container" style="height:220px;"><canvas id="chart-veg-donut"></canvas></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card__header">
+              <h3 class="card__title" data-i18n="dash.owner.expenseBreakdown"></h3>
+            </div>
+            <div class="card__body">
+              <div class="chart-container" style="height:220px;"><canvas id="chart-expenses"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Row 3 + Activity Feed -->
+        <div class="charts-grid" style="grid-template-columns:1fr 1fr 360px;margin-top:1.25rem;gap:1.25rem;">
+          <div class="card">
+            <div class="card__header">
+              <h3 class="card__title" data-i18n="dash.owner.vendorVolume"></h3>
+            </div>
+            <div class="card__body">
+              <div class="chart-container" style="height:240px;"><canvas id="chart-vendor-bar"></canvas></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card__header">
+              <h3 class="card__title">Farmer Supply Volume</h3>
+            </div>
+            <div class="card__body">
+              <div class="chart-container" style="height:240px;"><canvas id="chart-farmer-bar"></canvas></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card__header">
+              <h3 class="card__title" data-i18n="dash.owner.recentActivity"></h3>
+            </div>
+            <div class="card__body" style="padding:0;">
+              <ul class="activity-feed" id="activity-feed"></ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card" style="margin-top:1.25rem;">
+          <div class="card__header">
+            <h3 class="card__title">Quick Actions</h3>
+          </div>
+          <div class="card__body">
+            <div style="display:flex;flex-wrap:wrap;gap:0.75rem;">
+              <a href="purchases.html" class="btn btn-primary">+ New Purchase</a>
+              <a href="orders.html" class="btn btn-secondary">+ New Order</a>
+              <a href="labour.html" class="btn btn-secondary">Labour Attendance</a>
+              <a href="daily-closing.html" class="btn btn-warning">Daily Closing</a>
+              <a href="expenses.html" class="btn btn-ghost">Record Expense</a>
+              <a href="reports.html" class="btn btn-ghost">View Reports</a>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('owner');
+
+      const stats = MockDB.getTodayDashboardStats();
+      const farmers = MockDB.getFarmers();
+      const vendors = MockDB.getVendors();
+
+      // KPIs — use demo values since today's date won't match seed data
+      document.getElementById('kpi-purchases').textContent  = Utils.formatCurrency(485000);
+      document.getElementById('kpi-sales').textContent      = Utils.formatCurrency(572000);
+      document.getElementById('kpi-expenses').textContent   = Utils.formatCurrency(42500);
+      document.getElementById('kpi-profit').textContent     = Utils.formatCurrency(44500);
+      document.getElementById('kpi-pending-orders').textContent = stats.pendingOrders || 12;
+      document.getElementById('kpi-stock-value').textContent = Utils.formatCurrency(stats.stockValue || 184000);
+      document.getElementById('kpi-farmers').textContent   = farmers.length + ' Farmers';
+      document.getElementById('kpi-vendors').textContent   = vendors.length + ' Vendors';
+
+      // Today date
+      document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-IN', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+      // Charts
+      Charts.renderSalesTrend('chart-sales-trend');
+      Charts.renderProfitTrend('chart-profit-trend');
+      Charts.renderStockDonut('chart-veg-donut');
+      Charts.renderExpenseBreakdown('chart-expenses');
+      Charts.renderVendorVolumeBar('chart-vendor-bar');
+      Charts.renderFarmerSupplyBar('chart-farmer-bar');
+
+      // Activity Feed
+      const activities = [
+        { icon: '🚛', text: 'ARR003 — Lakshmaiah arrived with Potato (900 kg)', time: '08:15' },
+        { icon: '⚖️', text: 'WGT007 — Onion weighment completed: 500 kg net', time: '08:00' },
+        { icon: '✅', text: 'QC007 — Onion quality check: Grade A 420 kg', time: '07:45' },
+        { icon: '📦', text: 'ORD-10245 — Loading started for Chennai Fresh Mart', time: '07:30' },
+        { icon: '💰', text: 'PAY013 — ₹11,760 paid to Venkatesh Reddy (UPI)', time: '07:00' },
+        { icon: '🚚', text: 'DSP008 — Vehicle AP05BK1234 loading for Chennai', time: '06:50' },
+        { icon: '🛒', text: 'ORD-10243 — New order from Sri Ram Traders ₹56,700', time: '06:30' },
+        { icon: '📋', text: 'PUR018 — Tomato A 550 kg purchased from Lakshmaiah', time: '06:15' },
+        { icon: '🌿', text: 'ARR001 — Venkatesh Reddy arrival completed', time: '06:00' },
+        { icon: '💳', text: 'PAY014 — ₹1,00,000 advance received from Deccan Veg', time: '05:30' },
+      ];
+      const feed = document.getElementById('activity-feed');
+      activities.forEach(a => {
+        const li = document.createElement('li');
+        li.className = 'activity-item';
+        li.innerHTML = `<span class="activity-icon">${a.icon}</span><div class="activity-body"><span class="activity-text">${a.text}</span><span class="activity-time">${a.time}</span></div>`;
+        feed.appendChild(li);
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vendor Management — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content">
+        <div class="page-header">
+          <h1 class="page-title" data-i18n="page.vendors"></h1>
+          <div class="page-header-actions">
+            <button class="btn btn-primary" onclick="openAddVendor()">+ <span data-i18n="common.add"></span> Vendor</button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:1rem;">
+          <div class="card__body">
+            <div class="filter-row">
+              <input type="text" class="form-input" id="vendor-search" placeholder="Search name, city, GST…" oninput="renderVendorTable()">
+              <select class="form-select" id="vendor-state-filter" onchange="renderVendorTable()">
+                <option value="">All States</option>
+                <option value="TS">Telangana (TS)</option>
+                <option value="AP">Andhra Pradesh (AP)</option>
+                <option value="TN">Tamil Nadu (TN)</option>
+                <option value="KA">Karnataka (KA)</option>
+                <option value="MH">Maharashtra (MH)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card__body" style="padding:0;">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Vendor ID</th>
+                    <th data-i18n="col.businessName"></th>
+                    <th data-i18n="col.city"></th>
+                    <th data-i18n="col.state"></th>
+                    <th>GST</th>
+                    <th data-i18n="col.creditLimit"></th>
+                    <th data-i18n="col.outstanding"></th>
+                    <th data-i18n="col.status"></th>
+                    <th data-i18n="common.actions"></th>
+                  </tr>
+                </thead>
+                <tbody id="vendors-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Add/Edit Vendor Modal -->
+  <div class="modal-overlay" id="modal-vendor">
+    <div class="modal modal--lg">
+      <div class="modal__header">
+        <h3 class="modal__title" id="vendor-modal-title">Add Vendor</h3>
+        <button class="modal__close" onclick="Utils.closeModal('modal-vendor')">&times;</button>
+      </div>
+      <div class="modal__body">
+        <form id="vendor-form">
+          <input type="hidden" id="vendor-edit-id">
+          <div class="form-grid form-grid--2">
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.businessName"></label>
+              <input type="text" class="form-input" id="v-business" data-validate="required" placeholder="Business Name">
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.contactPerson"></label>
+              <input type="text" class="form-input" id="v-contact" placeholder="Contact Person Name">
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.mobile"></label>
+              <input type="text" class="form-input" id="v-mobile" placeholder="Mobile number">
+            </div>
+            <div class="form-group">
+              <label class="form-label">WhatsApp</label>
+              <input type="text" class="form-input" id="v-whatsapp" placeholder="WhatsApp number">
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.city"></label>
+              <input type="text" class="form-input" id="v-city" placeholder="City">
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.state"></label>
+              <select class="form-select" id="v-state">
+                <option value="AP">Andhra Pradesh</option>
+                <option value="TS">Telangana</option>
+                <option value="TN">Tamil Nadu</option>
+                <option value="KA">Karnataka</option>
+                <option value="MH">Maharashtra</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.gstNumber"></label>
+              <input type="text" class="form-input" id="v-gst" placeholder="GST Number (15 chars)">
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.creditLimit"></label>
+              <input type="number" class="form-input" id="v-credit" placeholder="Credit Limit (₹)">
+            </div>
+            <div class="form-group form-group--full">
+              <label class="form-label" data-i18n="field.deliveryAddress"></label>
+              <textarea class="form-textarea" id="v-address" rows="2" placeholder="Full delivery address"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.paymentTerms"></label>
+              <select class="form-select" id="v-terms">
+                <option>Net 3</option><option>Net 7</option><option>Net 10</option>
+                <option>Net 15</option><option>Net 30</option><option>Advance</option>
+              </select>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn-ghost" onclick="Utils.closeModal('modal-vendor')" data-i18n="common.cancel"></button>
+        <button class="btn btn-primary" onclick="saveVendor()" data-i18n="common.save"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- View Vendor Modal -->
+  <div class="modal-overlay" id="modal-vendor-view">
+    <div class="modal modal--lg">
+      <div class="modal__header">
+        <h3 class="modal__title" id="view-vendor-name">Vendor Profile</h3>
+        <button class="modal__close" onclick="Utils.closeModal('modal-vendor-view')">&times;</button>
+      </div>
+      <div class="modal__body" id="view-vendor-body"></div>
+      <div class="modal__footer">
+        <button class="btn btn-ghost" onclick="Utils.closeModal('modal-vendor-view')" data-i18n="common.close"></button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    let _vendors = [];
+
+    function renderVendorTable() {
+      const q = (document.getElementById('vendor-search').value || '').toLowerCase();
+      const state = document.getElementById('vendor-state-filter').value;
+      const data = _vendors.filter(v => {
+        const match = !q || [v.businessName, v.city, v.gst, v.contactPerson].some(x => x && x.toLowerCase().includes(q));
+        return match && (!state || v.state === state);
+      });
+      document.getElementById('vendors-tbody').innerHTML = data.map(v => `
+        <tr>
+          <td><code>${v.id}</code></td>
+          <td><strong>${v.businessName}</strong><br><small class="text-muted">${v.contactPerson}</small></td>
+          <td>${v.city}</td>
+          <td>${v.state}</td>
+          <td><small>${v.gst}</small></td>
+          <td>${Utils.formatCurrency(v.creditLimit)}</td>
+          <td class="${v.outstanding > 0 ? 'text-warning' : 'text-success'}">${Utils.formatCurrency(v.outstanding)}</td>
+          <td>${Utils.statusBadge(v.outstanding > v.creditLimit * 0.8 ? 'overdue' : v.outstanding > 0 ? 'partial' : 'paid')}</td>
+          <td>
+            <button class="btn btn-sm btn-ghost" onclick="viewVendor('${v.id}')">View</button>
+            <button class="btn btn-sm btn-secondary" onclick="editVendor('${v.id}')">Edit</button>
+            <a class="btn btn-sm btn-ghost" href="vendor-ledger.html?id=${v.id}">Ledger</a>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function openAddVendor() {
+      document.getElementById('vendor-modal-title').textContent = 'Add Vendor';
+      document.getElementById('vendor-edit-id').value = '';
+      document.getElementById('vendor-form').reset();
+      Utils.openModal('modal-vendor');
+    }
+
+    function editVendor(id) {
+      const v = _vendors.find(x => x.id === id);
+      if (!v) return;
+      document.getElementById('vendor-modal-title').textContent = 'Edit Vendor';
+      document.getElementById('vendor-edit-id').value = id;
+      document.getElementById('v-business').value = v.businessName;
+      document.getElementById('v-contact').value = v.contactPerson;
+      document.getElementById('v-mobile').value = v.mobile;
+      document.getElementById('v-city').value = v.city;
+      document.getElementById('v-state').value = v.state;
+      document.getElementById('v-gst').value = v.gst;
+      document.getElementById('v-credit').value = v.creditLimit;
+      document.getElementById('v-terms').value = v.paymentTerms;
+      Utils.openModal('modal-vendor');
+    }
+
+    function saveVendor() {
+      const business = document.getElementById('v-business').value.trim();
+      if (!business) { Utils.showToast('Business name is required.', 'error'); return; }
+      const editId = document.getElementById('vendor-edit-id').value;
+      const record = {
+        businessName: business,
+        contactPerson: document.getElementById('v-contact').value.trim(),
+        mobile: document.getElementById('v-mobile').value.trim(),
+        city: document.getElementById('v-city').value.trim(),
+        state: document.getElementById('v-state').value,
+        gst: document.getElementById('v-gst').value.trim(),
+        creditLimit: Number(document.getElementById('v-credit').value) || 0,
+        paymentTerms: document.getElementById('v-terms').value,
+        outstanding: 0,
+        joinedDate: new Date().toISOString().split('T')[0],
+      };
+      if (editId) {
+        MockDB.updateRecord('_vendors', editId, record);
+      } else {
+        record.id = Utils.generateId('VN');
+        MockDB.saveRecord('_vendors', record);
+      }
+      _vendors = MockDB.getVendors();
+      Utils.closeModal('modal-vendor');
+      Utils.showToast(t('toast.vendor.saved'), 'success');
+      renderVendorTable();
+    }
+
+    function viewVendor(id) {
+      const v = _vendors.find(x => x.id === id);
+      if (!v) return;
+      const orders = MockDB.getOrders().filter(o => o.vendorId === id);
+      const payments = MockDB.getPayments().filter(p => p.partyId === id && p.partyType === 'vendor');
+      document.getElementById('view-vendor-name').textContent = v.businessName;
+      document.getElementById('view-vendor-body').innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
+          <div><strong>Contact:</strong> ${v.contactPerson}</div>
+          <div><strong>Mobile:</strong> ${v.mobile}</div>
+          <div><strong>City:</strong> ${v.city}, ${v.state}</div>
+          <div><strong>GST:</strong> ${v.gst}</div>
+          <div><strong>Credit Limit:</strong> ${Utils.formatCurrency(v.creditLimit)}</div>
+          <div><strong>Payment Terms:</strong> ${v.paymentTerms}</div>
+          <div><strong>Outstanding:</strong> <span class="${v.outstanding>0?'text-warning':'text-success'}">${Utils.formatCurrency(v.outstanding)}</span></div>
+          <div><strong>Joined:</strong> ${Utils.formatDate(v.joinedDate)}</div>
+        </div>
+        <h4 style="margin-bottom:0.75rem;">Order History (${orders.length} orders)</h4>
+        <table class="data-table" style="margin-bottom:1rem;">
+          <thead><tr><th>Order ID</th><th>Date</th><th>Delivery</th><th>Total</th><th>Status</th></tr></thead>
+          <tbody>${orders.map(o => `<tr><td>${o.id}</td><td>${Utils.formatDate(o.orderDate)}</td><td>${Utils.formatDate(o.deliveryDate)}</td><td>${Utils.formatCurrency(o.total)}</td><td>${Utils.statusBadge(o.status)}</td></tr>`).join('')}</tbody>
+        </table>
+        <div style="display:flex;gap:2rem;padding:0.75rem;background:var(--color-bg);border-radius:8px;">
+          <div><strong>Total Orders:</strong> ${Utils.formatCurrency(orders.reduce((s,o)=>s+o.total,0))}</div>
+          <div><strong>Total Received:</strong> ${Utils.formatCurrency(payments.reduce((s,p)=>s+p.amount,0))}</div>
+          <div><strong>Outstanding:</strong> <span class="text-warning">${Utils.formatCurrency(v.outstanding)}</span></div>
+        </div>
+      `;
+      Utils.openModal('modal-vendor-view');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('owner');
+      _vendors = MockDB.getVendors();
+      renderVendorTable();
+    });
+  </script>
+</body>
+</html>

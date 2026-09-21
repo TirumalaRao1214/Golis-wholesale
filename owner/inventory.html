@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventory Status — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content">
+        <div class="page-header">
+          <h1 class="page-title" data-i18n="page.inventory"></h1>
+          <div class="page-header-actions">
+            <select class="form-select form-select--sm" id="inv-filter-status" onchange="renderInventory()">
+              <option value="">All Status</option>
+              <option value="healthy">Healthy</option>
+              <option value="low">Low Stock</option>
+              <option value="out">Out of Stock</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Alerts -->
+        <div id="stock-alerts" style="margin-bottom:1rem;"></div>
+
+        <!-- Summary Cards -->
+        <div class="stats-grid stats-grid--4" style="margin-bottom:1rem;">
+          <div class="stat-card stat-card--success">
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="inv-total-stock">—</div>
+              <div class="stat-card__label">Total Stock</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--info">
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="inv-total-value">—</div>
+              <div class="stat-card__label">Total Stock Value</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--warning">
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="inv-low-count">—</div>
+              <div class="stat-card__label">Low Stock Items</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--danger">
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="inv-out-count">—</div>
+              <div class="stat-card__label">Out of Stock</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Formula display -->
+        <div class="card" style="margin-bottom:1rem;">
+          <div class="card__body">
+            <div class="formula-display">
+              <span class="formula-part">Opening</span>
+              <span class="formula-op">+</span>
+              <span class="formula-part formula-part--success">Purchased</span>
+              <span class="formula-op">+</span>
+              <span class="formula-part formula-part--info">Returns</span>
+              <span class="formula-op">−</span>
+              <span class="formula-part formula-part--warning">Sold</span>
+              <span class="formula-op">−</span>
+              <span class="formula-part formula-part--danger">Damaged</span>
+              <span class="formula-op">−</span>
+              <span class="formula-part formula-part--muted">Wastage</span>
+              <span class="formula-op">=</span>
+              <span class="formula-part formula-part--primary"><strong>Closing</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Inventory Table -->
+        <div class="card">
+          <div class="card__body" style="padding:0;">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th data-i18n="col.vegetable"></th>
+                    <th data-i18n="col.grade"></th>
+                    <th data-i18n="col.opening"></th>
+                    <th data-i18n="col.purchased"></th>
+                    <th data-i18n="col.sold"></th>
+                    <th data-i18n="col.damaged"></th>
+                    <th data-i18n="col.wastage"></th>
+                    <th data-i18n="col.closing"></th>
+                    <th data-i18n="col.status"></th>
+                  </tr>
+                </thead>
+                <tbody id="inventory-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    function getStockStatus(closing) {
+      if (closing <= 0) return 'out';
+      if (closing < 200) return 'low';
+      return 'healthy';
+    }
+
+    function renderInventory() {
+      const filterStatus = document.getElementById('inv-filter-status').value;
+      const inventory = MockDB.getInventory();
+      const vegs = MockDB.getVegetables();
+
+      let totalStock = 0, totalValue = 0, lowCount = 0, outCount = 0;
+      const alerts = [];
+
+      const rows = inventory.map(inv => {
+        const veg = vegs.find(v => v.id === inv.vegId);
+        const closing = inv.opening + inv.purchased - inv.sold - inv.damaged - inv.wastage;
+        const status = getStockStatus(closing);
+        totalStock += closing;
+        totalValue += closing * (veg ? veg.currentSellPrice : 0);
+        if (status === 'low') { lowCount++; alerts.push({ name: veg ? veg.nameEn : inv.vegId, closing, status: 'low' }); }
+        if (status === 'out') { outCount++; alerts.push({ name: veg ? veg.nameEn : inv.vegId, closing, status: 'out' }); }
+
+        if (filterStatus === 'healthy' && status !== 'healthy') return null;
+        if (filterStatus === 'low' && status !== 'low') return null;
+        if (filterStatus === 'out' && status !== 'out') return null;
+
+        const statusClass = status === 'healthy' ? 'badge--success' : status === 'low' ? 'badge--warning' : 'badge--danger';
+        const statusLabel = status === 'healthy' ? 'Healthy' : status === 'low' ? 'Low Stock' : 'Out of Stock';
+        return `<tr class="${status === 'out' ? 'row--danger' : status === 'low' ? 'row--warning' : ''}">
+          <td><strong>${veg ? veg.nameEn : inv.vegId}</strong></td>
+          <td><span class="badge badge--info">${inv.grade}</span></td>
+          <td>${inv.opening.toLocaleString('en-IN')} kg</td>
+          <td class="text-success">+${inv.purchased.toLocaleString('en-IN')} kg</td>
+          <td class="text-warning">−${inv.sold.toLocaleString('en-IN')} kg</td>
+          <td class="text-danger">−${inv.damaged.toLocaleString('en-IN')} kg</td>
+          <td class="text-muted">−${inv.wastage.toLocaleString('en-IN')} kg</td>
+          <td><strong>${closing.toLocaleString('en-IN')} kg</strong></td>
+          <td><span class="badge ${statusClass}">${statusLabel}</span></td>
+        </tr>`;
+      }).filter(Boolean);
+
+      document.getElementById('inventory-tbody').innerHTML = rows.join('') || '<tr><td colspan="9" class="empty-state">No inventory data</td></tr>';
+      document.getElementById('inv-total-stock').textContent = Utils.formatWeight(totalStock);
+      document.getElementById('inv-total-value').textContent = Utils.formatCurrency(totalValue);
+      document.getElementById('inv-low-count').textContent = lowCount;
+      document.getElementById('inv-out-count').textContent = outCount;
+
+      // Alert banner
+      const alertEl = document.getElementById('stock-alerts');
+      if (alerts.length > 0) {
+        alertEl.innerHTML = `<div class="alert alert--warning"><strong>⚠ Stock Alert:</strong> ${alerts.map(a => `<span class="badge ${a.status === 'out' ? 'badge--danger' : 'badge--warning'}" style="margin-left:4px;">${a.name}${a.status === 'out' ? ' (OUT)' : ` (${a.closing} kg)`}</span>`).join('')}</div>`;
+      } else {
+        alertEl.innerHTML = '';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('owner');
+      renderInventory();
+    });
+  </script>
+</body>
+</html>

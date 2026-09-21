@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cash Book — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content">
+        <div class="page-header">
+          <h1 class="page-title" data-i18n="page.cashBook"></h1>
+          <div class="page-header-actions">
+            <input type="date" class="form-input" id="cashbook-date" onchange="loadCashBook()">
+            <button class="btn btn-ghost" onclick="window.print()">🖨 Print</button>
+          </div>
+        </div>
+
+        <!-- Summary Strip -->
+        <div class="stats-grid stats-grid--4" style="margin-bottom:1.25rem;">
+          <div class="stat-card stat-card--info">
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="cb-opening">—</div>
+              <div class="stat-card__label">Opening Balance</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--success">
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="cb-receipts">—</div>
+              <div class="stat-card__label">Total Receipts</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--warning">
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="cb-payments">—</div>
+              <div class="stat-card__label">Total Payments</div>
+            </div>
+          </div>
+          <div class="stat-card" id="cb-closing-card">
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="cb-closing">—</div>
+              <div class="stat-card__label">Closing Balance</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Two-column cash book -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;">
+          <div class="card">
+            <div class="card__header">
+              <h3 class="card__title" style="color:var(--color-success);">Receipts (In)</h3>
+            </div>
+            <div class="card__body" style="padding:0;">
+              <table class="data-table">
+                <thead><tr><th>Description</th><th>Amount (₹)</th></tr></thead>
+                <tbody id="cb-receipts-tbody"></tbody>
+                <tfoot><tr><th>Total Receipts</th><th id="cb-receipts-total">—</th></tr></tfoot>
+              </table>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card__header">
+              <h3 class="card__title" style="color:var(--color-warning);">Payments (Out)</h3>
+            </div>
+            <div class="card__body" style="padding:0;">
+              <table class="data-table">
+                <thead><tr><th>Description</th><th>Amount (₹)</th></tr></thead>
+                <tbody id="cb-payments-tbody"></tbody>
+                <tfoot><tr><th>Total Payments</th><th id="cb-payments-total">—</th></tr></tfoot>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Net Balance -->
+        <div class="card" style="margin-top:1.25rem;">
+          <div class="card__body" style="display:flex;align-items:center;justify-content:space-between;padding:1.25rem;">
+            <div>
+              <div style="font-size:0.875rem;color:var(--color-text-secondary);">Net Balance for the Day</div>
+              <div style="font-size:0.75rem;color:var(--color-text-secondary);">Receipts − Payments</div>
+            </div>
+            <div id="cb-net-balance" style="font-size:1.75rem;font-weight:700;">—</div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    function loadCashBook() {
+      const date = document.getElementById('cashbook-date').value || new Date().toISOString().split('T')[0];
+
+      const payments = MockDB.getPayments().filter(p => p.date === date);
+      const expenses = MockDB.getExpenses().filter(e => e.date === date);
+
+      // Receipts = vendor payments received (vendor paying us)
+      const receipts = payments.filter(p => p.partyType === 'vendor').map(p => ({
+        desc: `${p.partyName} — ${p.mode} (${p.txnId})`,
+        amount: p.amount,
+      }));
+
+      // Payments = farmer payments made + expenses
+      const paymentItems = [
+        ...payments.filter(p => p.partyType === 'farmer').map(p => ({
+          desc: `${p.partyName} — ${p.mode} (${p.notes || ''})`,
+          amount: p.amount,
+        })),
+        ...expenses.map(e => ({
+          desc: `${e.category} — ${e.notes || ''}`,
+          amount: e.amount,
+        })),
+      ];
+
+      const totalReceipts = receipts.reduce((s, r) => s + r.amount, 0);
+      const totalPayments = paymentItems.reduce((s, p) => s + p.amount, 0);
+      const opening = 85000; // demo opening balance
+      const closing = opening + totalReceipts - totalPayments;
+
+      // Update summary
+      document.getElementById('cb-opening').textContent = Utils.formatCurrency(opening);
+      document.getElementById('cb-receipts').textContent = Utils.formatCurrency(totalReceipts);
+      document.getElementById('cb-payments').textContent = Utils.formatCurrency(totalPayments);
+      document.getElementById('cb-closing').textContent = Utils.formatCurrency(closing);
+      document.getElementById('cb-receipts-total').textContent = Utils.formatCurrency(totalReceipts);
+      document.getElementById('cb-payments-total').textContent = Utils.formatCurrency(totalPayments);
+
+      const closingCard = document.getElementById('cb-closing-card');
+      const netEl = document.getElementById('cb-net-balance');
+      const net = totalReceipts - totalPayments;
+      closingCard.className = `stat-card ${closing >= 0 ? 'stat-card--success' : 'stat-card--danger'}`;
+      netEl.textContent = Utils.formatCurrency(net);
+      netEl.style.color = net >= 0 ? 'var(--color-success)' : 'var(--color-danger)';
+
+      // Receipts table
+      document.getElementById('cb-receipts-tbody').innerHTML = receipts.length
+        ? receipts.map(r => `<tr><td>${r.desc}</td><td class="text-success"><strong>${Utils.formatCurrency(r.amount)}</strong></td></tr>`).join('')
+        : '<tr><td colspan="2" class="text-muted" style="text-align:center;padding:1rem;">No receipts for this date</td></tr>';
+
+      // Payments table
+      document.getElementById('cb-payments-tbody').innerHTML = paymentItems.length
+        ? paymentItems.map(p => `<tr><td>${p.desc}</td><td class="text-warning"><strong>${Utils.formatCurrency(p.amount)}</strong></td></tr>`).join('')
+        : '<tr><td colspan="2" class="text-muted" style="text-align:center;padding:1rem;">No payments for this date</td></tr>';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('owner');
+      document.getElementById('cashbook-date').value = new Date().toISOString().split('T')[0];
+      loadCashBook();
+    });
+  </script>
+</body>
+</html>

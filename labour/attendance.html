@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Attendance — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <style>
+    .calendar-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
+    .calendar-header { text-align:center; font-size:0.75rem; font-weight:700; color:var(--color-text-secondary); padding:0.5rem 0; }
+    .calendar-day { aspect-ratio:1; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:var(--radius-md); border:1px solid transparent; cursor:default; font-size:0.85rem; }
+    .cal-present  { background:#dcfce7; border-color:#86efac; color:#15803d; font-weight:700; }
+    .cal-halfday  { background:#fef9c3; border-color:#fde047; color:#a16207; font-weight:700; }
+    .cal-absent   { background:#fee2e2; border-color:#fca5a5; color:#dc2626; font-weight:700; }
+    .cal-norecord { background:var(--color-bg); color:var(--color-text-secondary); }
+    .cal-today    { outline:2px solid var(--color-primary); }
+    .view-toggle { display:flex; border:1px solid var(--color-border); border-radius:var(--radius-md); overflow:hidden; }
+    .view-toggle button { padding:0.4rem 1rem; border:none; background:none; cursor:pointer; font-size:0.875rem; transition:background 0.15s; }
+    .view-toggle button.active { background:var(--color-primary); color:white; }
+  </style>
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content">
+        <div class="page-header">
+          <h1 class="page-title">My Attendance</h1>
+          <div class="page-header-actions">
+            <div class="view-toggle">
+              <button class="active" id="btn-calendar-view" onclick="switchView('calendar')">📅 Calendar</button>
+              <button id="btn-table-view" onclick="switchView('table')">📋 Table</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Month Selector + Summary -->
+        <div class="card">
+          <div class="card__body">
+            <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+              <div style="display:flex;align-items:center;gap:0.5rem;">
+                <label class="form-label" style="margin:0;">Month:</label>
+                <select class="form-select" id="month-select" style="width:auto;"></select>
+                <select class="form-select" id="year-select" style="width:auto;"></select>
+                <button class="btn btn-secondary btn-sm" onclick="loadMonth()">Load</button>
+              </div>
+              <div style="display:flex;gap:1rem;flex-wrap:wrap;font-size:0.875rem;">
+                <span><span style="background:#dcfce7;padding:0.2rem 0.5rem;border-radius:4px;font-weight:600;color:#15803d;">■ Present</span></span>
+                <span><span style="background:#fef9c3;padding:0.2rem 0.5rem;border-radius:4px;font-weight:600;color:#a16207;">■ Half Day</span></span>
+                <span><span style="background:#fee2e2;padding:0.2rem 0.5rem;border-radius:4px;font-weight:600;color:#dc2626;">■ Absent</span></span>
+                <span><span style="background:var(--color-bg);padding:0.2rem 0.5rem;border-radius:4px;color:var(--color-text-secondary);">■ No Record</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Monthly Summary Cards -->
+        <div class="stats-grid" style="grid-template-columns:repeat(5,1fr);margin-top:1.25rem;">
+          <div class="stat-card stat-card--success">
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="sum-present">0</div>
+              <div class="stat-card__label">Present</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--warning">
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="sum-halfday">0</div>
+              <div class="stat-card__label">Half Days</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--danger">
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="sum-absent">0</div>
+              <div class="stat-card__label">Absent</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--info">
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="sum-total-days">0</div>
+              <div class="stat-card__label">Working Days</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--success">
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="sum-monthly-wage">₹0</div>
+              <div class="stat-card__label">Monthly Wage</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Calendar View -->
+        <div id="view-calendar" class="card" style="margin-top:1.25rem;">
+          <div class="card__header">
+            <h3 class="card__title" id="calendar-title">Attendance Calendar</h3>
+          </div>
+          <div class="card__body">
+            <div class="calendar-grid" id="calendar-header-row">
+              <div class="calendar-header">Sun</div>
+              <div class="calendar-header">Mon</div>
+              <div class="calendar-header">Tue</div>
+              <div class="calendar-header">Wed</div>
+              <div class="calendar-header">Thu</div>
+              <div class="calendar-header">Fri</div>
+              <div class="calendar-header">Sat</div>
+            </div>
+            <div class="calendar-grid" style="margin-top:4px;" id="calendar-body"></div>
+          </div>
+        </div>
+
+        <!-- Table View -->
+        <div id="view-table" class="card" style="margin-top:1.25rem;display:none;">
+          <div class="card__body" style="padding:0;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Day</th>
+                  <th>Status</th>
+                  <th class="text-right">Wage (₹)</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody id="attendance-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    let worker     = null;
+    let currentView = 'calendar';
+
+    const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const STATUS_LABELS = { present:'Present', halfDay:'Half Day', absent:'Absent', overtime:'Overtime' };
+    const STATUS_CLS    = { present:'badge--success', halfDay:'badge--warning', absent:'badge--danger', overtime:'badge--info' };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('labour');
+      const user = APP.user;
+      worker     = MockDB._labour.find(l => l.id === user.refId);
+
+      // Populate month/year selectors
+      const now   = new Date();
+      const ms    = document.getElementById('month-select');
+      const ys    = document.getElementById('year-select');
+      MONTHS.forEach((m, i) => {
+        const opt = document.createElement('option');
+        opt.value = i + 1;
+        opt.textContent = m;
+        if (i === now.getMonth()) opt.selected = true;
+        ms.appendChild(opt);
+      });
+      for (let y = now.getFullYear(); y >= 2023; y--) {
+        const opt = document.createElement('option');
+        opt.value = y;
+        opt.textContent = y;
+        if (y === now.getFullYear()) opt.selected = true;
+        ys.appendChild(opt);
+      }
+
+      loadMonth();
+    });
+
+    function switchView(v) {
+      currentView = v;
+      document.getElementById('view-calendar').style.display = v === 'calendar' ? 'block' : 'none';
+      document.getElementById('view-table').style.display    = v === 'table'    ? 'block' : 'none';
+      document.getElementById('btn-calendar-view').className = v === 'calendar' ? 'active' : '';
+      document.getElementById('btn-table-view').className    = v === 'table'    ? 'active' : '';
+    }
+
+    function loadMonth() {
+      const month = parseInt(document.getElementById('month-select').value);
+      const year  = parseInt(document.getElementById('year-select').value);
+      const labourId = APP.user.refId;
+      const monthStr = `${year}-${String(month).padStart(2,'0')}`;
+      document.getElementById('calendar-title').textContent = `${MONTHS[month-1]} ${year}`;
+
+      // Get attendance for this month
+      const monthAttendance = MockDB.getAttendance().filter(a => a.labourId === labourId && a.date.startsWith(monthStr));
+      const attMap = {};
+      monthAttendance.forEach(a => { attMap[a.date] = a; });
+
+      // Build calendar
+      const daysInMonth  = new Date(year, month, 0).getDate();
+      const firstDayOfWeek = new Date(year, month - 1, 1).getDay();
+      const today        = new Date().toISOString().split('T')[0];
+      const dailyWage    = worker ? worker.dailyWage : 700;
+
+      // Summary
+      let present = 0, halfDay = 0, absent = 0, totalDays = daysInMonth;
+      monthAttendance.forEach(a => {
+        if (a.status === 'present' || a.status === 'overtime') present++;
+        else if (a.status === 'halfDay') halfDay++;
+        else if (a.status === 'absent') absent++;
+      });
+      const monthWage = (present * dailyWage) + (halfDay * dailyWage * 0.5);
+      document.getElementById('sum-present').textContent     = present;
+      document.getElementById('sum-halfday').textContent     = halfDay;
+      document.getElementById('sum-absent').textContent      = absent;
+      document.getElementById('sum-total-days').textContent  = totalDays;
+      document.getElementById('sum-monthly-wage').textContent= Utils.formatCurrency(monthWage);
+
+      // Calendar grid
+      let calHTML = '';
+      for (let i = 0; i < firstDayOfWeek; i++) {
+        calHTML += `<div class="calendar-day" style="background:none;border:none;"></div>`;
+      }
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dateStr = `${year}-${String(month).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const att     = attMap[dateStr];
+        const isToday = dateStr === today;
+        let cls = 'cal-norecord';
+        let emoji = '';
+        if (att) {
+          if (att.status === 'present' || att.status === 'overtime') { cls = 'cal-present'; emoji = '✓'; }
+          else if (att.status === 'halfDay') { cls = 'cal-halfday'; emoji = '½'; }
+          else if (att.status === 'absent')  { cls = 'cal-absent';  emoji = '✗'; }
+        }
+        calHTML += `<div class="calendar-day ${cls} ${isToday ? 'cal-today' : ''}" title="${att ? STATUS_LABELS[att.status] || att.status : 'No record'}">
+          <span>${d}</span>
+          ${emoji ? `<span style="font-size:0.65rem;margin-top:1px;">${emoji}</span>` : ''}
+        </div>`;
+      }
+      document.getElementById('calendar-body').innerHTML = calHTML;
+
+      // Table view
+      const rows = [];
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dateStr = `${year}-${String(month).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const dateObj = new Date(dateStr);
+        const att     = attMap[dateStr];
+        if (!att && dateStr > today) continue; // skip future days without record
+        const wage = att
+          ? (att.status === 'present' || att.status === 'overtime') ? dailyWage
+          : att.status === 'halfDay' ? dailyWage * 0.5
+          : 0
+          : 0;
+        rows.push(`<tr>
+          <td>${Utils.formatDate(dateStr)}</td>
+          <td>${DAYS[dateObj.getDay()]}</td>
+          <td>${att ? `<span class="badge ${STATUS_CLS[att.status] || ''}">${STATUS_LABELS[att.status] || att.status}</span>` : '<span class="badge">No Record</span>'}</td>
+          <td class="text-right" style="font-weight:${wage > 0 ? '700' : '400'};">${wage > 0 ? '₹'+wage : '—'}</td>
+          <td class="text-muted">${att && att.notes ? att.notes : '—'}</td>
+        </tr>`);
+      }
+      document.getElementById('attendance-tbody').innerHTML = rows.join('') || '<tr><td colspan="5" class="text-center text-muted">No records found</td></tr>';
+    }
+  </script>
+</body>
+</html>

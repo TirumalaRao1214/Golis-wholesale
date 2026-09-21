@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weighment Entry — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content">
+        <div class="page-header">
+          <h1 class="page-title" data-i18n="page.weighment"></h1>
+          <div class="page-header-actions">
+            <button class="btn btn-primary" onclick="Utils.openModal('modal-weighment')">+ New Weighment</button>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="card">
+          <div class="card__body" style="padding:0;">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Weighment ID</th>
+                    <th data-i18n="col.date"></th>
+                    <th>Arrival Ref</th>
+                    <th>Farmer</th>
+                    <th>Vegetable</th>
+                    <th data-i18n="col.grossWt"></th>
+                    <th data-i18n="col.tareWt"></th>
+                    <th data-i18n="col.netWt"></th>
+                    <th>Weighed By</th>
+                  </tr>
+                </thead>
+                <tbody id="weighments-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Add Weighment Modal -->
+  <div class="modal-overlay" id="modal-weighment">
+    <div class="modal">
+      <div class="modal__header">
+        <h3 class="modal__title">New Weighment Entry</h3>
+        <button class="modal__close" onclick="Utils.closeModal('modal-weighment')">&times;</button>
+      </div>
+      <div class="modal__body">
+        <form id="weighment-form">
+          <div class="form-group">
+            <label class="form-label">Link to Arrival</label>
+            <select class="form-select" id="w-arrival">
+              <option value="">Select Arrival</option>
+            </select>
+          </div>
+          <div class="form-grid form-grid--2">
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.grossWeight"></label>
+              <input type="number" class="form-input" id="w-gross" placeholder="0" oninput="calcNetWeight()" min="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.tareWeight"></label>
+              <input type="number" class="form-input" id="w-tare" placeholder="0" oninput="calcNetWeight()" min="0">
+            </div>
+          </div>
+          <!-- Net weight auto-calc display -->
+          <div class="form-group">
+            <label class="form-label" data-i18n="field.netWeight"></label>
+            <div class="calc-display">
+              <span class="calc-display__value" id="w-net-value">0 kg</span>
+              <span class="calc-display__formula" id="w-net-formula">Gross − Tare = Net Weight</span>
+            </div>
+            <div class="calc-example" style="margin-top:0.5rem;padding:0.5rem 0.75rem;background:var(--color-primary-pale);border-radius:6px;font-size:0.8rem;color:var(--color-primary);">
+              Example: 5,200 kg − 2,000 kg = <strong>3,200 kg</strong>
+            </div>
+          </div>
+          <div class="form-grid form-grid--2">
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.weighmentDate"></label>
+              <input type="date" class="form-input" id="w-date">
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.weighedBy"></label>
+              <input type="text" class="form-input" id="w-by" placeholder="Staff name">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="common.notes"></label>
+            <textarea class="form-textarea" id="w-notes" rows="2"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn-ghost" onclick="Utils.closeModal('modal-weighment')" data-i18n="common.cancel"></button>
+        <button class="btn btn-primary" onclick="saveWeighment()">Save Weighment</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    let _weighments = [];
+
+    function calcNetWeight() {
+      const gross = Number(document.getElementById('w-gross').value) || 0;
+      const tare  = Number(document.getElementById('w-tare').value) || 0;
+      const net   = Math.max(0, gross - tare);
+      document.getElementById('w-net-value').textContent = net.toLocaleString('en-IN') + ' kg';
+      document.getElementById('w-net-formula').textContent = `${gross.toLocaleString('en-IN')} kg − ${tare.toLocaleString('en-IN')} kg = ${net.toLocaleString('en-IN')} kg`;
+    }
+
+    function renderWeighmentTable() {
+      const arrivals = MockDB.getArrivals();
+      document.getElementById('weighments-tbody').innerHTML = _weighments.map(w => {
+        const arr = arrivals.find(a => a.id === w.arrivalId);
+        const farmer = arr ? MockDB.getFarmerById(arr.farmerId) : null;
+        const veg = arr ? MockDB.getVegetableById(arr.vegetableId) : null;
+        return `<tr>
+          <td><code>${w.id}</code></td>
+          <td>${w.date ? Utils.formatDate(w.date) : '<span class="badge badge--warning">Pending</span>'}</td>
+          <td><code>${w.arrivalId}</code></td>
+          <td>${farmer ? farmer.name : '—'}</td>
+          <td>${veg ? veg.nameEn : '—'}</td>
+          <td>${w.grossWt ? w.grossWt.toLocaleString('en-IN') + ' kg' : '—'}</td>
+          <td>${w.tareWt ? w.tareWt.toLocaleString('en-IN') + ' kg' : '—'}</td>
+          <td><strong>${w.netWt ? w.netWt.toLocaleString('en-IN') + ' kg' : '—'}</strong></td>
+          <td>${w.weighedBy || '—'}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    function saveWeighment() {
+      const gross = Number(document.getElementById('w-gross').value) || 0;
+      const tare  = Number(document.getElementById('w-tare').value) || 0;
+      if (!gross) { Utils.showToast('Gross weight is required.', 'error'); return; }
+      const record = {
+        id: Utils.generateId('WGT'),
+        arrivalId: document.getElementById('w-arrival').value,
+        grossWt: gross,
+        tareWt: tare,
+        netWt: Math.max(0, gross - tare),
+        date: document.getElementById('w-date').value || new Date().toISOString().split('T')[0],
+        weighedBy: document.getElementById('w-by').value.trim(),
+        notes: document.getElementById('w-notes').value.trim(),
+      };
+      MockDB.saveRecord('_weighments', record);
+      _weighments = MockDB.getWeighments();
+      Utils.closeModal('modal-weighment');
+      Utils.showToast(t('toast.weighment.saved'), 'success');
+      renderWeighmentTable();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('owner');
+      _weighments = MockDB.getWeighments();
+
+      // Populate arrivals dropdown
+      const arrivals = MockDB.getArrivals();
+      const sel = document.getElementById('w-arrival');
+      arrivals.forEach(a => {
+        const farmer = MockDB.getFarmerById(a.farmerId);
+        const veg = MockDB.getVegetableById(a.vegetableId);
+        sel.add(new Option(`${a.id} — ${farmer ? farmer.name : ''} / ${veg ? veg.nameEn : ''} (${a.status})`, a.id));
+      });
+
+      document.getElementById('w-date').value = new Date().toISOString().split('T')[0];
+      document.getElementById('w-by').value = APP.user ? APP.user.name : '';
+      renderWeighmentTable();
+    });
+  </script>
+</body>
+</html>

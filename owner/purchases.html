@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Purchase Records — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content">
+        <div class="page-header">
+          <h1 class="page-title" data-i18n="page.purchases"></h1>
+          <div class="page-header-actions">
+            <button class="btn btn-primary" onclick="Utils.openModal('modal-purchase')">+ New Purchase</button>
+          </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="stats-grid stats-grid--3" style="margin-bottom:1rem;">
+          <div class="stat-card stat-card--success">
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="pur-today">—</div>
+              <div class="stat-card__label">Today's Total</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--info">
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="pur-week">—</div>
+              <div class="stat-card__label">This Week</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--warning">
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="pur-month">—</div>
+              <div class="stat-card__label">This Month</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="card" style="margin-bottom:1rem;">
+          <div class="card__body">
+            <div class="filter-row">
+              <select class="form-select" id="pur-filter-farmer" onchange="renderPurchaseTable()">
+                <option value="">All Farmers</option>
+              </select>
+              <select class="form-select" id="pur-filter-veg" onchange="renderPurchaseTable()">
+                <option value="">All Vegetables</option>
+              </select>
+              <input type="date" class="form-input" id="pur-filter-from" onchange="renderPurchaseTable()" placeholder="From Date">
+              <input type="date" class="form-input" id="pur-filter-to" onchange="renderPurchaseTable()" placeholder="To Date">
+              <button class="btn btn-ghost btn-sm" onclick="clearPurchaseFilters()">Clear</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="card">
+          <div class="card__body" style="padding:0;">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Purchase ID</th>
+                    <th data-i18n="col.date"></th>
+                    <th data-i18n="col.farmer"></th>
+                    <th data-i18n="col.vegetable"></th>
+                    <th data-i18n="col.grade"></th>
+                    <th>Qty (kg)</th>
+                    <th>Rate (₹/kg)</th>
+                    <th>Total (₹)</th>
+                    <th>Vehicle</th>
+                    <th data-i18n="col.status"></th>
+                  </tr>
+                </thead>
+                <tbody id="purchases-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Add Purchase Modal -->
+  <div class="modal-overlay" id="modal-purchase">
+    <div class="modal modal--lg">
+      <div class="modal__header">
+        <h3 class="modal__title">New Purchase</h3>
+        <button class="modal__close" onclick="Utils.closeModal('modal-purchase')">&times;</button>
+      </div>
+      <div class="modal__body">
+        <form id="purchase-form">
+          <div class="form-grid form-grid--2">
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.farmer"></label>
+              <select class="form-select" id="p-farmer" data-validate="required">
+                <option value="">Select Farmer</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.vegetable"></label>
+              <select class="form-select" id="p-veg" data-validate="required">
+                <option value="">Select Vegetable</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.grade"></label>
+              <select class="form-select" id="p-grade">
+                <option value="A">Grade A</option>
+                <option value="B">Grade B</option>
+                <option value="C">Grade C</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.purchaseDate"></label>
+              <input type="date" class="form-input" id="p-date">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Quantity (kg)</label>
+              <input type="number" class="form-input" id="p-qty" placeholder="0" oninput="calcPurchaseTotal()" min="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Rate (₹/kg)</label>
+              <input type="number" class="form-input" id="p-rate" placeholder="0" oninput="calcPurchaseTotal()" min="0">
+            </div>
+            <div class="form-group form-group--full">
+              <label class="form-label">Auto-calculated Total</label>
+              <div class="calc-display" id="p-total-display">
+                <span class="calc-display__value">₹0</span>
+                <span class="calc-display__formula" id="p-formula">0 kg × ₹0/kg = ₹0</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.vehicleNumber"></label>
+              <input type="text" class="form-input" id="p-vehicle" placeholder="AP29XX1234">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Payment Mode</label>
+              <select class="form-select" id="p-mode">
+                <option>Cash</option><option>UPI</option><option>Bank Transfer</option>
+              </select>
+            </div>
+            <div class="form-group form-group--full">
+              <label class="form-label" data-i18n="common.notes"></label>
+              <textarea class="form-textarea" id="p-notes" rows="2"></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn-ghost" onclick="Utils.closeModal('modal-purchase')" data-i18n="common.cancel"></button>
+        <button class="btn btn-primary" onclick="savePurchase()">Save Purchase</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    let _purchases = [];
+
+    function calcPurchaseTotal() {
+      const qty = Number(document.getElementById('p-qty').value) || 0;
+      const rate = Number(document.getElementById('p-rate').value) || 0;
+      const total = qty * rate;
+      document.querySelector('#p-total-display .calc-display__value').textContent = Utils.formatCurrency(total);
+      document.getElementById('p-formula').textContent = `${qty} kg × ₹${rate}/kg = ${Utils.formatCurrency(total)}`;
+      document.querySelector('#p-total-display .calc-display__value').classList.add('calc-highlight');
+      setTimeout(() => document.querySelector('#p-total-display .calc-display__value').classList.remove('calc-highlight'), 500);
+    }
+
+    function renderPurchaseTable() {
+      const farmerId = document.getElementById('pur-filter-farmer').value;
+      const vegId = document.getElementById('pur-filter-veg').value;
+      const from = document.getElementById('pur-filter-from').value;
+      const to = document.getElementById('pur-filter-to').value;
+      const data = _purchases.filter(p => {
+        if (farmerId && p.farmerId !== farmerId) return false;
+        if (vegId && p.vegetableId !== vegId) return false;
+        if (from && p.date < from) return false;
+        if (to && p.date > to) return false;
+        return true;
+      });
+      document.getElementById('purchases-tbody').innerHTML = data.map(p => {
+        const farmer = MockDB.getFarmerById(p.farmerId);
+        const veg = MockDB.getVegetableById(p.vegetableId);
+        return `<tr>
+          <td><code>${p.id}</code></td>
+          <td>${Utils.formatDate(p.date)}</td>
+          <td>${farmer ? farmer.name : p.farmerId}</td>
+          <td>${veg ? veg.nameEn : p.vegetableId}</td>
+          <td><span class="badge badge--info">${p.grade}</span></td>
+          <td>${p.qty.toLocaleString('en-IN')}</td>
+          <td>₹${p.rate}</td>
+          <td><strong>${Utils.formatCurrency(p.total)}</strong></td>
+          <td><small>${p.vehicleNo || '—'}</small></td>
+          <td>${Utils.statusBadge(p.status)}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    function clearPurchaseFilters() {
+      document.getElementById('pur-filter-farmer').value = '';
+      document.getElementById('pur-filter-veg').value = '';
+      document.getElementById('pur-filter-from').value = '';
+      document.getElementById('pur-filter-to').value = '';
+      renderPurchaseTable();
+    }
+
+    function savePurchase() {
+      const farmerId = document.getElementById('p-farmer').value;
+      const vegId = document.getElementById('p-veg').value;
+      const qty = Number(document.getElementById('p-qty').value);
+      const rate = Number(document.getElementById('p-rate').value);
+      if (!farmerId || !vegId || !qty || !rate) { Utils.showToast('Please fill all required fields.', 'error'); return; }
+      const record = {
+        id: Utils.generateId('PUR'),
+        farmerId,
+        vegetableId: vegId,
+        grade: document.getElementById('p-grade').value,
+        qty,
+        rate,
+        total: qty * rate,
+        date: document.getElementById('p-date').value || new Date().toISOString().split('T')[0],
+        vehicleNo: document.getElementById('p-vehicle').value.trim(),
+        paymentMode: document.getElementById('p-mode').value,
+        bags: Math.ceil(qty / 50),
+        status: 'pending',
+      };
+      MockDB.saveRecord('_purchases', record);
+      _purchases = MockDB.getPurchases();
+      Utils.closeModal('modal-purchase');
+      Utils.showToast(t('toast.purchase.saved'), 'success');
+      renderPurchaseTable();
+      updateSummaryCards();
+    }
+
+    function updateSummaryCards() {
+      const today = new Date().toISOString().split('T')[0];
+      const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
+      const weekStr = weekAgo.toISOString().split('T')[0];
+      const monthStr = today.substring(0, 7);
+      document.getElementById('pur-today').textContent = Utils.formatCurrency(_purchases.filter(p => p.date === today).reduce((s,p)=>s+p.total,0));
+      document.getElementById('pur-week').textContent = Utils.formatCurrency(_purchases.filter(p => p.date >= weekStr).reduce((s,p)=>s+p.total,0));
+      document.getElementById('pur-month').textContent = Utils.formatCurrency(_purchases.filter(p => p.date.startsWith(monthStr)).reduce((s,p)=>s+p.total,0));
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('owner');
+      _purchases = MockDB.getPurchases();
+
+      // Populate filters
+      const farmers = MockDB.getFarmers();
+      const vegs = MockDB.getVegetables();
+      const farmerSel = document.getElementById('pur-filter-farmer');
+      const vegSel = document.getElementById('pur-filter-veg');
+      const pFarmer = document.getElementById('p-farmer');
+      const pVeg = document.getElementById('p-veg');
+      farmers.forEach(f => {
+        farmerSel.add(new Option(f.name, f.id));
+        pFarmer.add(new Option(f.name, f.id));
+      });
+      vegs.forEach(v => {
+        vegSel.add(new Option(v.nameEn, v.id));
+        pVeg.add(new Option(v.nameEn, v.id));
+      });
+
+      document.getElementById('p-date').value = new Date().toISOString().split('T')[0];
+      updateSummaryCards();
+      renderPurchaseTable();
+    });
+  </script>
+</body>
+</html>

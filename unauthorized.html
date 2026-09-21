@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unauthorized Access — GOLIS Wholesale</title>
+  <meta name="description" content="Access Denied - GOLIS Wholesale">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <style>
+    /* ─── Unauthorized Page Styles ────────────────────────── */
+    body.unauthorized-body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--color-bg);
+      color: var(--color-text-primary);
+      font-family: var(--font-primary);
+      margin: 0;
+      padding: 0;
+    }
+
+    .unauthorized-header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .unauthorized-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: var(--color-text-primary);
+    }
+    .unauthorized-logo-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md);
+      background: var(--color-primary);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: var(--font-bold);
+      font-size: var(--text-lg);
+    }
+    .unauthorized-logo-text {
+      font-size: var(--text-base);
+      font-weight: var(--font-bold);
+      letter-spacing: -0.01em;
+    }
+
+    .unauthorized-lang-switch {
+      display: inline-flex;
+      align-items: center;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-full);
+      padding: 2px 4px;
+      box-shadow: var(--shadow-sm);
+    }
+    .unauthorized-lang-btn {
+      background: none;
+      border: none;
+      color: var(--color-text-secondary);
+      font-size: var(--text-xs);
+      font-weight: var(--font-semibold);
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .unauthorized-lang-btn.active {
+      background: var(--color-primary);
+      color: #ffffff;
+    }
+
+    .unauthorized-main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem 3rem;
+    }
+
+    .unauthorized-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      padding: 3rem 2.5rem;
+      max-width: 520px;
+      width: 100%;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .unauthorized-icon-wrap {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: var(--color-danger-bg);
+      color: var(--color-danger);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 0 0 8px rgba(230, 57, 70, 0.08);
+    }
+    .unauthorized-icon-wrap svg {
+      width: 36px;
+      height: 36px;
+    }
+
+    .unauthorized-title {
+      font-size: var(--text-2xl);
+      font-weight: var(--font-bold);
+      color: var(--color-text-primary);
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    .unauthorized-msg {
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+
+    .unauthorized-user-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--color-surface-hover);
+      border: 1px solid var(--color-border);
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-full);
+      font-size: var(--text-xs);
+      font-weight: var(--font-medium);
+      color: var(--color-text-primary);
+      margin-bottom: 2rem;
+    }
+
+    .unauthorized-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      width: 100%;
+    }
+
+    .unauthorized-btn-primary {
+      background: var(--color-primary);
+      color: #ffffff;
+      padding: 0.75rem 1.25rem;
+      border-radius: var(--radius-md);
+      font-size: var(--text-sm);
+      font-weight: var(--font-semibold);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: background-color var(--transition-fast), transform var(--transition-fast);
+      border: none;
+      cursor: pointer;
+    }
+    .unauthorized-btn-primary:hover {
+      background: #245c43;
+      color: #ffffff;
+      text-decoration: none;
+      transform: translateY(-1px);
+    }
+
+    .unauthorized-btn-secondary {
+      background: var(--color-surface);
+      color: var(--color-danger);
+      border: 1px solid rgba(230, 57, 70, 0.3);
+      padding: 0.75rem 1.25rem;
+      border-radius: var(--radius-md);
+      font-size: var(--text-sm);
+      font-weight: var(--font-semibold);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all var(--transition-fast);
+      cursor: pointer;
+    }
+    .unauthorized-btn-secondary:hover {
+      background: var(--color-danger-bg);
+      border-color: var(--color-danger);
+    }
+  </style>
+</head>
+<body class="unauthorized-body">
+
+  <!-- Header -->
+  <header class="unauthorized-header-bar">
+    <a href="index.html" class="unauthorized-logo">
+      <div class="unauthorized-logo-mark" aria-hidden="true">G</div>
+      <div class="unauthorized-logo-text" data-i18n="app.name">GOLIS Wholesale</div>
+    </a>
+    <div class="unauthorized-lang-switch" role="group" aria-label="Language switcher">
+      <button class="unauthorized-lang-btn" data-lang-btn="en" aria-label="Switch to English">EN</button>
+      <button class="unauthorized-lang-btn" data-lang-btn="te" aria-label="తెలుగుకు మారండి">తెలుగు</button>
+    </div>
+  </header>
+
+  <!-- Main Box -->
+  <main class="unauthorized-main">
+    <div class="unauthorized-card">
+      
+      <!-- Large Lock SVG Icon -->
+      <div class="unauthorized-icon-wrap" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          <circle cx="12" cy="16" r="1"/>
+        </svg>
+      </div>
+
+      <!-- Heading -->
+      <h1 class="unauthorized-title" data-i18n="auth.unauthorized">Access Denied</h1>
+      
+      <!-- Subtitle Message -->
+      <p class="unauthorized-msg" data-i18n="auth.unauthorizedMsg">You don't have permission to view this page.</p>
+
+      <!-- Current User Info -->
+      <div class="unauthorized-user-badge" id="user-info">
+        <span data-i18n="auth.loggedInAs">Logged in as</span>: <span id="user-role-name">Guest</span>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="unauthorized-actions">
+        <a href="login.html" id="dashboard-btn" class="unauthorized-btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span data-i18n="auth.goToDashboard">Go to My Dashboard</span>
+        </a>
+
+        <button type="button" id="logout-btn" class="unauthorized-btn-secondary" onclick="APP.logout()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span data-i18n="auth.logout">Logout</span>
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Core Scripts -->
+  <script src="js/i18n.js"></script>
+  <script src="js/mock-data.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/app.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      MockDB.init();
+      I18N.currentLang = I18N.getLanguage();
+      
+      const session = APP.getSession();
+      if (session) {
+        const roleCapitalized = session.role ? session.role.charAt(0).toUpperCase() + session.role.slice(1) : '';
+        const userEl = document.getElementById('user-role-name');
+        if (userEl) {
+          userEl.textContent = `${roleCapitalized} — ${session.name || session.email}`;
+        }
+        const dashboardBtn = document.getElementById('dashboard-btn');
+        if (dashboardBtn) {
+          dashboardBtn.href = getDashboardUrl(session.role);
+        }
+      } else {
+        const userInfo = document.getElementById('user-info');
+        if (userInfo) userInfo.style.display = 'none';
+        const dashboardBtn = document.getElementById('dashboard-btn');
+        if (dashboardBtn) {
+          dashboardBtn.href = 'login.html';
+          dashboardBtn.textContent = t('pub.login') || 'Login';
+        }
+      }
+
+      I18N.applyTranslations();
+      updateLangButtons();
+
+      function getDashboardUrl(role) {
+        const routes = {
+          owner: 'owner/dashboard.html',
+          manager: 'manager/dashboard.html',
+          farmer: 'farmer/dashboard.html',
+          vendor: 'vendor/dashboard.html',
+          labour: 'labour/dashboard.html',
+        };
+        return routes[role] || 'login.html';
+      }
+
+      function updateLangButtons() {
+        document.querySelectorAll('[data-lang-btn]').forEach(btn => {
+          if (btn.dataset.langBtn === I18N.currentLang) {
+            btn.classList.add('active');
+          } else {
+            btn.classList.remove('active');
+          }
+        });
+      }
+
+      document.querySelectorAll('[data-lang-btn]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          I18N.setLanguage(btn.dataset.langBtn);
+          updateLangButtons();
+        });
+      });
+    });
+  </script>
+</body>
+</html>

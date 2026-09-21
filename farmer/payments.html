@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Payments — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content">
+        <div class="page-header">
+          <h1 class="page-title">My Payments</h1>
+          <div class="page-header-actions">
+            <button class="btn btn-secondary" onclick="raiseQuery()">📩 Raise Payment Query</button>
+          </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);">
+          <div class="stat-card stat-card--success">
+            <div class="stat-card__icon">🌾</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="kpi-total-earned">—</div>
+              <div class="stat-card__label">Total Earned</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--success">
+            <div class="stat-card__icon">✅</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="kpi-received">—</div>
+              <div class="stat-card__label">Received</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--warning">
+            <div class="stat-card__icon">⏳</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="kpi-pending">—</div>
+              <div class="stat-card__label">Pending</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--info">
+            <div class="stat-card__icon">📅</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="kpi-this-month">—</div>
+              <div class="stat-card__label">This Month</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pending Payments -->
+        <div class="card" style="margin-top:1.25rem;">
+          <div class="card__header">
+            <h3 class="card__title">⏳ Pending Payments</h3>
+            <span class="badge badge--warning" id="pending-badge">0 pending</span>
+          </div>
+          <div class="card__body" style="padding:0;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Supply Date</th>
+                  <th>Vegetable</th>
+                  <th>Qty (kg)</th>
+                  <th>Purchase Value</th>
+                  <th>Advance</th>
+                  <th>Balance</th>
+                  <th>Expected Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="pending-tbody">
+                <tr><td colspan="8" class="text-center text-muted">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Payment History -->
+        <div class="card" style="margin-top:1.25rem;">
+          <div class="card__header">
+            <h3 class="card__title">📋 Payment History</h3>
+          </div>
+          <div class="card__body" style="padding:0;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Amount</th>
+                  <th>Payment Method</th>
+                  <th>Reference</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody id="history-tbody">
+                <tr><td colspan="5" class="text-center text-muted">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('farmer');
+      const user       = APP.user;
+      const farmerId   = user.refId;
+      const purchases  = MockDB.getPurchases().filter(p => p.farmerId === farmerId);
+      const payments   = MockDB.getPayments().filter(p => p.partyId === farmerId && p.partyType === 'farmer');
+      const vegetables = MockDB.getVegetables();
+
+      const totalEarned  = purchases.reduce((s, p) => s + p.total, 0);
+      const totalReceived = payments.reduce((s, p) => s + p.amount, 0);
+      const pending       = Math.max(0, totalEarned - totalReceived);
+
+      const now        = new Date();
+      const monthStart = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+      const monthPaid  = payments.filter(p => p.date && p.date.startsWith(monthStart)).reduce((s,p) => s+p.amount, 0);
+
+      document.getElementById('kpi-total-earned').textContent = Utils.formatCurrency(totalEarned);
+      document.getElementById('kpi-received').textContent     = Utils.formatCurrency(totalReceived);
+      document.getElementById('kpi-pending').textContent      = Utils.formatCurrency(pending);
+      document.getElementById('kpi-this-month').textContent   = Utils.formatCurrency(monthPaid);
+
+      // Pending entries (purchases without full payment)
+      const pendingPurchases = purchases.filter(p => p.status === 'pending' || p.status === 'paymentPending');
+      document.getElementById('pending-badge').textContent = `${pendingPurchases.length} pending`;
+
+      const pendingTbody = document.getElementById('pending-tbody');
+      if (!pendingPurchases.length) {
+        pendingTbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No pending payments — all settled 🎉</td></tr>';
+      } else {
+        pendingTbody.innerHTML = pendingPurchases.map(p => {
+          const veg     = vegetables.find(v => v.id === p.vegetableId);
+          const advance = 0; // demo
+          const balance = p.total - advance;
+          const expectedDate = new Date(p.date);
+          expectedDate.setDate(expectedDate.getDate() + 3);
+          return `<tr>
+            <td>${Utils.formatDate(p.date)}</td>
+            <td>${veg ? `${veg.emoji} ${veg.nameEn}` : p.vegetableId}</td>
+            <td class="text-right">${Utils.formatIndianNumber(p.qty)}</td>
+            <td class="text-right" style="font-weight:600;">${Utils.formatCurrency(p.total)}</td>
+            <td class="text-right">${Utils.formatCurrency(advance)}</td>
+            <td class="text-right" style="font-weight:700;color:var(--color-warning);">${Utils.formatCurrency(balance)}</td>
+            <td>${Utils.formatDate(expectedDate)}</td>
+            <td><span class="badge badge--warning">Payment Pending</span></td>
+          </tr>`;
+        }).join('');
+      }
+
+      // Payment history
+      const histTbody = document.getElementById('history-tbody');
+      const sortedPay  = [...payments].sort((a, b) => b.date.localeCompare(a.date));
+      if (!sortedPay.length) {
+        histTbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No payment history found</td></tr>';
+      } else {
+        histTbody.innerHTML = sortedPay.map(p => `<tr>
+          <td>${Utils.formatDate(p.date)}</td>
+          <td style="font-weight:700;color:var(--color-success);">${Utils.formatCurrency(p.amount)}</td>
+          <td><span class="badge badge--info">${p.mode}</span></td>
+          <td class="text-muted" style="font-size:0.85rem;">${p.txnId || '—'}</td>
+          <td class="text-muted">${p.notes || '—'}</td>
+        </tr>`).join('');
+      }
+    });
+
+    function raiseQuery() {
+      Utils.showToast('Query submitted. You will be contacted within 24 hours. 📞', 'success', 5000);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payments — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content">
+        <div class="page-header">
+          <h1 class="page-title">Payments</h1>
+        </div>
+
+        <!-- 4 Summary Cards -->
+        <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);">
+          <div class="stat-card stat-card--info">
+            <div class="stat-card__icon">📦</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="kpi-orders-value">—</div>
+              <div class="stat-card__label">Total Orders Value</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--success">
+            <div class="stat-card__icon">✅</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="kpi-paid">—</div>
+              <div class="stat-card__label">Total Paid</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--danger">
+            <div class="stat-card__icon">⚠️</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="kpi-outstanding">—</div>
+              <div class="stat-card__label">Outstanding Balance</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--success">
+            <div class="stat-card__icon">📅</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="kpi-month-paid">—</div>
+              <div class="stat-card__label">This Month Paid</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Outstanding Invoices -->
+        <div class="card" style="margin-top:1.5rem;">
+          <div class="card__header">
+            <h3 class="card__title">📋 Outstanding Invoices</h3>
+          </div>
+          <div class="card__body" style="padding:0;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Date</th>
+                  <th class="text-right">Order Value</th>
+                  <th class="text-right">Paid</th>
+                  <th class="text-right">Balance</th>
+                  <th>Due Date</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="invoices-tbody">
+                <tr><td colspan="8" class="text-center text-muted">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Payment History -->
+        <div class="card" style="margin-top:1.25rem;">
+          <div class="card__header">
+            <h3 class="card__title">🧾 Payment History</h3>
+          </div>
+          <div class="card__body" style="padding:0;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th class="text-right">Amount</th>
+                  <th>Method</th>
+                  <th>Reference</th>
+                  <th>Order ID</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody id="history-tbody">
+                <tr><td colspan="6" class="text-center text-muted">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Pay Now Modal -->
+  <div class="modal-overlay" id="modal-pay">
+    <div class="modal" style="max-width:440px;">
+      <div class="modal__header">
+        <h3 class="modal__title">Make Payment</h3>
+        <button class="modal__close" data-modal-close>&times;</button>
+      </div>
+      <div class="modal__body">
+        <div style="background:var(--color-primary-pale);padding:0.75rem;border-radius:var(--radius-md);margin-bottom:1rem;">
+          <div class="text-muted" style="font-size:0.85rem;">Paying for Order</div>
+          <div style="font-weight:700;font-size:1.1rem;" id="pay-modal-order-id">—</div>
+          <div style="font-size:1.5rem;font-weight:800;color:var(--color-primary);margin-top:0.25rem;" id="pay-modal-amount">—</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Payment Method</label>
+          <select class="form-select" id="pay-method">
+            <option value="Cash">Cash</option>
+            <option value="UPI">UPI</option>
+            <option value="Bank Transfer">Bank Transfer (NEFT/RTGS)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Reference / Transaction ID (optional)</label>
+          <input type="text" class="form-input" id="pay-txn-id" placeholder="e.g. UPI-12345678">
+        </div>
+        <div style="background:#fef3c7;padding:0.65rem;border-radius:var(--radius-md);font-size:0.8rem;color:#78350f;margin-bottom:1rem;">
+          ⚠️ DEMO APPLICATION — This is a simulated payment. No actual money will be charged.
+        </div>
+        <div style="display:flex;gap:0.75rem;justify-content:flex-end;">
+          <button class="btn btn-ghost" data-modal-close>Cancel</button>
+          <button class="btn btn-primary" onclick="confirmPayment()">Confirm Payment</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    let currentPayOrderId = null;
+    let currentPayAmount  = 0;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('vendor');
+      loadData();
+    });
+
+    function loadData() {
+      const user    = APP.user;
+      const orders  = MockDB.getOrders().filter(o => o.vendorId === user.refId);
+      const payments = MockDB.getPayments().filter(p => p.partyId === user.refId && p.partyType === 'vendor');
+
+      const totalOrdersValue = orders.reduce((s, o) => s + o.total, 0);
+      const totalPaid        = payments.reduce((s, p) => s + p.amount, 0);
+      const outstanding      = Math.max(0, totalOrdersValue - totalPaid);
+
+      const now        = new Date();
+      const monthStart = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+      const monthPaid  = payments.filter(p => p.date && p.date.startsWith(monthStart)).reduce((s,p) => s+p.amount, 0);
+
+      document.getElementById('kpi-orders-value').textContent = Utils.formatCurrency(totalOrdersValue);
+      document.getElementById('kpi-paid').textContent         = Utils.formatCurrency(totalPaid);
+      document.getElementById('kpi-outstanding').textContent  = Utils.formatCurrency(outstanding);
+      document.getElementById('kpi-month-paid').textContent   = Utils.formatCurrency(monthPaid);
+
+      // Build invoices (non-delivered or delivered but not fully paid)
+      const invoiceOrders = orders.filter(o => ['pending','confirmed','preparing','stockAllocated','loading','dispatched','inTransit','delivered'].includes(o.status));
+      const invoicesTbody = document.getElementById('invoices-tbody');
+
+      if (!invoiceOrders.length) {
+        invoicesTbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No outstanding invoices</td></tr>';
+      } else {
+        invoicesTbody.innerHTML = invoiceOrders.map(o => {
+          const orderPayments = payments.filter(p => p.notes && p.notes.includes(o.id));
+          const paid          = orderPayments.reduce((s, p) => s + p.amount, 0);
+          const balance       = Math.max(0, o.total - paid);
+
+          const dueDate = new Date(o.orderDate);
+          dueDate.setDate(dueDate.getDate() + 7); // net 7
+
+          const isOverdue  = dueDate < new Date() && balance > 0;
+          const isDueSoon  = !isOverdue && (dueDate - new Date()) < 2 * 86400000 && balance > 0;
+          const statusCls  = isOverdue ? 'badge--danger' : isDueSoon ? 'badge--warning' : 'badge--success';
+          const statusLbl  = isOverdue ? 'Overdue' : isDueSoon ? 'Due Soon' : 'On Time';
+
+          return `<tr>
+            <td style="font-weight:700;">${o.id}</td>
+            <td>${Utils.formatDate(o.orderDate)}</td>
+            <td class="text-right">${Utils.formatCurrency(o.total)}</td>
+            <td class="text-right" style="color:var(--color-success);">${Utils.formatCurrency(paid)}</td>
+            <td class="text-right" style="font-weight:700;${balance > 0 ? 'color:var(--color-danger);' : ''}">${Utils.formatCurrency(balance)}</td>
+            <td>${Utils.formatDate(dueDate)}</td>
+            <td><span class="badge ${statusCls}">${statusLbl}</span></td>
+            <td>${balance > 0 ? `<button class="btn btn-primary btn-sm" onclick="openPayModal('${o.id}',${balance})">Pay Now</button>` : '<span class="badge badge--success">Paid</span>'}</td>
+          </tr>`;
+        }).join('');
+      }
+
+      // Payment history
+      const histTbody = document.getElementById('history-tbody');
+      const sortedPay = [...payments].sort((a, b) => b.date.localeCompare(a.date));
+      if (!sortedPay.length) {
+        histTbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No payment records found</td></tr>';
+      } else {
+        histTbody.innerHTML = sortedPay.map(p => `<tr>
+          <td>${Utils.formatDate(p.date)}</td>
+          <td class="text-right" style="font-weight:700;color:var(--color-success);">${Utils.formatCurrency(p.amount)}</td>
+          <td><span class="badge badge--info">${p.mode}</span></td>
+          <td class="text-muted" style="font-size:0.85rem;">${p.txnId || '—'}</td>
+          <td class="text-muted">—</td>
+          <td class="text-muted">${p.notes || '—'}</td>
+        </tr>`).join('');
+      }
+    }
+
+    function openPayModal(orderId, amount) {
+      currentPayOrderId = orderId;
+      currentPayAmount  = amount;
+      document.getElementById('pay-modal-order-id').textContent = orderId;
+      document.getElementById('pay-modal-amount').textContent   = Utils.formatCurrency(amount);
+      Utils.openModal('modal-pay');
+    }
+
+    function confirmPayment() {
+      if (!currentPayOrderId) return;
+      const method = document.getElementById('pay-method').value;
+      const txnId  = document.getElementById('pay-txn-id').value.trim() || `DEMO-${Date.now()}`;
+      const date   = new Date().toISOString().split('T')[0];
+
+      MockDB.saveRecord('_payments', {
+        id:        Utils.generateId('PAY'),
+        partyId:   APP.user.refId,
+        partyType: 'vendor',
+        partyName: APP.user.name,
+        amount:    currentPayAmount,
+        mode:      method,
+        txnId,
+        date,
+        notes:     `Payment for ${currentPayOrderId}`,
+      });
+
+      Utils.closeModal('modal-pay');
+      Utils.showToast(`Payment of ${Utils.formatCurrency(currentPayAmount)} recorded successfully ✅`, 'success');
+      loadData();
+    }
+  </script>
+</body>
+</html>

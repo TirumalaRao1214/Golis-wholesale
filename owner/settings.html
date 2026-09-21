@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content">
+        <div class="page-header">
+          <h1 class="page-title" data-i18n="page.settings"></h1>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs" id="settings-tabs">
+          <button class="tab-btn tab-btn--active" data-tab="business-info" onclick="switchSettingsTab('business-info')">Business Info</button>
+          <button class="tab-btn" data-tab="price-mgmt" onclick="switchSettingsTab('price-mgmt')">Price Management</button>
+          <button class="tab-btn" data-tab="user-mgmt" onclick="switchSettingsTab('user-mgmt')">User Management</button>
+        </div>
+
+        <!-- Business Info Tab -->
+        <div class="tab-content" id="tab-business-info" style="margin-top:1.25rem;">
+          <div class="card">
+            <div class="card__header">
+              <h3 class="card__title">Business Information</h3>
+              <button class="btn btn-primary btn-sm" onclick="saveBusinessInfo()">Save Changes</button>
+            </div>
+            <div class="card__body">
+              <div class="form-grid form-grid--2">
+                <div class="form-group">
+                  <label class="form-label">Business Name</label>
+                  <input type="text" class="form-input" id="biz-name" value="GOLIS Wholesale">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">GST Number</label>
+                  <input type="text" class="form-input" id="biz-gst" value="37AABCG1234X1Z1">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Phone</label>
+                  <input type="text" class="form-input" id="biz-phone" value="9848012345">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Email</label>
+                  <input type="email" class="form-input" id="biz-email" value="contact@goliswholesale.in">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">City</label>
+                  <input type="text" class="form-input" id="biz-city" value="Guntur">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">State</label>
+                  <input type="text" class="form-input" id="biz-state" value="Andhra Pradesh">
+                </div>
+                <div class="form-group form-group--full">
+                  <label class="form-label">Full Address</label>
+                  <textarea class="form-textarea" id="biz-address" rows="3">Market Yard, Old Town, Guntur - 522001, Andhra Pradesh</textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Price Management Tab -->
+        <div class="tab-content" id="tab-price-mgmt" style="display:none;margin-top:1.25rem;">
+          <div class="card">
+            <div class="card__header">
+              <h3 class="card__title">Today's Wholesale Price Management</h3>
+              <button class="btn btn-primary btn-sm" onclick="savePriceManagement()">Save All Prices</button>
+            </div>
+            <div class="card__body" style="padding:0;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Vegetable</th>
+                    <th>Telugu</th>
+                    <th>Buy Price (₹/kg)</th>
+                    <th>Sell Price (₹/kg)</th>
+                    <th>Previous</th>
+                    <th>Change</th>
+                  </tr>
+                </thead>
+                <tbody id="price-mgmt-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- User Management Tab -->
+        <div class="tab-content" id="tab-user-mgmt" style="display:none;margin-top:1.25rem;">
+          <div class="card">
+            <div class="card__header">
+              <h3 class="card__title">Demo Users</h3>
+              <div class="badge badge--warning">Demo Only — Changes not persisted to backend</div>
+            </div>
+            <div class="card__body" style="padding:0;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>User ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Mobile</th>
+                    <th data-i18n="common.actions"></th>
+                  </tr>
+                </thead>
+                <tbody id="users-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    let _vegs = [];
+
+    function switchSettingsTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-btn--active'));
+      document.querySelector(`[data-tab="${tab}"]`).classList.add('tab-btn--active');
+      document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+      document.getElementById('tab-' + tab).style.display = '';
+      if (tab === 'price-mgmt') renderPriceManagement();
+      if (tab === 'user-mgmt') renderUserManagement();
+    }
+
+    function saveBusinessInfo() {
+      Utils.showToast('Business info saved. (Demo — no backend persistence)', 'success');
+    }
+
+    function renderPriceManagement() {
+      _vegs = MockDB.getVegetables();
+      document.getElementById('price-mgmt-tbody').innerHTML = _vegs.map(v => {
+        const change = v.currentSellPrice > v.prevSellPrice ? 'up' : v.currentSellPrice < v.prevSellPrice ? 'down' : 'neutral';
+        return `<tr>
+          <td><strong>${v.emoji || ''} ${v.nameEn}</strong></td>
+          <td class="telugu-text">${v.nameTe}</td>
+          <td><input type="number" class="form-input form-input--sm" id="pm-buy-${v.id}" value="${v.currentBuyPrice}" style="width:80px;" min="0"></td>
+          <td><input type="number" class="form-input form-input--sm" id="pm-sell-${v.id}" value="${v.currentSellPrice}" style="width:80px;" min="0" oninput="updatePriceChange('${v.id}')"></td>
+          <td class="text-muted">₹${v.prevSellPrice}/kg</td>
+          <td id="pm-change-${v.id}">${Utils.priceIcon(change)}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    function updatePriceChange(vegId) {
+      const v = _vegs.find(x => x.id === vegId);
+      if (!v) return;
+      const newSell = Number(document.getElementById(`pm-sell-${vegId}`).value);
+      const change = newSell > v.prevSellPrice ? 'up' : newSell < v.prevSellPrice ? 'down' : 'neutral';
+      document.getElementById(`pm-change-${vegId}`).innerHTML = Utils.priceIcon(change);
+    }
+
+    function savePriceManagement() {
+      _vegs.forEach(v => {
+        const buyInput = document.getElementById(`pm-buy-${v.id}`);
+        const sellInput = document.getElementById(`pm-sell-${v.id}`);
+        if (buyInput && sellInput) {
+          MockDB.updateRecord('_vegetables', v.id, {
+            currentBuyPrice: Number(buyInput.value),
+            prevSellPrice: v.currentSellPrice,
+            currentSellPrice: Number(sellInput.value),
+          });
+        }
+      });
+      _vegs = MockDB.getVegetables();
+      Utils.showToast('Prices saved successfully.', 'success');
+      renderPriceManagement();
+    }
+
+    function renderUserManagement() {
+      const users = MockDB.getUsers();
+      const ROLE_COLORS = { owner: 'badge--success', manager: 'badge--info', farmer: 'badge--warning', vendor: 'badge--primary', labour: 'badge--muted' };
+      document.getElementById('users-tbody').innerHTML = users.map(u => `
+        <tr>
+          <td><code>${u.id}</code></td>
+          <td><strong>${u.name}</strong></td>
+          <td>${u.email}</td>
+          <td><span class="badge ${ROLE_COLORS[u.role] || 'badge--muted'}">${u.role}</span></td>
+          <td>${u.mobile}</td>
+          <td>
+            <button class="btn btn-sm btn-ghost" onclick="changePassword('${u.id}', '${u.name}')">Change Password</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function changePassword(userId, name) {
+      Utils.showToast(`Password change for "${name}" — demo only, no actual change made.`, 'info');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('owner');
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content">
+        <div class="page-header">
+          <h1 class="page-title">My Profile</h1>
+          <div class="page-header-actions">
+            <button class="btn btn-secondary" id="btn-edit" onclick="toggleEdit()">✏️ Edit Profile</button>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 340px;gap:1.5rem;margin-top:0.5rem;">
+          <!-- Profile Form -->
+          <div class="card">
+            <div class="card__header">
+              <h3 class="card__title">Personal Information</h3>
+            </div>
+            <div class="card__body">
+              <form id="profile-form" onsubmit="saveProfile(event)">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                  <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-input" id="field-name" disabled>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Mobile Number</label>
+                    <input type="tel" class="form-input" id="field-mobile" disabled>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Village</label>
+                    <input type="text" class="form-input" id="field-village" disabled>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Mandal</label>
+                    <input type="text" class="form-input" id="field-mandal" disabled>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">District</label>
+                    <input type="text" class="form-input" id="field-district" disabled>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">State</label>
+                    <input type="text" class="form-input" id="field-state" disabled>
+                  </div>
+                </div>
+                <div id="save-actions" style="display:none;margin-top:0.5rem;">
+                  <div style="display:flex;gap:0.75rem;justify-content:flex-end;">
+                    <button type="button" class="btn btn-ghost" onclick="cancelEdit()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Statistics Panel -->
+          <div style="display:flex;flex-direction:column;gap:1rem;">
+            <div class="card">
+              <div class="card__header">
+                <h3 class="card__title">📊 Supply Statistics</h3>
+              </div>
+              <div class="card__body">
+                <div style="display:flex;flex-direction:column;gap:0.75rem;">
+                  <div style="display:flex;justify-content:space-between;padding:0.5rem;background:var(--color-bg);border-radius:var(--radius-md);">
+                    <span class="text-muted">Total Supplies</span>
+                    <span style="font-weight:700;" id="stat-count">—</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;padding:0.5rem;background:var(--color-bg);border-radius:var(--radius-md);">
+                    <span class="text-muted">Total Quantity</span>
+                    <span style="font-weight:700;" id="stat-qty">—</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;padding:0.5rem;background:var(--color-primary-pale);border-radius:var(--radius-md);">
+                    <span class="text-muted">Purchase Value</span>
+                    <span style="font-weight:700;color:var(--color-primary);" id="stat-total-value">—</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;padding:0.5rem;background:var(--color-bg);border-radius:var(--radius-md);">
+                    <span class="text-muted">Amount Received</span>
+                    <span style="font-weight:700;color:var(--color-success);" id="stat-received">—</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;padding:0.5rem;background:#fffbeb;border-radius:var(--radius-md);">
+                    <span class="text-muted">Pending Amount</span>
+                    <span style="font-weight:700;color:var(--color-warning);" id="stat-pending">—</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;padding:0.5rem;background:var(--color-bg);border-radius:var(--radius-md);">
+                    <span class="text-muted">Member Since</span>
+                    <span style="font-weight:700;" id="stat-joined">—</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Account Status Card -->
+            <div class="card" style="border-left:4px solid var(--color-success);">
+              <div class="card__body" style="text-align:center;padding:1.25rem;">
+                <div style="font-size:2.5rem;">🌾</div>
+                <div style="font-weight:700;font-size:1.1rem;margin-top:0.5rem;color:var(--color-primary);" id="profile-name-display">—</div>
+                <div class="text-muted" style="font-size:0.85rem;margin-top:0.25rem;" id="profile-village-display">—</div>
+                <div style="margin-top:0.75rem;">
+                  <span class="badge badge--success">Active Farmer</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    let currentFarmer = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('farmer');
+      const user     = APP.user;
+      currentFarmer  = MockDB.getFarmerById(user.refId);
+      const stats    = MockDB.getFarmerStats(user.refId);
+      const payments = MockDB.getPayments().filter(p => p.partyId === user.refId && p.partyType === 'farmer');
+      const received = payments.reduce((s, p) => s + p.amount, 0);
+
+      if (currentFarmer) {
+        document.getElementById('field-name').value     = currentFarmer.name     || '';
+        document.getElementById('field-mobile').value   = currentFarmer.mobile   || '';
+        document.getElementById('field-village').value  = currentFarmer.village  || '';
+        document.getElementById('field-mandal').value   = currentFarmer.mandal   || '';
+        document.getElementById('field-district').value = currentFarmer.district || '';
+        document.getElementById('field-state').value    = currentFarmer.state    || '';
+
+        document.getElementById('profile-name-display').textContent    = currentFarmer.name;
+        document.getElementById('profile-village-display').textContent = `${currentFarmer.village}, ${currentFarmer.district}`;
+      }
+
+      document.getElementById('stat-count').textContent       = stats.purchaseCount || 18;
+      document.getElementById('stat-qty').textContent         = Utils.formatWeight(stats.totalQuantity || 4250);
+      document.getElementById('stat-total-value').textContent = Utils.formatCurrency(stats.totalSupplyValue || 245000);
+      document.getElementById('stat-received').textContent    = Utils.formatCurrency(received || 226800);
+      document.getElementById('stat-pending').textContent     = Utils.formatCurrency(Math.max(0, (stats.totalSupplyValue || 245000) - received));
+      document.getElementById('stat-joined').textContent      = currentFarmer ? new Date(currentFarmer.joinedDate).getFullYear() : '2024';
+    });
+
+    function toggleEdit() {
+      const fields = document.querySelectorAll('#profile-form input');
+      fields.forEach(f => f.disabled = false);
+      document.getElementById('save-actions').style.display = 'block';
+      document.getElementById('btn-edit').style.display = 'none';
+    }
+
+    function cancelEdit() {
+      const fields = document.querySelectorAll('#profile-form input');
+      fields.forEach(f => f.disabled = true);
+      document.getElementById('save-actions').style.display = 'none';
+      document.getElementById('btn-edit').style.display = 'inline-flex';
+      if (currentFarmer) {
+        document.getElementById('field-name').value     = currentFarmer.name     || '';
+        document.getElementById('field-mobile').value   = currentFarmer.mobile   || '';
+        document.getElementById('field-village').value  = currentFarmer.village  || '';
+        document.getElementById('field-mandal').value   = currentFarmer.mandal   || '';
+        document.getElementById('field-district').value = currentFarmer.district || '';
+        document.getElementById('field-state').value    = currentFarmer.state    || '';
+      }
+    }
+
+    function saveProfile(e) {
+      e.preventDefault();
+      const updates = {
+        name:     document.getElementById('field-name').value.trim(),
+        mobile:   document.getElementById('field-mobile').value.trim(),
+        village:  document.getElementById('field-village').value.trim(),
+        mandal:   document.getElementById('field-mandal').value.trim(),
+        district: document.getElementById('field-district').value.trim(),
+        state:    document.getElementById('field-state').value.trim(),
+      };
+      MockDB.updateRecord('_farmers', currentFarmer.id, updates);
+      currentFarmer = { ...currentFarmer, ...updates };
+      document.getElementById('profile-name-display').textContent    = currentFarmer.name;
+      document.getElementById('profile-village-display').textContent = `${currentFarmer.village}, ${currentFarmer.district}`;
+
+      const fields = document.querySelectorAll('#profile-form input');
+      fields.forEach(f => f.disabled = true);
+      document.getElementById('save-actions').style.display = 'none';
+      document.getElementById('btn-edit').style.display = 'inline-flex';
+      Utils.showToast('Profile updated successfully! ✅', 'success');
+    }
+  </script>
+</body>
+</html>

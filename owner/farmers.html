@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farmer Management — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content">
+        <div class="page-header">
+          <h1 class="page-title" data-i18n="page.farmers"></h1>
+          <div class="page-header-actions">
+            <button class="btn btn-primary" onclick="openAddFarmer()">+ <span data-i18n="common.add"></span> Farmer</button>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="card" style="margin-bottom:1rem;">
+          <div class="card__body">
+            <div class="filter-row">
+              <input type="text" class="form-input" id="farmer-search" placeholder="Search by name, mobile, village…" oninput="renderFarmerTable()">
+              <select class="form-select" id="farmer-district-filter" onchange="renderFarmerTable()">
+                <option value="">All Districts</option>
+                <option>Guntur</option><option>Krishna</option><option>Prakasam</option><option>Nellore</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="card">
+          <div class="card__body" style="padding:0;">
+            <div class="table-responsive">
+              <table class="data-table" id="farmers-table">
+                <thead>
+                  <tr>
+                    <th data-i18n="col.slno"></th>
+                    <th data-i18n="col.name"></th>
+                    <th data-i18n="col.mobile"></th>
+                    <th data-i18n="col.village"></th>
+                    <th data-i18n="col.district"></th>
+                    <th>Total Supply</th>
+                    <th>Total Value</th>
+                    <th>Payable (₹)</th>
+                    <th data-i18n="col.status"></th>
+                    <th data-i18n="common.actions"></th>
+                  </tr>
+                </thead>
+                <tbody id="farmers-tbody"></tbody>
+              </table>
+            </div>
+            <div id="farmers-pagination" class="pagination-wrapper"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Add/Edit Farmer Modal -->
+  <div class="modal-overlay" id="modal-farmer">
+    <div class="modal">
+      <div class="modal__header">
+        <h3 class="modal__title" id="farmer-modal-title">Add Farmer</h3>
+        <button class="modal__close" onclick="Utils.closeModal('modal-farmer')">&times;</button>
+      </div>
+      <div class="modal__body">
+        <form id="farmer-form">
+          <input type="hidden" id="farmer-edit-id">
+          <div class="form-grid form-grid--2">
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.farmerName"></label>
+              <input type="text" class="form-input" id="f-name" data-validate="required" placeholder="Full Name">
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.mobile"></label>
+              <input type="text" class="form-input" id="f-mobile" data-validate="required" placeholder="10-digit mobile">
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.village"></label>
+              <input type="text" class="form-input" id="f-village" placeholder="Village name">
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.mandal"></label>
+              <input type="text" class="form-input" id="f-mandal" placeholder="Mandal name">
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.district"></label>
+              <input type="text" class="form-input" id="f-district" placeholder="District">
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.state"></label>
+              <input type="text" class="form-input" id="f-state" value="AP" placeholder="State">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn-ghost" onclick="Utils.closeModal('modal-farmer')" data-i18n="common.cancel"></button>
+        <button class="btn btn-primary" onclick="saveFarmer()" data-i18n="common.save"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- View Farmer Modal -->
+  <div class="modal-overlay" id="modal-farmer-view">
+    <div class="modal modal--lg">
+      <div class="modal__header">
+        <h3 class="modal__title" id="view-farmer-name">Farmer Profile</h3>
+        <button class="modal__close" onclick="Utils.closeModal('modal-farmer-view')">&times;</button>
+      </div>
+      <div class="modal__body" id="view-farmer-body"></div>
+      <div class="modal__footer">
+        <button class="btn btn-ghost" onclick="Utils.closeModal('modal-farmer-view')" data-i18n="common.close"></button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    let _farmers = [];
+    let _currentPage = 1;
+    const PAGE_SIZE = 10;
+
+    function renderFarmerTable() {
+      const q = (document.getElementById('farmer-search').value || '').toLowerCase();
+      const dist = document.getElementById('farmer-district-filter').value;
+      let data = _farmers.filter(f => {
+        const match = !q || [f.name, f.mobile, f.village, f.district].some(v => v && v.toLowerCase().includes(q));
+        const distMatch = !dist || f.district === dist;
+        return match && distMatch;
+      });
+      const tbody = document.getElementById('farmers-tbody');
+      const start = (_currentPage - 1) * PAGE_SIZE;
+      const page = data.slice(start, start + PAGE_SIZE);
+      tbody.innerHTML = page.map((f, i) => `
+        <tr>
+          <td>${start + i + 1}</td>
+          <td><strong>${f.name}</strong></td>
+          <td>${f.mobile}</td>
+          <td>${f.village}</td>
+          <td>${f.district}</td>
+          <td>${Utils.formatWeight(f.totalSupplyKg)}</td>
+          <td>${Utils.formatCurrency(f.totalSupplyValue)}</td>
+          <td class="${f.pendingPayable > 0 ? 'text-warning' : 'text-success'}">${Utils.formatCurrency(f.pendingPayable)}</td>
+          <td>${Utils.statusBadge(f.pendingPayable > 0 ? 'unpaid' : 'paid')}</td>
+          <td>
+            <button class="btn btn-sm btn-ghost" onclick="viewFarmer('${f.id}')" data-i18n="common.view"></button>
+            <button class="btn btn-sm btn-secondary" onclick="editFarmer('${f.id}')" data-i18n="common.edit"></button>
+            <a class="btn btn-sm btn-ghost" href="farmer-ledger.html?id=${f.id}">Ledger</a>
+          </td>
+        </tr>
+      `).join('');
+      // Pagination
+      const totalPages = Math.ceil(data.length / PAGE_SIZE);
+      const pag = document.getElementById('farmers-pagination');
+      pag.innerHTML = `<div class="pagination"><span class="pagination__info">Showing ${start+1}–${Math.min(start+PAGE_SIZE, data.length)} of ${data.length}</span><div class="pagination__controls">${_currentPage > 1 ? `<button class="btn btn-sm btn-ghost" onclick="goPage(${_currentPage-1})">← Prev</button>` : ''} Page ${_currentPage}/${totalPages} ${_currentPage < totalPages ? `<button class="btn btn-sm btn-ghost" onclick="goPage(${_currentPage+1})">Next →</button>` : ''}</div></div>`;
+    }
+
+    function goPage(p) { _currentPage = p; renderFarmerTable(); }
+
+    function openAddFarmer() {
+      document.getElementById('farmer-modal-title').textContent = 'Add Farmer';
+      document.getElementById('farmer-edit-id').value = '';
+      document.getElementById('farmer-form').reset();
+      Utils.openModal('modal-farmer');
+    }
+
+    function editFarmer(id) {
+      const f = _farmers.find(x => x.id === id);
+      if (!f) return;
+      document.getElementById('farmer-modal-title').textContent = 'Edit Farmer';
+      document.getElementById('farmer-edit-id').value = id;
+      document.getElementById('f-name').value = f.name;
+      document.getElementById('f-mobile').value = f.mobile;
+      document.getElementById('f-village').value = f.village;
+      document.getElementById('f-mandal').value = f.mandal;
+      document.getElementById('f-district').value = f.district;
+      document.getElementById('f-state').value = f.state;
+      Utils.openModal('modal-farmer');
+    }
+
+    function saveFarmer() {
+      const name = document.getElementById('f-name').value.trim();
+      if (!name) { Utils.showToast('Farmer name is required.', 'error'); return; }
+      const editId = document.getElementById('farmer-edit-id').value;
+      const record = {
+        name,
+        mobile: document.getElementById('f-mobile').value.trim(),
+        village: document.getElementById('f-village').value.trim(),
+        mandal: document.getElementById('f-mandal').value.trim(),
+        district: document.getElementById('f-district').value.trim(),
+        state: document.getElementById('f-state').value.trim(),
+        totalSupplyKg: 0, totalSupplyValue: 0, pendingPayable: 0,
+        joinedDate: new Date().toISOString().split('T')[0],
+      };
+      if (editId) {
+        MockDB.updateRecord('_farmers', editId, record);
+      } else {
+        record.id = Utils.generateId('F');
+        MockDB.saveRecord('_farmers', record);
+      }
+      _farmers = MockDB.getFarmers();
+      Utils.closeModal('modal-farmer');
+      Utils.showToast(t('toast.farmer.saved'), 'success');
+      renderFarmerTable();
+    }
+
+    function viewFarmer(id) {
+      const f = _farmers.find(x => x.id === id);
+      if (!f) return;
+      const purchases = MockDB.getPurchases().filter(p => p.farmerId === id);
+      const payments = MockDB.getPayments().filter(p => p.partyId === id && p.partyType === 'farmer');
+      document.getElementById('view-farmer-name').textContent = f.name;
+      document.getElementById('view-farmer-body').innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
+          <div><strong>ID:</strong> ${f.id}</div>
+          <div><strong>Mobile:</strong> ${f.mobile}</div>
+          <div><strong>Village:</strong> ${f.village}, ${f.mandal}</div>
+          <div><strong>District:</strong> ${f.district}, ${f.state}</div>
+          <div><strong>Total Supply:</strong> ${Utils.formatWeight(f.totalSupplyKg)}</div>
+          <div><strong>Total Value:</strong> ${Utils.formatCurrency(f.totalSupplyValue)}</div>
+          <div><strong>Pending Payable:</strong> <span class="${f.pendingPayable>0?'text-warning':'text-success'}">${Utils.formatCurrency(f.pendingPayable)}</span></div>
+          <div><strong>Joined:</strong> ${Utils.formatDate(f.joinedDate)}</div>
+        </div>
+        <h4 style="margin-bottom:0.75rem;">Supply History (${purchases.length} records)</h4>
+        <table class="data-table" style="margin-bottom:1rem;">
+          <thead><tr><th>ID</th><th>Date</th><th>Vegetable</th><th>Grade</th><th>Qty</th><th>Rate</th><th>Total</th></tr></thead>
+          <tbody>${purchases.map(p => {
+            const veg = MockDB.getVegetableById(p.vegetableId);
+            return `<tr><td>${p.id}</td><td>${Utils.formatDate(p.date)}</td><td>${veg ? veg.nameEn : p.vegetableId}</td><td>${p.grade}</td><td>${p.qty} kg</td><td>₹${p.rate}/kg</td><td>${Utils.formatCurrency(p.total)}</td></tr>`;
+          }).join('')}</tbody>
+        </table>
+        <div style="display:flex;gap:2rem;padding:0.75rem;background:var(--color-bg);border-radius:8px;">
+          <div><strong>Total Purchased:</strong> ${Utils.formatCurrency(purchases.reduce((s,p)=>s+p.total,0))}</div>
+          <div><strong>Total Paid:</strong> ${Utils.formatCurrency(payments.reduce((s,p)=>s+p.amount,0))}</div>
+          <div><strong>Balance:</strong> <span class="text-warning">${Utils.formatCurrency(f.pendingPayable)}</span></div>
+        </div>
+      `;
+      Utils.openModal('modal-farmer-view');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('owner');
+      _farmers = MockDB.getFarmers();
+      renderFarmerTable();
+    });
+  </script>
+</body>
+</html>

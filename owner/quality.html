@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quality Inspection — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content">
+        <div class="page-header">
+          <h1 class="page-title" data-i18n="page.quality"></h1>
+          <div class="page-header-actions">
+            <button class="btn btn-primary" onclick="Utils.openModal('modal-quality')">+ New Quality Check</button>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="card">
+          <div class="card__body" style="padding:0;">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Check ID</th>
+                    <th data-i18n="col.date"></th>
+                    <th data-i18n="col.vegetable"></th>
+                    <th>Received Qty</th>
+                    <th data-i18n="col.gradeA"></th>
+                    <th data-i18n="col.gradeB"></th>
+                    <th data-i18n="col.gradeC"></th>
+                    <th>Damaged</th>
+                    <th>Rejected</th>
+                    <th data-i18n="col.status"></th>
+                  </tr>
+                </thead>
+                <tbody id="quality-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Quality Check Modal -->
+  <div class="modal-overlay" id="modal-quality">
+    <div class="modal modal--lg">
+      <div class="modal__header">
+        <h3 class="modal__title">New Quality Check</h3>
+        <button class="modal__close" onclick="Utils.closeModal('modal-quality')">&times;</button>
+      </div>
+      <div class="modal__body">
+        <form id="quality-form">
+          <div class="form-group">
+            <label class="form-label">Link to Weighment</label>
+            <select class="form-select" id="q-weighment" onchange="onWeighmentSelect()">
+              <option value="">Select Weighment</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Received Quantity (auto-filled from weighment)</label>
+            <input type="number" class="form-input" id="q-received" readonly style="background:var(--color-bg);">
+          </div>
+          <div class="form-grid form-grid--3">
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.gradeA"></label>
+              <input type="number" class="form-input" id="q-a" placeholder="0" oninput="calcQualityTotal()" min="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.gradeB"></label>
+              <input type="number" class="form-input" id="q-b" placeholder="0" oninput="calcQualityTotal()" min="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.gradeC"></label>
+              <input type="number" class="form-input" id="q-c" placeholder="0" oninput="calcQualityTotal()" min="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.damagedQty"></label>
+              <input type="number" class="form-input" id="q-damaged" placeholder="0" oninput="calcQualityTotal()" min="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.rejectedQty"></label>
+              <input type="number" class="form-input" id="q-rejected" placeholder="0" oninput="calcQualityTotal()" min="0">
+            </div>
+          </div>
+
+          <!-- Running total validation -->
+          <div id="q-validation-bar" style="padding:0.75rem;border-radius:8px;margin-top:0.5rem;background:var(--color-bg);border:1px solid var(--color-border);">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span id="q-validation-text">Allocated: 0 kg of 0 kg received (0 kg remaining)</span>
+              <span id="q-validation-icon">—</span>
+            </div>
+            <div style="margin-top:0.5rem;background:#e5e7eb;border-radius:4px;height:6px;">
+              <div id="q-progress-bar" style="height:6px;border-radius:4px;background:var(--color-success);width:0%;transition:width 0.3s;"></div>
+            </div>
+          </div>
+
+          <div class="form-grid form-grid--2" style="margin-top:1rem;">
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.inspectedBy"></label>
+              <input type="text" class="form-input" id="q-by" placeholder="Inspector name">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Inspection Date</label>
+              <input type="date" class="form-input" id="q-date">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" data-i18n="field.remarks"></label>
+            <textarea class="form-textarea" id="q-remarks" rows="2"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn-ghost" onclick="Utils.closeModal('modal-quality')" data-i18n="common.cancel"></button>
+        <button class="btn btn-primary" onclick="saveQuality()">Save Quality Check</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    let _quality = [];
+
+    function onWeighmentSelect() {
+      const weighmentId = document.getElementById('q-weighment').value;
+      if (!weighmentId) { document.getElementById('q-received').value = ''; return; }
+      const w = MockDB.getWeighments().find(x => x.id === weighmentId);
+      if (w) document.getElementById('q-received').value = w.netWt || 0;
+      calcQualityTotal();
+    }
+
+    function calcQualityTotal() {
+      const received = Number(document.getElementById('q-received').value) || 0;
+      const a = Number(document.getElementById('q-a').value) || 0;
+      const b = Number(document.getElementById('q-b').value) || 0;
+      const c = Number(document.getElementById('q-c').value) || 0;
+      const dmg = Number(document.getElementById('q-damaged').value) || 0;
+      const rej = Number(document.getElementById('q-rejected').value) || 0;
+      const allocated = a + b + c + dmg + rej;
+      const remaining = received - allocated;
+      const pct = received > 0 ? Math.min(100, (allocated / received) * 100) : 0;
+
+      document.getElementById('q-validation-text').textContent =
+        `Allocated: ${allocated.toLocaleString('en-IN')} kg of ${received.toLocaleString('en-IN')} kg received (${Math.max(0, remaining).toLocaleString('en-IN')} kg remaining)`;
+
+      const bar = document.getElementById('q-progress-bar');
+      bar.style.width = pct + '%';
+      bar.style.background = remaining === 0 ? 'var(--color-success)' : remaining < 0 ? 'var(--color-danger)' : 'var(--color-warning)';
+
+      const icon = document.getElementById('q-validation-icon');
+      if (remaining === 0) { icon.textContent = '✅'; document.getElementById('q-validation-bar').style.borderColor = 'var(--color-success)'; }
+      else if (remaining < 0) { icon.textContent = '❌ Over-allocated'; document.getElementById('q-validation-bar').style.borderColor = 'var(--color-danger)'; }
+      else { icon.textContent = `⚠ ${remaining} kg unallocated`; document.getElementById('q-validation-bar').style.borderColor = 'var(--color-warning)'; }
+    }
+
+    function renderQualityTable() {
+      const weighments = MockDB.getWeighments();
+      document.getElementById('quality-tbody').innerHTML = _quality.map(q => {
+        const wgt = weighments.find(w => w.id === q.weighmentId);
+        const veg = MockDB.getVegetableById(q.vegId);
+        const ok = q.total > 0 && (q.gradeA + q.gradeB + q.gradeC + q.damaged + q.rejected === q.total);
+        return `<tr>
+          <td><code>${q.id}</code></td>
+          <td>${q.date ? Utils.formatDate(q.date) : '—'}</td>
+          <td>${veg ? veg.nameEn : q.vegId}</td>
+          <td>${q.total > 0 ? q.total.toLocaleString('en-IN') + ' kg' : '—'}</td>
+          <td class="text-success">${q.gradeA || 0} kg</td>
+          <td>${q.gradeB || 0} kg</td>
+          <td class="text-muted">${q.gradeC || 0} kg</td>
+          <td class="text-warning">${q.damaged || 0} kg</td>
+          <td class="text-danger">${q.rejected || 0} kg</td>
+          <td>${Utils.statusBadge(q.total > 0 ? (ok ? 'completed' : 'pending') : 'pending')}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    function saveQuality() {
+      const weighmentId = document.getElementById('q-weighment').value;
+      if (!weighmentId) { Utils.showToast('Please link a weighment record.', 'error'); return; }
+      const received = Number(document.getElementById('q-received').value) || 0;
+      const a = Number(document.getElementById('q-a').value) || 0;
+      const b = Number(document.getElementById('q-b').value) || 0;
+      const c = Number(document.getElementById('q-c').value) || 0;
+      const dmg = Number(document.getElementById('q-damaged').value) || 0;
+      const rej = Number(document.getElementById('q-rejected').value) || 0;
+      const wgt = MockDB.getWeighments().find(w => w.id === weighmentId);
+      const record = {
+        id: Utils.generateId('QC'),
+        weighmentId,
+        vegId: wgt ? (MockDB.getArrivals().find(a => a.id === wgt.arrivalId) || {}).vegetableId : null,
+        gradeA: a, gradeB: b, gradeC: c,
+        damaged: dmg, rejected: rej,
+        total: received,
+        inspectedBy: document.getElementById('q-by').value.trim(),
+        date: document.getElementById('q-date').value || new Date().toISOString().split('T')[0],
+        remarks: document.getElementById('q-remarks').value.trim(),
+      };
+      MockDB.saveRecord('_qualityChecks', record);
+      _quality = MockDB.getQualityChecks();
+      Utils.closeModal('modal-quality');
+      Utils.showToast(t('toast.quality.saved'), 'success');
+      renderQualityTable();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('owner');
+      _quality = MockDB.getQualityChecks();
+      const weighments = MockDB.getWeighments();
+      const sel = document.getElementById('q-weighment');
+      weighments.forEach(w => {
+        if (w.netWt > 0) sel.add(new Option(`${w.id} — Net: ${w.netWt} kg (${w.date || 'pending'})`, w.id));
+      });
+      document.getElementById('q-date').value = new Date().toISOString().split('T')[0];
+      document.getElementById('q-by').value = APP.user ? APP.user.name : '';
+      renderQualityTable();
+    });
+  </script>
+</body>
+</html>

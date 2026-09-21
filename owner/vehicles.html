@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vehicle Registry — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content">
+        <div class="page-header">
+          <h1 class="page-title" data-i18n="page.vehicles"></h1>
+          <div class="page-header-actions">
+            <button class="btn btn-primary" onclick="openAddVehicle()">+ Add Vehicle</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card__body" style="padding:0;">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th data-i18n="col.vehicleNo"></th>
+                    <th>Type</th>
+                    <th data-i18n="col.driver"></th>
+                    <th>Driver Mobile</th>
+                    <th data-i18n="col.capacity"></th>
+                    <th data-i18n="col.status"></th>
+                    <th>Notes</th>
+                    <th data-i18n="common.actions"></th>
+                  </tr>
+                </thead>
+                <tbody id="vehicles-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Add/Edit Vehicle Modal -->
+  <div class="modal-overlay" id="modal-vehicle">
+    <div class="modal">
+      <div class="modal__header">
+        <h3 class="modal__title" id="vehicle-modal-title">Add Vehicle</h3>
+        <button class="modal__close" onclick="Utils.closeModal('modal-vehicle')">&times;</button>
+      </div>
+      <div class="modal__body">
+        <form id="vehicle-form">
+          <input type="hidden" id="vehicle-edit-id">
+          <div class="form-grid form-grid--2">
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.vehicleNo"></label>
+              <input type="text" class="form-input" id="vh-no" placeholder="AP29XX1234" style="text-transform:uppercase;">
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.vehicleType"></label>
+              <select class="form-select" id="vh-type">
+                <option>Pickup Truck</option>
+                <option>Mini Truck</option>
+                <option>Tempo</option>
+                <option>Lorry</option>
+                <option>Auto</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.driverName"></label>
+              <input type="text" class="form-input" id="vh-driver" placeholder="Driver Name">
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.driverMobile"></label>
+              <input type="text" class="form-input" id="vh-driver-mobile" placeholder="Driver Mobile">
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.capacity"></label>
+              <input type="number" class="form-input" id="vh-capacity" placeholder="Capacity in tons">
+            </div>
+            <div class="form-group">
+              <label class="form-label" data-i18n="field.vehicleStatus"></label>
+              <select class="form-select" id="vh-status">
+                <option value="available">Available</option>
+                <option value="inUse">In Use</option>
+                <option value="maintenance">Maintenance</option>
+              </select>
+            </div>
+            <div class="form-group form-group--full">
+              <label class="form-label" data-i18n="common.notes"></label>
+              <input type="text" class="form-input" id="vh-notes" placeholder="Notes">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn-ghost" onclick="Utils.closeModal('modal-vehicle')" data-i18n="common.cancel"></button>
+        <button class="btn btn-primary" onclick="saveVehicle()" data-i18n="common.save"></button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    let _vehicles = [];
+
+    const VEHICLE_STATUS_COLORS = { available: 'badge--success', inUse: 'badge--info', maintenance: 'badge--danger', dispatched: 'badge--warning', loading: 'badge--info' };
+
+    function renderVehiclesTable() {
+      document.getElementById('vehicles-tbody').innerHTML = _vehicles.map(v => {
+        const colorClass = VEHICLE_STATUS_COLORS[v.status] || 'badge--muted';
+        const statusLabel = { available: 'Available', inUse: 'In Use', maintenance: 'Maintenance', dispatched: 'Dispatched', loading: 'Loading' }[v.status] || v.status;
+        return `<tr>
+          <td><strong>${v.vehicleNo}</strong></td>
+          <td>${v.type}</td>
+          <td>${v.driverName}</td>
+          <td>${v.driverMobile}</td>
+          <td>${v.capacity} ton${v.capacity !== 1 ? 's' : ''}</td>
+          <td><span class="badge ${colorClass}">${statusLabel}</span></td>
+          <td><small class="text-muted">${v.notes || '—'}</small></td>
+          <td>
+            <button class="btn btn-sm btn-secondary" onclick="editVehicle('${v.id}')">Edit</button>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    function openAddVehicle() {
+      document.getElementById('vehicle-modal-title').textContent = 'Add Vehicle';
+      document.getElementById('vehicle-edit-id').value = '';
+      document.getElementById('vehicle-form').reset();
+      Utils.openModal('modal-vehicle');
+    }
+
+    function editVehicle(id) {
+      const v = _vehicles.find(x => x.id === id);
+      if (!v) return;
+      document.getElementById('vehicle-modal-title').textContent = 'Edit Vehicle';
+      document.getElementById('vehicle-edit-id').value = id;
+      document.getElementById('vh-no').value = v.vehicleNo;
+      document.getElementById('vh-type').value = v.type;
+      document.getElementById('vh-driver').value = v.driverName;
+      document.getElementById('vh-driver-mobile').value = v.driverMobile;
+      document.getElementById('vh-capacity').value = v.capacity;
+      document.getElementById('vh-status').value = v.status;
+      document.getElementById('vh-notes').value = v.notes || '';
+      Utils.openModal('modal-vehicle');
+    }
+
+    function saveVehicle() {
+      const vehicleNo = document.getElementById('vh-no').value.trim().toUpperCase();
+      if (!vehicleNo) { Utils.showToast('Vehicle number is required.', 'error'); return; }
+      const editId = document.getElementById('vehicle-edit-id').value;
+      const record = {
+        vehicleNo,
+        type: document.getElementById('vh-type').value,
+        driverName: document.getElementById('vh-driver').value.trim(),
+        driverMobile: document.getElementById('vh-driver-mobile').value.trim(),
+        capacity: Number(document.getElementById('vh-capacity').value) || 1,
+        status: document.getElementById('vh-status').value,
+        notes: document.getElementById('vh-notes').value.trim(),
+      };
+      if (editId) {
+        MockDB.updateRecord('_vehicles', editId, record);
+      } else {
+        record.id = Utils.generateId('VH');
+        MockDB.saveRecord('_vehicles', record);
+      }
+      _vehicles = MockDB.getVehicles();
+      Utils.closeModal('modal-vehicle');
+      Utils.showToast(t('toast.vehicle.saved'), 'success');
+      renderVehiclesTable();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('owner');
+      _vehicles = MockDB.getVehicles();
+      renderVehiclesTable();
+    });
+  </script>
+</body>
+</html>

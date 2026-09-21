@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Purchases — GOLIS Wholesale</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/theme.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/layout.css">
+</head>
+<body>
+  <div id="app-layout">
+    <aside id="sidebar"></aside>
+    <div id="main-content">
+      <header id="topbar"></header>
+      <div id="demo-banner"></div>
+      <main class="page-content">
+        <div class="page-header">
+          <h1 class="page-title" data-i18n="page.purchases"></h1>
+          <div class="page-header-actions">
+            <button class="btn btn-primary" onclick="Utils.openModal('modal-purchase')">+ New Purchase</button>
+          </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:1.25rem;">
+          <div class="stat-card stat-card--success">
+            <div class="stat-card__icon">₹</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="sum-today-val">—</div>
+              <div class="stat-card__label">Today's Purchase Value</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--info">
+            <div class="stat-card__icon">#</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="sum-today-count">—</div>
+              <div class="stat-card__label">Today's Entries</div>
+            </div>
+          </div>
+          <div class="stat-card stat-card--warning">
+            <div class="stat-card__icon">⚖</div>
+            <div class="stat-card__body">
+              <div class="stat-card__value" id="sum-today-qty">—</div>
+              <div class="stat-card__label">Today's Total Qty (kg)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Today's Purchases Table -->
+        <div class="card">
+          <div class="card__header">
+            <h3 class="card__title">Purchase History</h3>
+          </div>
+          <div class="card__body" style="padding:0;">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Purchase ID</th>
+                    <th data-i18n="col.date"></th>
+                    <th>Farmer</th>
+                    <th data-i18n="col.vegetable"></th>
+                    <th>Grade</th>
+                    <th>Qty (kg)</th>
+                    <th>Rate (₹/kg)</th>
+                    <th>Total</th>
+                    <th data-i18n="col.status"></th>
+                  </tr>
+                </thead>
+                <tbody id="purchases-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Purchase Modal (pre-fill from Quality Check) -->
+  <div class="modal-overlay" id="modal-purchase">
+    <div class="modal modal--lg">
+      <div class="modal__header">
+        <h3 class="modal__title">New Purchase Entry</h3>
+        <button class="modal__close" onclick="Utils.closeModal('modal-purchase')">&times;</button>
+      </div>
+      <div class="modal__body">
+        <form id="purchase-form">
+          <!-- Pre-fill from Quality Check -->
+          <div class="form-group">
+            <label class="form-label">Pre-fill from Quality Check (optional)</label>
+            <select class="form-select" id="p-qc" onchange="prefillFromQC()">
+              <option value="">Enter manually or select quality check</option>
+            </select>
+          </div>
+
+          <!-- Quality Check summary (shown when QC selected) -->
+          <div id="qc-summary" style="display:none;padding:1rem;background:var(--color-primary-pale);border-radius:8px;margin-bottom:1rem;">
+            <h4 style="margin:0 0 0.75rem;font-size:0.875rem;color:var(--color-primary);">Quality Check Summary</h4>
+            <div id="qc-grade-rows"></div>
+          </div>
+
+          <div class="form-grid form-grid--2">
+            <div class="form-group">
+              <label class="form-label">Farmer <span class="required">*</span></label>
+              <select class="form-select" id="p-farmer" required>
+                <option value="">Select Farmer</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Vegetable <span class="required">*</span></label>
+              <select class="form-select" id="p-veg" onchange="updateRateFields()" required>
+                <option value="">Select Vegetable</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Grade-wise Rate & Qty Entry -->
+          <div id="grade-entry-section">
+            <div class="form-grid form-grid--3" id="grade-fields">
+              <div class="form-group" id="grade-a-grp">
+                <label class="form-label">Grade A — Qty (kg)</label>
+                <input type="number" class="form-input" id="p-a-qty" placeholder="0" min="0" oninput="calcPurchaseTotal()">
+              </div>
+              <div class="form-group" id="grade-a-rate-grp">
+                <label class="form-label">Grade A — Rate (₹/kg)</label>
+                <input type="number" class="form-input" id="p-a-rate" placeholder="0" min="0" step="0.5" oninput="calcPurchaseTotal()">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Grade A — Amount</label>
+                <div class="calc-display"><span id="p-a-amt" class="calc-display__value">₹0</span></div>
+              </div>
+              <div class="form-group" id="grade-b-grp">
+                <label class="form-label">Grade B — Qty (kg)</label>
+                <input type="number" class="form-input" id="p-b-qty" placeholder="0" min="0" oninput="calcPurchaseTotal()">
+              </div>
+              <div class="form-group" id="grade-b-rate-grp">
+                <label class="form-label">Grade B — Rate (₹/kg)</label>
+                <input type="number" class="form-input" id="p-b-rate" placeholder="0" min="0" step="0.5" oninput="calcPurchaseTotal()">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Grade B — Amount</label>
+                <div class="calc-display"><span id="p-b-amt" class="calc-display__value">₹0</span></div>
+              </div>
+              <div class="form-group" id="grade-c-grp">
+                <label class="form-label">Grade C — Qty (kg)</label>
+                <input type="number" class="form-input" id="p-c-qty" placeholder="0" min="0" oninput="calcPurchaseTotal()">
+              </div>
+              <div class="form-group" id="grade-c-rate-grp">
+                <label class="form-label">Grade C — Rate (₹/kg)</label>
+                <input type="number" class="form-input" id="p-c-rate" placeholder="0" min="0" step="0.5" oninput="calcPurchaseTotal()">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Grade C — Amount</label>
+                <div class="calc-display"><span id="p-c-amt" class="calc-display__value">₹0</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Purchase Summary -->
+          <div style="padding:1rem;background:var(--color-bg);border:2px solid var(--color-primary);border-radius:8px;margin-top:0.5rem;">
+            <div id="purchase-summary-rows"></div>
+            <div style="border-top:2px solid var(--color-primary);margin-top:0.75rem;padding-top:0.75rem;display:flex;justify-content:space-between;align-items:center;">
+              <strong>Total Purchase Amount</strong>
+              <strong id="purchase-grand-total" style="font-size:1.25rem;color:var(--color-primary);">₹0</strong>
+            </div>
+          </div>
+
+          <div class="form-grid form-grid--2" style="margin-top:1rem;">
+            <div class="form-group">
+              <label class="form-label">Vehicle Number</label>
+              <input type="text" class="form-input" id="p-vehicle" placeholder="e.g. AP29AJ4567">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Payment Mode</label>
+              <select class="form-select" id="p-mode">
+                <option value="Cash">Cash</option>
+                <option value="UPI">UPI</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+                <option value="Cheque">Cheque</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Purchase Date</label>
+            <input type="date" class="form-input" id="p-date">
+          </div>
+        </form>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn-ghost" onclick="Utils.closeModal('modal-purchase')" data-i18n="common.cancel"></button>
+        <button class="btn btn-primary" onclick="savePurchase()">Save Purchase &amp; Update Inventory</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../js/i18n.js"></script>
+  <script src="../js/mock-data.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/charts.js"></script>
+  <script>
+    let _purchases = [];
+
+    function prefillFromQC() {
+      const qcId = document.getElementById('p-qc').value;
+      if (!qcId) { document.getElementById('qc-summary').style.display = 'none'; return; }
+      const qc  = MockDB.getQualityChecks().find(q => q.id === qcId);
+      if (!qc)  { return; }
+      // Find farmer & veg via weighment → arrival chain
+      const wgt    = MockDB.getWeighments().find(w => w.id === qc.weighmentId);
+      const arr    = wgt ? MockDB.getArrivals().find(a => a.id === wgt.arrivalId) : null;
+      if (arr) {
+        document.getElementById('p-farmer').value = arr.farmerId;
+        document.getElementById('p-veg').value    = arr.vegetableId;
+        updateRateFields();
+      }
+      // Pre-fill qty fields
+      document.getElementById('p-a-qty').value = qc.gradeA || 0;
+      document.getElementById('p-b-qty').value = qc.gradeB || 0;
+      document.getElementById('p-c-qty').value = qc.gradeC || 0;
+
+      // Show summary
+      const veg = MockDB.getVegetableById(qc.vegId);
+      document.getElementById('qc-grade-rows').innerHTML = `
+        <table style="width:100%;font-size:0.8rem;border-collapse:collapse;">
+          <tr><td style="padding:2px 0;color:var(--color-text-secondary);">Grade A</td><td style="font-weight:600;">${qc.gradeA || 0} kg</td></tr>
+          <tr><td style="padding:2px 0;color:var(--color-text-secondary);">Grade B</td><td style="font-weight:600;">${qc.gradeB || 0} kg</td></tr>
+          <tr><td style="padding:2px 0;color:var(--color-text-secondary);">Grade C</td><td style="font-weight:600;">${qc.gradeC || 0} kg</td></tr>
+          <tr><td style="padding:2px 0;color:var(--color-text-secondary);">Damaged</td><td class="text-warning">${qc.damaged || 0} kg</td></tr>
+          <tr><td style="padding:2px 0;color:var(--color-text-secondary);">Rejected</td><td class="text-danger">${qc.rejected || 0} kg</td></tr>
+        </table>`;
+      document.getElementById('qc-summary').style.display = '';
+      calcPurchaseTotal();
+    }
+
+    function updateRateFields() {
+      const vegId = document.getElementById('p-veg').value;
+      if (!vegId) return;
+      const veg = MockDB.getVegetableById(vegId);
+      if (!veg) return;
+      document.getElementById('p-a-rate').value = veg.currentBuyPrice;
+      document.getElementById('p-b-rate').value = Math.round(veg.currentBuyPrice * 0.82);
+      document.getElementById('p-c-rate').value = Math.round(veg.currentBuyPrice * 0.65);
+      calcPurchaseTotal();
+    }
+
+    function calcPurchaseTotal() {
+      const aQty  = Number(document.getElementById('p-a-qty').value) || 0;
+      const aRate = Number(document.getElementById('p-a-rate').value)|| 0;
+      const bQty  = Number(document.getElementById('p-b-qty').value) || 0;
+      const bRate = Number(document.getElementById('p-b-rate').value)|| 0;
+      const cQty  = Number(document.getElementById('p-c-qty').value) || 0;
+      const cRate = Number(document.getElementById('p-c-rate').value)|| 0;
+      const aAmt = aQty * aRate;
+      const bAmt = bQty * bRate;
+      const cAmt = cQty * cRate;
+      const total = aAmt + bAmt + cAmt;
+
+      document.getElementById('p-a-amt').textContent = Utils.formatCurrency(aAmt);
+      document.getElementById('p-b-amt').textContent = Utils.formatCurrency(bAmt);
+      document.getElementById('p-c-amt').textContent = Utils.formatCurrency(cAmt);
+      document.getElementById('purchase-grand-total').textContent = Utils.formatCurrency(total);
+
+      const rows = [];
+      if (aQty > 0) rows.push(`<div style="display:flex;justify-content:space-between;font-size:0.875rem;padding:4px 0;"><span>Grade A: ${aQty.toLocaleString('en-IN')} kg × ₹${aRate}</span><span>${Utils.formatCurrency(aAmt)}</span></div>`);
+      if (bQty > 0) rows.push(`<div style="display:flex;justify-content:space-between;font-size:0.875rem;padding:4px 0;"><span>Grade B: ${bQty.toLocaleString('en-IN')} kg × ₹${bRate}</span><span>${Utils.formatCurrency(bAmt)}</span></div>`);
+      if (cQty > 0) rows.push(`<div style="display:flex;justify-content:space-between;font-size:0.875rem;padding:4px 0;"><span>Grade C: ${cQty.toLocaleString('en-IN')} kg × ₹${cRate}</span><span>${Utils.formatCurrency(cAmt)}</span></div>`);
+      document.getElementById('purchase-summary-rows').innerHTML = rows.join('') || '<div style="font-size:0.875rem;color:var(--color-text-secondary);">Enter quantities and rates above.</div>';
+    }
+
+    function renderPurchases() {
+      const today = new Date().toISOString().split('T')[0];
+      const todayList = _purchases.filter(p => p.date === today);
+      document.getElementById('sum-today-val').textContent   = Utils.formatCurrency(todayList.reduce((s, p) => s + p.total, 0));
+      document.getElementById('sum-today-count').textContent = todayList.length;
+      document.getElementById('sum-today-qty').textContent   = todayList.reduce((s, p) => s + p.qty, 0).toLocaleString('en-IN') + ' kg';
+
+      document.getElementById('purchases-tbody').innerHTML = _purchases.map(p => {
+        const farmer = MockDB.getFarmerById(p.farmerId);
+        const veg    = MockDB.getVegetableById(p.vegetableId);
+        return `<tr>
+          <td><code>${p.id}</code></td>
+          <td>${Utils.formatDate(p.date)}</td>
+          <td>${farmer ? farmer.name : p.farmerId}</td>
+          <td>${veg ? veg.nameEn : p.vegetableId}</td>
+          <td><span class="badge badge--success">Grade ${p.grade}</span></td>
+          <td>${p.qty.toLocaleString('en-IN')} kg</td>
+          <td>₹${p.rate}</td>
+          <td><strong>${Utils.formatCurrency(p.total)}</strong></td>
+          <td>${Utils.statusBadge(p.status)}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    function savePurchase() {
+      const farmerId = document.getElementById('p-farmer').value;
+      const vegId    = document.getElementById('p-veg').value;
+      if (!farmerId || !vegId) { Utils.showToast('Please select Farmer and Vegetable.', 'error'); return; }
+
+      const aQty  = Number(document.getElementById('p-a-qty').value)  || 0;
+      const aRate = Number(document.getElementById('p-a-rate').value) || 0;
+      const bQty  = Number(document.getElementById('p-b-qty').value)  || 0;
+      const bRate = Number(document.getElementById('p-b-rate').value) || 0;
+      const cQty  = Number(document.getElementById('p-c-qty').value)  || 0;
+      const cRate = Number(document.getElementById('p-c-rate').value) || 0;
+
+      if (aQty === 0 && bQty === 0 && cQty === 0) {
+        Utils.showToast('Enter at least one grade quantity.', 'error'); return;
+      }
+      const pDate   = document.getElementById('p-date').value || new Date().toISOString().split('T')[0];
+      const vehicle = document.getElementById('p-vehicle').value.trim().toUpperCase();
+      const mode    = document.getElementById('p-mode').value;
+
+      const gradeEntries = [
+        { grade: 'A', qty: aQty, rate: aRate },
+        { grade: 'B', qty: bQty, rate: bRate },
+        { grade: 'C', qty: cQty, rate: cRate },
+      ].filter(e => e.qty > 0);
+
+      gradeEntries.forEach(e => {
+        const record = {
+          id: Utils.generateId('PUR'),
+          farmerId, vegetableId: vegId,
+          grade: e.grade,
+          qty: e.qty,
+          rate: e.rate,
+          total: e.qty * e.rate,
+          date: pDate,
+          vehicleNo: vehicle,
+          paymentMode: mode,
+          status: 'pending',
+        };
+        MockDB.saveRecord('_purchases', record);
+        // Update inventory — add to purchased
+        const inv = MockDB.getInventoryByVegetable(vegId, e.grade);
+        if (inv) {
+          const newPurchased = (inv.purchased || 0) + e.qty;
+          const newClosing   = inv.opening + newPurchased - (inv.sold || 0) - (inv.damaged || 0) - (inv.wastage || 0);
+          MockDB.updateRecord('_inventory', inv.id, { purchased: newPurchased, closing: newClosing });
+        }
+      });
+
+      _purchases = MockDB.getPurchases();
+      Utils.closeModal('modal-purchase');
+      Utils.showToast('Purchase saved and inventory updated!', 'success');
+      renderPurchases();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      APP.init('manager');
+      _purchases = MockDB.getPurchases();
+
+      MockDB.getFarmers().forEach(f   => document.getElementById('p-farmer').add(new Option(f.name, f.id)));
+      MockDB.getVegetables().forEach(v => document.getElementById('p-veg').add(new Option(v.nameEn, v.id)));
+
+      // Populate QC dropdown
+      const existingPurchaseQcIds = new Set();
+      const qcSel = document.getElementById('p-qc');
+      MockDB.getQualityChecks().filter(q => q.total > 0).forEach(q => {
+        const veg = MockDB.getVegetableById(q.vegId);
+        qcSel.add(new Option(`${q.id} — ${veg ? veg.nameEn : ''} — ${q.total} kg (A:${q.gradeA} B:${q.gradeB} C:${q.gradeC})`, q.id));
+      });
+
+      document.getElementById('p-date').value = new Date().toISOString().split('T')[0];
+      calcPurchaseTotal();
+      renderPurchases();
+    });
+  </script>
+</body>
+</html>
